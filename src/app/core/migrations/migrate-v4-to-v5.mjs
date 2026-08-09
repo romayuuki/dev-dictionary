@@ -657,6 +657,306 @@ function splitJsAjax(frontendNode) {
   ajax.children = [ajaxCore, json];
 }
 
+// ============================================================
+// P2.1  Backend › HTTP — فصل البروتوكول عن رموز الحالة (§5.6)
+// ============================================================
+/**
+ * يحوّل be-http من term يخلط تعريف HTTP/HTTPS مع رموز الحالة
+ * إلى group بعقدتين مستقلتين: be-http-protocol و be-http-status.
+ * الدالة idempotent: إن وجدت children بالفعل لا تفعل شيئاً.
+ */
+function splitBeHttp(backendNode) {
+  const http = findNode(backendNode.children ?? [], 'be-http');
+  if (!http || (http.children?.length ?? 0) > 0) return; // idempotent
+
+  const protocol = term(
+    'be-http-protocol',
+    'HTTP و HTTPS',
+    '**HTTP** — *HyperText Transfer Protocol*\n\n- **Hyper text**: لغة ترميز خاصة (HTML) توفّر معياراً موحّداً بين المتصفح والسيرفر\n- **Transfer**: نقل الداتا من كمبيوتر لآخر — نص أو صورة أو غيرها\n- **Protocol**: بروتوكول معروف عالمياً بين الدول\n\n**HTTPS** — *HTTP Secure* — يضيف طبقة تشفير **TLS** فوق HTTP، مما يحمي البيانات من الاعتراض أثناء النقل. ضروري لبوابات الدفع وأي بيانات حساسة.',
+    ['http', 'https', 'protocol', 'بروتوكول'],
+    [],
+  );
+
+  const status = term(
+    'be-http-status',
+    'HTTP Status Codes',
+    'كود رقمي يُرسله السيرفر مع كل رد ليوضّح حالة الطلب:\n\n- **2xx** — نجاح: `200 OK`، `201 Created`، `204 No Content`\n- **3xx** — توجيه: `301 Moved Permanently`، `302 Found`\n- **4xx** — خطأ من **العميل**: `400 Bad Request`، `401 Unauthorized`، `403 Forbidden`، `404 Not Found`\n- **5xx** — خطأ من **السيرفر**: `500 Internal Server Error`، `503 Service Unavailable`',
+    ['status code', '200', '404', '500', 'http status'],
+    [
+      {
+        title: 'أشهر رموز الحالة',
+        lang: 'text',
+        code: '200 OK              — نجاح\n201 Created         — أُنشئ مورد جديد\n204 No Content      — نجاح بلا محتوى (مثل حذف)\n400 Bad Request     — طلب مكسور من العميل\n401 Unauthorized    — يجب تسجيل الدخول\n403 Forbidden       — مسموح بالدخول لكن ممنوع من هذا المورد\n404 Not Found       — المورد غير موجود\n500 Server Error    — خطأ داخلي في السيرفر\n503 Unavailable     — السيرفر مشغول أو في صيانة',
+      },
+    ],
+  );
+
+  http.def = 'بروتوكول نقل النصوص الفائقة، ورموز الحالة التي يُرجعها السيرفر للتعبير عن نتيجة الطلب.';
+  http.kind = 'group';
+  http.tags = ['http', 'https', 'status code', 'protocol'];
+  http.examples = [];
+  http.children = [protocol, status];
+}
+
+// ============================================================
+// P2.2  UI-UX › SEO — فصل مفهوم SEO عن آليات Crawl/Index/Serve (§5.7)
+// ============================================================
+/**
+ * يُضيف ux-seo-concept و ux-seo-pipeline كأوّل أبناء لـ ux-seo،
+ * ويُبقي الأبناء الموجودين (performance/tools/core-vitals) كما هم.
+ * الدالة idempotent: تتحقق من وجود ux-seo-concept قبل الإضافة.
+ */
+function splitUxSeo(uiuxNode) {
+  const seo = findNode(uiuxNode.children ?? [], 'ux-seo');
+  if (!seo) return;
+  // idempotent: ux-seo له أبناء أصلاً (performance/tools/vitals) — نتحقق من وجود concept تحديداً
+  if ((seo.children ?? []).find((c) => c.id === 'ux-seo-concept')) return;
+
+  const concept = term(
+    'ux-seo-concept',
+    'ما هو SEO؟',
+    '**SEO — Search Engine Optimization**: مدى قابلية ظهور موقعك ضمن نتائج البحث في Google، عبر بوتات/عناكب تقرأ محتوى الموقع (خاصةً الـ `meta`) وتصنّفه وفق الصلة بمصطلحات البحث.',
+    ['seo', 'search engine', 'google', 'تحسين'],
+    [],
+  );
+
+  const pipeline = term(
+    'ux-seo-pipeline',
+    'كيف يعمل محرك البحث؟ (Crawl → Index → Serve)',
+    '**Crawling (الزحف)**: بوتات محرك البحث تجوب الإنترنت عبر الروابط، تكتشف الصفحات الجديدة وتستخرج محتواها.\n\n**Indexing (الفهرسة)**: تُصنَّف الصفحات المكتشفة في فهرس ضخم مُنظَّم حسب الموضوع — مثل مكتبة إلكترونية.\n\n**Serving (التقديم)**: عند بحث المستخدم، يُعالج المحرك الاستعلام ويُقدّم قائمة مرتّبة من النتائج الأكثر صلة.',
+    ['crawl', 'index', 'serving', 'google', 'زحف', 'فهرسة'],
+    [],
+  );
+
+  const existingChildren = seo.children ?? [];
+  seo.def = 'تحسين ظهور موقعك في محركات البحث — من المفهوم إلى آلية عمل الزحف والفهرسة والتقديم.';
+  seo.kind = 'group';
+  seo.examples = [];
+  // نُضيف concept و pipeline في البداية ونُبقي باقي الأبناء
+  seo.children = [concept, pipeline, ...existingChildren];
+}
+
+// ============================================================
+// P2.3  UI-UX › PWA — فصل اشتراطات PWA عن Service Worker (§5.8)
+// ============================================================
+/**
+ * يحوّل ux-pwa من term يخلط اشتراطات PWA مع شرح Service Worker
+ * إلى group بعقدتين: ux-pwa-requirements و ux-pwa-service-worker.
+ * الدالة idempotent: إن وجدت children بالفعل لا تفعل شيئاً.
+ */
+function splitUxPwa(uiuxNode) {
+  const pwa = findNode(uiuxNode.children ?? [], 'ux-pwa');
+  if (!pwa || (pwa.children?.length ?? 0) > 0) return; // idempotent
+
+  const requirements = term(
+    'ux-pwa-requirements',
+    'اشتراطات PWA',
+    'لكي يُعامَل تطبيق الويب كـ **Progressive Web App** يجب توفّر أربعة شروط:\n\n1. التطبيق **Responsive** — يتأقلم مع كل أحجام الشاشات\n2. السيرفر يعمل على **HTTPS**\n3. يمكن تنزيله كتطبيق مستقل (**Standalone Application**)\n4. يوجد فيه **Service Worker**',
+    ['pwa', 'progressive web app', 'responsive', 'https', 'standalone'],
+    [],
+  );
+
+  const serviceWorker = term(
+    'ux-pwa-service-worker',
+    'Service Worker',
+    '**Service Worker**: سكريبت يعمل في الخلفية (**background thread**) مستقلاً عن الصفحة الرئيسية، ويمكّن من:\n\n- **Push Notifications** — إرسال إشعارات للمستخدم حتى وهو خارج الموقع (مثل تويتر)\n- **Offline caching** — حفظ الأصول محلياً للعمل بلا إنترنت\n- **Background sync** — تأجيل إرسال البيانات حتى عودة الاتصال',
+    ['service worker', 'push notification', 'offline', 'cache', 'background'],
+    [
+      {
+        title: 'تسجيل Service Worker',
+        lang: 'js',
+        code: "if ('serviceWorker' in navigator) {\n  navigator.serviceWorker.register('/sw.js')\n    .then(reg => console.log('SW registered:', reg.scope))\n    .catch(err => console.error('SW error:', err));\n}",
+      },
+    ],
+  );
+
+  pwa.def = 'مجموعة شروط تحوّل تطبيق الويب إلى تجربة تشبه التطبيقات النصية — قابلة للتنزيل وتعمل بلا إنترنت.';
+  pwa.kind = 'group';
+  pwa.examples = [];
+  pwa.children = [requirements, serviceWorker];
+}
+
+// ============================================================
+// P2.4  DevOps › Docker — فصل مفهوم Docker عن Docker Image (§5.9)
+// ============================================================
+/**
+ * يحوّل do-docker من term يخلط مفهوم Docker مع شرح Image
+ * إلى group بعقدتين: do-docker-concept و do-docker-image.
+ * الدالة idempotent: إن وجدت children بالفعل لا تفعل شيئاً.
+ */
+function splitDoDocker(devopsNode) {
+  const docker = findNode(devopsNode.children ?? [], 'do-docker');
+  if (!docker || (docker.children?.length ?? 0) > 0) return; // idempotent
+
+  const concept = term(
+    'do-docker-concept',
+    'ما هو Docker؟',
+    'برنامج يُنشئ **بيئات عمل معزولة (containers)** لكل مشروع، تحتوي على جميع مكوّناته (Node، البيئة، الاعتماديات) بغض النظر عما هو مثبّت على جهازك.\n\n**المشكلة التي يحلّها**: مشروع يحتاج Node 18 وآخر يحتاج Node 20 — بدون Docker تتعارض. مع Docker كل مشروع في container مستقل لا يؤثر في غيره.',
+    ['docker', 'container', 'عزل', 'بيئة عمل', 'isolation'],
+    [],
+  );
+
+  const image = term(
+    'do-docker-image',
+    'Docker Image',
+    '**Image**: قالب جاهز للقراءة فقط (**read-only template**) يصف كل ما يحتاجه المشروع — نظام التشغيل، إصدار Node، البيئة، الأوامر. يُنشئ Docker منه **Container** يعمل فعلياً.\n\n- **Image** = الوصفة (Blueprint) — ثابتة لا تتغير\n- **Container** = النسخة الحية منها (Instance) — تُنشأ وتُحذف\n\nكل مشروع يصف Image خاصة به في ملف `Dockerfile`.',
+    ['docker image', 'image', 'container', 'dockerfile', 'template'],
+    [
+      {
+        title: 'Dockerfile بسيط لتطبيق Node',
+        lang: 'dockerfile',
+        code: 'FROM node:20-alpine\nWORKDIR /app\nCOPY package*.json ./\nRUN npm install\nCOPY . .\nCMD ["node", "server.js"]',
+      },
+    ],
+  );
+
+  docker.def = 'أداة تعزل كل مشروع في بيئته المستقلة — مفهوم Container والـ Image الذي يصف هذه البيئة.';
+  docker.kind = 'group';
+  docker.examples = [];
+  docker.children = [concept, image];
+}
+
+// ============================================================
+// P3.1  Backend › Auth — توسيع العقدة الشحيحة وفصل Authn عن Authz (§5.10)
+// ============================================================
+/**
+ * يوسّع be-auth من جملة واحدة إلى group بفرعين:
+ *   be-auth-authn — Session/Cookie + JWT + OAuth 2.0/SSO
+ *   be-auth-authz — Roles/Permissions + RBAC
+ * الدالة idempotent: إن وجدت children بالفعل لا تفعل شيئاً.
+ */
+function expandBeAuth(backendNode) {
+  const auth = findNode(backendNode.children ?? [], 'be-auth');
+  if (!auth || (auth.children?.length ?? 0) > 0) return; // idempotent
+
+  const session = term(
+    'be-auth-session',
+    'Session و Cookie',
+    'بعد تسجيل الدخول يحفظ السيرفر **session** بمعرّف فريد (`session_id`) ويُرسله للمتصفح في **cookie**. في كل طلب لاحق يُرسل المتصفح الـ cookie فيتعرّف السيرفر على المستخدم دون طلب بيانات مجدداً.',
+    ['session', 'cookie', 'session_id'],
+    [{ title: 'تتابع Session', lang: 'text', code: '1. POST /login {email, password}\n2. السيرفر يُنشئ session → Set-Cookie: sid=abc123\n3. GET /profile → Cookie: sid=abc123 → يُعرَّف المستخدم تلقائياً' }],
+  );
+
+  const jwt = term(
+    'be-auth-jwt',
+    'JWT — JSON Web Token',
+    'رمز **موقَّع** يحمل بيانات المستخدم (claims) مشفَّرة بـ Base64. يُرسَل في header كل طلب ويتحقق السيرفر من توقيعه دون الرجوع لقاعدة بيانات.\n\n**التركيب**: `Header . Payload . Signature`\n- **Header**: خوارزمية التوقيع (`HS256`…)\n- **Payload**: البيانات (`userId`, `role`, `exp`)\n- **Signature**: توقيع بسر خاص يمنع التزوير\n\n**مقارنة**: JWT **stateless** (السيرفر لا يخزّن شيئاً) ↔ Session **stateful** (يحتاج DB أو Redis).',
+    ['jwt', 'token', 'json web token', 'bearer', 'claims'],
+    [{ title: 'إرسال JWT في header', lang: 'http', code: 'Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJ1c2VySWQiOiI0MiIsInJvbGUiOiJ1c2VyIn0.abc123' }],
+  );
+
+  const oauth = term(
+    'be-auth-oauth',
+    'OAuth 2.0 و SSO',
+    '**OAuth 2.0**: بروتوكول تفويض يسمح لتطبيقك بالوصول لبيانات المستخدم من خدمة خارجية (Google، GitHub…) **بإذنه** دون معرفة كلمة مروره.\n\n**SSO (Single Sign-On)**: تسجيل الدخول مرة واحدة للوصول لتطبيقات متعددة — مثلاً تسجيل Google يمنحك دخول Gmail وYouTube وآلاف التطبيقات دفعةً واحدة.',
+    ['oauth', 'oauth2', 'sso', 'single sign-on', 'google login', 'github'],
+    [],
+  );
+
+  const authn = group(
+    'be-auth-authn',
+    'المصادقة (Authentication)',
+    '**من أنت؟** — التحقق من هوية المستخدم وآليات تسجيل الدخول.',
+    ['authentication', 'authn', 'مصادقة', 'login'],
+    [session, jwt, oauth],
+  );
+
+  const roles = term(
+    'be-auth-roles',
+    'Roles و Permissions',
+    '**Role**: دور يُعطى للمستخدم (`admin`, `editor`, `viewer`…).\n**Permission**: إجراء محدد مسموح به (`read:posts`, `delete:users`…).\n\n**RBAC** (Role-Based Access Control): ربط الصلاحيات بالأدوار لا بالأفراد — تُعطي المستخدم دوراً ويرث صلاحياته تلقائياً، مما يبسّط الإدارة ويقلّل الأخطاء.',
+    ['rbac', 'role', 'permission', 'access control'],
+    [{ title: 'نموذج RBAC', lang: 'text', code: 'admin  → read + write + delete\neditor → read + write\nviewer → read فقط\n\nأحمد (editor) → read + write ✅ | delete ❌' }],
+  );
+
+  const authz = group(
+    'be-auth-authz',
+    'التحقق من الصلاحيات (Authorization)',
+    '**ماذا يحق لك؟** — بعد التحقق من الهوية، يُقرَّر ما يمكن للمستخدم فعله.',
+    ['authorization', 'authz', 'صلاحيات', 'rbac'],
+    [roles],
+  );
+
+  auth.def = 'مفهومان مختلفان: التحقق من هوية المستخدم، ثم تحديد ما يُسمح له به.';
+  auth.kind = 'group';
+  auth.examples = [];
+  auth.children = [authn, authz];
+}
+
+// ============================================================
+// P3.2  UI-UX › Accessibility — فصل المفهوم عن قواعد WCAG (§5.11)
+// ============================================================
+/**
+ * يحوّل ux-a11y من term يخلط تعريف Accessibility مع 5 قواعد WCAG
+ * إلى group بعقدتين: ux-a11y-concept و ux-a11y-wcag.
+ * الدالة idempotent: إن وجدت children بالفعل لا تفعل شيئاً.
+ */
+function splitUxA11y(uiuxNode) {
+  const a11y = findNode(uiuxNode.children ?? [], 'ux-a11y');
+  if (!a11y || (a11y.children?.length ?? 0) > 0) return; // idempotent
+
+  const concept = term(
+    'ux-a11y-concept',
+    'ما هي إتاحة الوصول؟',
+    'كل ما يجعل الموقع قابلاً للاستخدام من ذوي الإعاقات (بصرية، حركية، معرفية…).\n\n**Screen Readers**: برامج تقرأ المحتوى بصوت عالٍ لفاقدي البصر أو ضعافه — تعتمد على الوسوم الدلالية (`<strong>`، `<em>`، `alt`) لفهم المعنى وتشديد النطق.',
+    ['accessibility', 'a11y', 'screen reader', 'إتاحة', 'wcag'],
+    [],
+  );
+
+  const rules = term(
+    'ux-a11y-wcag',
+    'القواعد العملية (WCAG AA)',
+    '**WCAG** — Web Content Accessibility Guidelines — المعيار الدولي. الحد الأدنى المطلوب (مستوى AA):\n\n1. **تباين الألوان** لا يقل عن **4.5:1** للنص العادي (3:1 للنص الكبير أو الـ UI)\n2. **لوحة المفاتيح** — كل وظيفة قابلة للوصول بلا ماوس\n3. **مساحة اللمس** — لا تقل عن **44 × 44 px** لكل هدف تفاعلي\n4. **نص بديل** — `alt` واضح لكل صورة ذات معنى، فارغ للزخرفية\n5. **لا لوحيدة اللون** — لا تعتمد على اللون وحده لنقل معلومة — أضف أيقونة أو نصاً',
+    ['wcag', 'contrast', 'keyboard', 'alt', 'aria', 'touch target', '44px'],
+    [],
+  );
+
+  a11y.def = 'جعل الموقع مفتوحاً للجميع — المفهوم والمعايير العملية التي يقيسها WCAG.';
+  a11y.kind = 'group';
+  a11y.examples = [];
+  a11y.children = [concept, rules];
+}
+
+// ============================================================
+// P3.3  Backend › REST API — فصل التعريف العملي عن المعايير الستة (§5.12)
+// ============================================================
+/**
+ * يُضيف be-api-rest-concept و be-api-rest-restful كأول أبناء لـ be-api-rest،
+ * ويُبقي الأبناء الموجودين (verbs, versioning, endpoint) كما هم.
+ * الدالة idempotent: تتحقق من وجود be-api-rest-concept.
+ */
+function splitBeApiRest(backendNode) {
+  const api = findNode(backendNode.children ?? [], 'be-api');
+  if (!api) return;
+  const rest = findNode(api.children ?? [], 'be-api-rest');
+  if (!rest) return;
+  // idempotent: be-api-rest له أبناء أصلاً — نتحقق من concept تحديداً
+  if ((rest.children ?? []).find((c) => c.id === 'be-api-rest-concept')) return;
+
+  const concept = term(
+    'be-api-rest-concept',
+    'ما هو REST API؟',
+    'عنوان URL يُستخدم للربط بين تطبيق والسيرفر — يُرسِل ويستقبل البيانات عبر HTTP methods ويُستخدم عادةً مع `fetch`.\n\n**Pagination مع الداتا الكبيرة**: أضف `limit` و `offset` لتجنّب جلب آلاف السجلات دفعةً واحدة.',
+    ['rest', 'rest api', 'fetch', 'limit', 'offset', 'pagination'],
+    [{ title: 'Pagination بـ limit/offset', lang: 'js', code: "const res = await fetch('/api/posts?limit=20&offset=40');\n// الصفحة الثالثة: 20 مقالاً بدءاً من السجل رقم 40" }],
+  );
+
+  const restful = term(
+    'be-api-rest-restful',
+    'RESTful API — المعايير الستة',
+    'الـ **RESTful API** هي REST API تلتزم بستة مبادئ معمارية:\n\n1. **Uniform Interface** — واجهة موحّدة: URLs ثابتة + HTTP verbs\n2. **Client-Server** — الفرونت والباك مستقلان تماماً، لكل منهما مسؤوليته\n3. **Stateless** — كل طلب يحمل معلوماته كاملةً، السيرفر لا يتذكر طلباً سابقاً\n4. **Cacheable** — الردود تُصرّح بصلاحيتها للتخزين المؤقت\n5. **Layered System** — يمكن وضع Load Balancer أو CDN وسطاً بشفافية تامة\n6. **Code on Demand** (اختياري) — يمكن إرسال كود قابل للتنفيذ كـ JavaScript',
+    ['restful', 'stateless', 'uniform interface', 'cacheable', 'layered', 'معايير'],
+    [],
+  );
+
+  const existingChildren = rest.children ?? [];
+  rest.def = 'نمط معماري لبناء API عبر HTTP — من الاستخدام العملي إلى المعايير الستة.';
+  rest.kind = 'group';
+  rest.examples = [];
+  // concept + restful أولاً، ثم الأبناء الموجودين (verbs, versioning, endpoint)
+  rest.children = [concept, restful, ...existingChildren];
+}
+
 /**
  * نقطة الدخول الوحيدة. تُعيد نسخة جديدة من `data` بعد الترحيل، أو `data` كما هي
  * إن كانت بالفعل v5 أو لم تحتوِ العُقَد المتوقَّعة (idempotent + آمنة).
@@ -668,6 +968,9 @@ export function migrateV4ToV5(data) {
 
   const next = deepClone(data);
   const frontend = next.categories.find((c) => c?.id === 'frontend');
+  const backend  = next.categories.find((c) => c?.id === 'backend');
+  const devops   = next.categories.find((c) => c?.id === 'devops');
+  const uiux     = next.categories.find((c) => c?.id === 'ui-ux');
 
   if (frontend && Array.isArray(frontend.children)) {
     // P0 — §5.1–5.3: أطر العمل + HTML Tags
@@ -681,6 +984,19 @@ export function migrateV4ToV5(data) {
     splitCssUnits(frontend);
     splitJsAjax(frontend);
   }
+
+  // P2 — §5.6–5.9: HTTP Status Codes + SEO Pipeline + PWA + Docker
+  if (backend && Array.isArray(backend.children)) splitBeHttp(backend);
+  if (uiux    && Array.isArray(uiux.children))    splitUxSeo(uiux);
+  if (uiux    && Array.isArray(uiux.children))    splitUxPwa(uiux);
+  if (devops  && Array.isArray(devops.children))  splitDoDocker(devops);
+
+  // P3 — §5.10–5.12: Auth expansion + A11y split + REST split
+  if (backend && Array.isArray(backend.children)) {
+    expandBeAuth(backend);
+    splitBeApiRest(backend);
+  }
+  if (uiux && Array.isArray(uiux.children)) splitUxA11y(uiux);
 
   applyIdMapToRefs(next, ID_MAP_V4_V5);
   next.version = 5;

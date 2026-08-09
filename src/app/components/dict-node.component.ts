@@ -45,11 +45,11 @@ import { formatDefinition } from '../core/text.util';
             <span class="pill">{{ node().children.length }}</span>
           }
           <span class="row-acts">
-            <button type="button" class="mini" title="إضافة قسم بداخله" aria-label="إضافة قسم داخل {{ node().title }}"
+            <button type="button" class="mini" title="إضافة قسم بداخله" [attr.aria-label]="'إضافة قسم داخل ' + node().title"
                   (click)="add.emit(node().id); $event.stopPropagation()">＋</button>
-            <button type="button" class="mini" title="تعديل" aria-label="تعديل {{ node().title }}"
+            <button type="button" class="mini" title="تعديل" [attr.aria-label]="'تعديل ' + node().title"
                   (click)="edit.emit(node().id); $event.stopPropagation()">✎</button>
-            <button type="button" class="mini del" title="حذف" aria-label="حذف {{ node().title }}"
+            <button type="button" class="mini del" title="حذف" [attr.aria-label]="'حذف ' + node().title"
                   (click)="remove.emit(node().id); $event.stopPropagation()">🗑</button>
           </span>
         </span>

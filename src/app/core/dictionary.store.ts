@@ -1,4 +1,6 @@
 import { Injectable, computed, inject, signal } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { firstValueFrom } from 'rxjs';
 import {
   Category,
   DictData,
@@ -41,6 +43,7 @@ const deepClone = <T>(o: T): T => JSON.parse(JSON.stringify(o)) as T;
 @Injectable({ providedIn: 'root' })
 export class DictionaryStore {
   private readonly supabase = inject(SupabaseService);
+  private readonly http     = inject(HttpClient);
   private readonly _data = signal<DictData>(this.loadData());
   private readonly _ui = signal<UiState>(this.loadUi());
   private readonly _open = signal<Set<string>>(new Set());
@@ -61,8 +64,32 @@ export class DictionaryStore {
   constructor() {
     this._open.set(new Set(this._ui().open));
     this.applyTheme();
-    // حاول التحديث من Supabase بشكل غير متزامن، ثم اشترك في التغييرات اللحظية
-    this.syncFromSupabase().then(() => this.subscribeToRealtime());
+    // عند غياب بيانات محلية: احمّل البذرة من assets قبل محاولة Supabase
+    if (!localStorage.getItem(LS_DATA)) {
+      void this.seedFromAssets().then(() => this.syncFromSupabase()).then(() => this.subscribeToRealtime());
+    } else {
+      // حاول التحديث من Supabase بشكل غير متزامن، ثم اشترك في التغييرات اللحظية
+      this.syncFromSupabase().then(() => this.subscribeToRealtime());
+    }
+  }
+
+  /**
+   * يُحمَّل ملف assets/data-seed.json (مُولَّد بواسطة tools/migrate-v4-to-v5.mjs)
+   * كبيانات أولية لأي جهاز/متصفح جديد لا يحتوي بيانات محلية بعد.
+   * البذر ليس تعديل مستخدم → يُحفَظ في localStorage فقط، لا يُرسَل لـ Supabase.
+   */
+  private async seedFromAssets(): Promise<void> {
+    try {
+      const raw = await firstValueFrom(
+        this.http.get<DictData>('/assets/data-seed.json'),
+      );
+      if (!raw?.categories?.length) return;
+      const seeded = (raw.version ?? 0) >= DATA_VERSION ? raw : migrateV4ToV5(raw);
+      this._data.set(seeded);
+      localStorage.setItem(LS_DATA, JSON.stringify(seeded));
+    } catch {
+      /* لا ملف seed — يبدأ فارغاً، المستخدم يُضيف محتوى يدوياً */
+    }
   }
 
   /** يبقي اللوكل ونسخة الموقع المنشور متزامنين لحظياً في كلا الاتجاهين */

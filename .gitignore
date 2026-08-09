@@ -6,3 +6,7 @@
 .DS_Store
 .vercel
 data.txt
+
+# مستندات داخلية — لا تُرفَع على GitHub
+/docs/storytelling/
+/specs/

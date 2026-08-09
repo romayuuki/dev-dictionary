@@ -1,4 +1,4 @@
-import { Injectable, computed, signal } from '@angular/core';
+import { Injectable, computed, inject, signal } from '@angular/core';
 import {
   Category,
   DictData,
@@ -7,6 +7,7 @@ import {
   emptyNode,
   uid,
 } from '../models/dict.model';
+import { SupabaseService } from './supabase.service';
 
 const LS_DATA = 'dev-dictionary-v1';
 const LS_UI = 'dev-dictionary-ui-v1';
@@ -33,6 +34,7 @@ const deepClone = <T>(o: T): T => JSON.parse(JSON.stringify(o)) as T;
  */
 @Injectable({ providedIn: 'root' })
 export class DictionaryStore {
+  private readonly supabase = inject(SupabaseService);
   private readonly _data = signal<DictData>(this.loadData());
   private readonly _ui = signal<UiState>(this.loadUi());
   private readonly _open = signal<Set<string>>(new Set());
@@ -50,6 +52,8 @@ export class DictionaryStore {
   constructor() {
     this._open.set(new Set(this._ui().open));
     this.applyTheme();
+    // حاول التحديث من Supabase بشكل غير متزامن
+    this.syncFromSupabase();
   }
 
   // ---------- التخزين ----------
@@ -87,6 +91,27 @@ export class DictionaryStore {
       localStorage.setItem(LS_DATA, JSON.stringify(this._data()));
     } catch {
       throw new Error('تعذّر الحفظ المحلي — المساحة ممتلئة');
+    }
+    // احفظ في Supabase بشكل غير متزامن (لا تنتظر)
+    this.persistToSupabase();
+  }
+
+  /** احفظ البيانات في Supabase بدون انتظار */
+  private persistToSupabase(): void {
+    this.supabase.saveData(this._data()).catch((err) => {
+      console.warn('تعذّر الحفظ البعيد:', err);
+    });
+  }
+
+  /** حمّل البيانات من Supabase عند بدء التطبيق */
+  private async syncFromSupabase(): Promise<void> {
+    const { data, error } = await this.supabase.loadData();
+    if (error) {
+      console.warn('تعذّرت مزامنة Supabase:', error);
+      return;
+    }
+    if (data && Array.isArray(data?.categories)) {
+      this._data.set(data);
     }
   }
 

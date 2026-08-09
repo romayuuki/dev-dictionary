@@ -1,5 +1,5 @@
 import { Injectable, inject } from '@angular/core';
-import { DictNode, MatchField, SearchHit } from '../models/dict.model';
+import { DictNode, MatchField, SearchHit, nodeKind } from '../models/dict.model';
 import { DictionaryStore } from './dictionary.store';
 import { escapeHtml, expandSynonyms, highlight, norm, stripRefLinks } from './text.util';
 
@@ -15,6 +15,8 @@ const WEIGHTS: Record<MatchField | 'titlePrefix', number> = {
 /** أي مصطلح لا يطابق إطلاقاً يُسقط النتيجة بالكامل (بحث AND وليس OR) */
 const MISS_PENALTY = 1000;
 const MAX_RESULTS = 40;
+/** ترجيح العقدة الطرفية (SPEC-002 REQ-3.1) — تجعل المصطلح الذرّي يتفوّق على أبيه المُجمِّع */
+const LEAF_BOOST = 15;
 
 @Injectable({ providedIn: 'root' })
 export class SearchService {
@@ -32,7 +34,8 @@ export class SearchService {
         for (const node of nodes ?? []) {
           const haystack = {
             title: norm(node.title),
-            tags: norm((node.tags ?? []).join(' ')),
+            // REQ-3.5 — aka تُفهرَس بوزن tags نفسه ولا تُعرض في الواجهة
+            tags: norm([...(node.tags ?? []), ...(node.aka ?? [])].join(' ')),
             def: norm(node.def ?? ''),
             code: norm((node.examples ?? []).map((e) => `${e.title} ${e.code}`).join(' ')),
           };
@@ -61,6 +64,9 @@ export class SearchService {
             }
           }
 
+          // REQ-3.1 — ترجيح العقدة الطرفية (term) على العقدة المُجمِّعة (group)
+          if (score > 0 && where && nodeKind(node) === 'term') score += LEAF_BOOST;
+
           if (score > 0 && where) hits.push({ node, cat, path, score, where });
           dig(node.children ?? [], [...path, node]);
         }
@@ -68,7 +74,28 @@ export class SearchService {
       dig(cat.children ?? [], []);
     }
 
-    return hits.sort((a, b) => b.score - a.score).slice(0, MAX_RESULTS);
+    return this.suppressAncestors(hits)
+      .sort((a, b) => b.score - a.score || a.path.length - b.path.length) // REQ-3.4
+      .slice(0, MAX_RESULTS);
+  }
+
+  /**
+   * REQ-3.2/REQ-3.3 — إن طابق أبٌ وأحد أبنائه معاً وكانت نقاط الابن أعلى، تُسقَط نتيجة الأب،
+   * إلا إذا طابق الأب في العنوان بينما طابق الابن في مكان أضعف (def/code) فقط.
+   */
+  private suppressAncestors(hits: SearchHit[]): SearchHit[] {
+    const byId = new Map(hits.map((h) => [h.node.id, h]));
+    const beaten = new Set<string>();
+
+    for (const hit of hits) {
+      for (const ancestor of hit.path) {
+        const a = byId.get(ancestor.id);
+        if (a && a.score < hit.score && !(a.where === 'title' && hit.where !== 'title')) {
+          beaten.add(ancestor.id);
+        }
+      }
+    }
+    return hits.filter((h) => !beaten.has(h.node.id));
   }
 
   /**

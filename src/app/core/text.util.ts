@@ -211,15 +211,30 @@ export function highlight(text: string, query: string): string {
   );
 }
 
+/** أحجام النص المسموحة لتنسيق نص محدَّد — مجموعة ثابتة تحافظ على إيقاع التصميم بدل px حرّة */
+export const TEXT_SIZE_TOKENS: Record<string, string> = {
+  sm: '12.5px',
+  lg: '19px',
+  xl: '24px',
+};
+
 /**
  * روابط داخلية بين المصطلحات: `[[node-id|النص الظاهر]]` تتحول لرابط قابل للنقر
  * يأخذ المستخدم لشرح تلك النقطة مباشرة (عبر حدث نقر يُعالج في dict-node.component).
+ *
+ * تنسيق نص محدَّد (لون/حجم): `{color:#RRGGBB}نص{/color}` و `{size:sm|lg|xl}نص{/size}`.
+ * القيم تُدقَّق بصرامة (hex 3/6/8 خانات، أو أحد رموز الحجم الثابتة) قبل التحويل لـ style —
+ * أي قيمة لا تُطابق تبقى نصاً عادياً بلا تنسيق، فلا خطر من إدخال CSS تعسّفي.
  */
 const inlineFormat = (s: string): string =>
   escapeHtml(s)
     .replace(
       /\[\[([a-zA-Z0-9_-]+)\|([^\]]+)\]\]/g,
       '<a href="#" class="ref-link" data-ref-id="$1">$2</a>',
+    )
+    .replace(/\{color:(#[0-9a-fA-F]{3,8})\}([\s\S]*?)\{\/color\}/g, '<span style="color:$1">$2</span>')
+    .replace(/\{size:(sm|lg|xl)\}([\s\S]*?)\{\/size\}/g, (_m, key: string, inner: string) =>
+      `<span style="font-size:${TEXT_SIZE_TOKENS[key]}">${inner}</span>`,
     )
     .replace(/`([^`]+)`/g, '<code>$1</code>')
     .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')

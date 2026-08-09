@@ -49,11 +49,31 @@ export class DictionaryStore {
     return cats.find((c) => c.id === this._ui().catId) ?? cats[0];
   });
 
+  /** يمنع صدى الحفظ عند استقبال تحديث من جهاز/نافذة أخرى عبر Realtime */
+  private applyingRemoteUpdate = false;
+
   constructor() {
     this._open.set(new Set(this._ui().open));
     this.applyTheme();
-    // حاول التحديث من Supabase بشكل غير متزامن
-    this.syncFromSupabase();
+    // حاول التحديث من Supabase بشكل غير متزامن، ثم اشترك في التغييرات اللحظية
+    this.syncFromSupabase().then(() => this.subscribeToRealtime());
+  }
+
+  /** يبقي اللوكل ونسخة الموقع المنشور متزامنين لحظياً في كلا الاتجاهين */
+  private subscribeToRealtime(): void {
+    this.supabase.subscribeToChanges((remoteData) => {
+      if (!remoteData || !Array.isArray(remoteData.categories)) return;
+      if (JSON.stringify(remoteData) === JSON.stringify(this._data())) return;
+
+      this.applyingRemoteUpdate = true;
+      this._data.set(remoteData);
+      try {
+        localStorage.setItem(LS_DATA, JSON.stringify(remoteData));
+      } catch {
+        /* تجاهل — التحديث اللحظي أهم من نجاح الكاش المحلي */
+      }
+      this.applyingRemoteUpdate = false;
+    });
   }
 
   // ---------- التخزين ----------
@@ -92,8 +112,8 @@ export class DictionaryStore {
     } catch {
       throw new Error('تعذّر الحفظ المحلي — المساحة ممتلئة');
     }
-    // احفظ في Supabase بشكل غير متزامن (لا تنتظر)
-    this.persistToSupabase();
+    // لا تعيد الحفظ في Supabase إن كان هذا التحديث قادماً من هناك أصلاً
+    if (!this.applyingRemoteUpdate) this.persistToSupabase();
   }
 
   /** احفظ البيانات في Supabase بدون انتظار */

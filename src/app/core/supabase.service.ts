@@ -52,4 +52,26 @@ export class SupabaseService {
       return { data: null, error: err.message };
     }
   }
+
+  /**
+   * يشترك في تغييرات جدول dictionary لحظياً — أي حفظ من جهاز آخر (أو نافذة أخرى)
+   * يصل هنا فوراً عبر Supabase Realtime، فيتحقق التزامن بين اللوكل والموقع المنشور.
+   */
+  subscribeToChanges(onChange: (data: any) => void): () => void {
+    const channel = this.client
+      .channel('dictionary-changes')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'dictionary' },
+        (payload: any) => {
+          const row = payload.new ?? payload.old;
+          if (row?.data) onChange(row.data);
+        },
+      )
+      .subscribe();
+
+    return () => {
+      this.client.removeChannel(channel);
+    };
+  }
 }

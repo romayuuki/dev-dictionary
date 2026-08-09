@@ -71,6 +71,126 @@ function applyIdMapToRefs(dataOrNode, idMap) {
 }
 
 // ============================================================
+// 5.0b  Frontend › أطر العمل › React — محتوى اليوم الثامن
+// ============================================================
+/**
+ * يبني شجرة محتوى React كاملة (اليوم 8) مقارناً بـ Vue.
+ * idempotent: يُستدعى فقط داخل buildFrameworksSection ولا يُعدّل بيانات موجودة.
+ */
+function buildReactSection() {
+  // 1. المكوّن
+  const component = term(
+    'fe-fw-react-component',
+    'المكوّن (Component)',
+    'في Vue المكوّن ملف `.vue` فيه 3 أقسام منفصلة. في React المكوّن **دالة JavaScript عادية** تعمل `return` لشكل الواجهة.\n\n**المنطق** في أعلى الدالة — **الشكل (JSX)** في الـ `return`.\n\n⚠️ اسم المكوّن لازم يبدأ بحرف **كبير** — وإلا React تظنّه وسم HTML عادي.',
+    ['component', 'مكوّن', 'jsx', 'function'],
+    [{ title: 'مكوّن بسيط', lang: 'jsx',
+       code: '// Hello.jsx\nfunction Hello() {\n  // المنطق هنا\n\n  return <h3>أهلاً!</h3>;\n}\n\nexport default Hello;' }],
+  );
+
+  // 2. JSX
+  const jsxRules = term(
+    'fe-fw-react-jsx-rules',
+    'قواعد JSX الأربع',
+    '1. **قوس واحد بدل اتنين**: `{name}` بدل `{{ name }}`\n2. **class تبقى className** — لأن `class` كلمة محجوزة في JavaScript\n3. **عنصر أب واحد** — لو عندك أكثر من عنصر لفّهم بـ `<>...</>` (Fragment)\n4. **كل وسم يُغلق**: `<br />` و `<img />`\n\n💡 أي شيء داخل `{ }` في JSX هو **JavaScript** — `{2 + 2}` يطبع 4، `{user.name}` يطبع الاسم.',
+    ['jsx', 'classname', 'fragment', 'قواعد'],
+    [{ title: 'Vue مقابل JSX', lang: 'jsx',
+       code: '// Vue\n<div class="box">\n  <p>{{ name }}</p>\n  <br>\n</div>\n\n// React (JSX)\n<div className="box">\n  <p>{name}</p>\n  <br />\n</div>' }],
+  );
+  const jsx = group(
+    'fe-fw-react-jsx',
+    'JSX — الـ HTML جوّه JavaScript',
+    'JSX يسمح بكتابة HTML مباشرةً داخل JavaScript. 4 قواعد فقط تختلف عن HTML العادي.',
+    ['jsx', 'template', 'syntax'],
+    [jsxRules],
+  );
+
+  // 3. Props
+  const props = term(
+    'fe-fw-react-props',
+    'Props — تمرير بيانات للابن',
+    'الاستدعاء **متطابق** بين Vue و React: `<Card title="مرحبا" />`.\n\nالفرق فقط في **الاستقبال**: بدل `defineProps` تفكّ الكائن في معاملات الدالة.\n\n**قاعدة مشتركة**: props للقراءة فقط — الابن لا يعدّلها أبداً.',
+    ['props', 'properties'],
+    [{ title: 'Vue مقابل React', lang: 'jsx',
+       code: "// Vue — الابن\n// defineProps(['title'])\n// {{ title }}\n\n// React — الابن\nfunction Card({ title }) {\n  return <h4>{title}</h4>;\n}\n\n// الأب — متطابق في الاتنين\n<Card title=\"مرحبا\" />" }],
+  );
+
+  // 4. useState
+  const useState = term(
+    'fe-fw-react-usestate',
+    'useState — إدارة الحالة',
+    '`useState` تُعيد زوجاً: **القيمة الحالية** و**setter (دالة للتغيير)**.\n\n```\nconst [count, setCount] = useState(0);\n//     ↑قيمة   ↑setter       ↑ابتدائية\n```\n\n**أهم فرق مع Vue**: في Vue `count.value++` مباشر ✅. في React `count++` ممنوع — لن يُحدّث الشاشة. لازم `setCount(count + 1)` لأن الـ setter هو من **يُخبر React بإعادة الرسم**.',
+    ['usestate', 'state', 'hook', 'setter', 'حالة'],
+    [
+      { title: 'useState مقابل ref', lang: 'jsx',
+        code: '// Vue\nconst count = ref(0)\ncount.value++  // مباشر ✅\n\n// React\nconst [count, setCount] = useState(0)\ncount++              // ❌ الشاشة لن تتغير\nsetCount(count + 1)  // ✅ يُعيد الرسم' },
+      { title: 'تحديث مصفوفة', lang: 'jsx',
+        code: '// ❌ خطأ — push لا تُخبر React\nitems.push(newItem)\n\n// ✅ صح — نسخة جديدة\nsetItems([...items, newItem])\nsetItems(items.filter(i => i.id !== id)) // حذف' },
+    ],
+  );
+
+  // 5. الشرط
+  const conditional = term(
+    'fe-fw-react-cond',
+    'الشرط — بدل v-if',
+    'React **لا تحتوي** `v-if`. بدلاً منها JavaScript عادي داخل `{ }`:\n\n- **`{cond && <Element />}`** — اعرض فقط لو الشرط صحيح\n- **`{cond ? <A /> : <B />}`** — اعرض A أو B',
+    ['conditional', 'v-if', 'ternary', 'شرط'],
+    [{ title: 'الشرط في JSX', lang: 'jsx',
+       code: "// Vue\n// <p v-if=\"isLoggedIn\">أهلاً</p>\n// <p v-if=\"ok\">نعم</p><p v-else>لا</p>\n\n// React\n{isLoggedIn && <p>أهلاً</p>}\n{ok ? <p>نعم</p> : <p>لا</p>}" }],
+  );
+
+  // 6. القوائم
+  const lists = term(
+    'fe-fw-react-lists',
+    'القوائم — بدل v-for',
+    'بدل `v-for` تستخدم `.map()` — تدخل قائمة عناصر، تخرج قائمة JSX.\n\n**`key` إجبارية** في الاتنين — هي "الرقم القومي" لكل عنصر حتى React تعرف مَن تغيّر بدل إعادة رسم القائمة كاملة.',
+    ['v-for', 'map', 'list', 'key', 'قوائم'],
+    [{ title: '.map() بدل v-for', lang: 'jsx',
+       code: "// Vue\n// <li v-for=\"u in users\" :key=\"u.id\">{{ u.name }}</li>\n\n// React\n{users.map(u => (\n  <li key={u.id}>{u.name}</li>\n))}" }],
+  );
+
+  // 7. useEffect
+  const useEffect = term(
+    'fe-fw-react-useeffect',
+    'useEffect — التأثيرات الجانبية',
+    '`useEffect(fn, deps)` تنفّذ `fn` عند تغيّر أي قيمة في مصفوفة `deps`.\n\n| الشكل | يشتغل إمتى؟ | يقابل في Vue |\n|---|---|---|\n| `useEffect(fn, [])` | مرة واحدة عند الظهور | `onMounted` |\n| `useEffect(fn, [id])` | كل ما `id` تتغيّر | `watch(id, ...)` |\n\n⚠️ **أكبر خطأ للمبتدئين**: نسيان المصفوفة `[]` يُشغّل الـ effect بعد **كل رسمة** ← حلقة لا نهائية.',
+    ['useeffect', 'hook', 'onmounted', 'watch', 'side effect'],
+    [
+      { title: 'جلب بيانات عند الظهور', lang: 'jsx',
+        code: "// Vue: onMounted(async () => { data.value = await fetch(...) })\n\n// React\nuseEffect(() => {\n  fetch('/api/items')\n    .then(r => r.json())\n    .then(d => setItems(d));\n}, []); // ← [] = مرة واحدة فقط" },
+      { title: 'تنظيف عند الإزالة (كـ onUnmounted)', lang: 'jsx',
+        code: 'useEffect(() => {\n  const timer = setTimeout(() => setDone(true), 3000);\n  return () => clearTimeout(timer); // تنظيف\n}, []);' },
+    ],
+  );
+
+  // 8. جدول الترجمة Vue → React
+  const translation = term(
+    'fe-fw-react-translation',
+    'جدول الترجمة — Vue → React',
+    '| Vue 3 | React | ملاحظة |\n|---|---|---|\n| `ref(0)` | `useState(0)` | التغيير بالـ setter فقط |\n| `computed(...)` | متغيّر عادي في الدالة | يُحسب تلقائياً كل رسمة |\n| `onMounted` | `useEffect(fn, [])` | — |\n| `watch(x, fn)` | `useEffect(fn, [x])` | — |\n| `v-if` | `{cond && ...}` | JavaScript عادي |\n| `v-for` | `.map()` | `key` إجبارية |\n| `v-model` | `value` + `onChange` | يدوي في React |\n| `@click` | `onClick` | camelCase |\n| `:class` | `className={...}` | — |\n| `defineProps` | `function C({ x })` | — |\n| `emit(\'save\')` | تمرير دالة كـ prop | `<C onSave={fn} />` |\n| `<slot />` | `props.children` | — |\n| Pinia | `useContext` / Zustand | Context يكفي في البداية |\n| composable | Custom Hook | نفس الفكرة تماماً |',
+    ['vue react comparison', 'translation', 'cheatsheet', 'ترجمة', 'مقارنة'],
+    [],
+  );
+
+  // 9. أخطاء شائعة
+  const commonErrors = term(
+    'fe-fw-react-errors',
+    'أخطاء شائعة في React',
+    '1. **`count++` بدل `setCount(count + 1)`** → الشاشة لن تتغيّر\n2. **نسيان `[]` في `useEffect`** → حلقة لا نهائية\n3. **`class` بدل `className`** → التنسيق لن يعمل\n4. **`onClick={fn()}`** (بأقواس) → تُستدعى فوراً لحظة الرسم! الصح: `onClick={fn}` أو `onClick={() => fn(id)}`\n5. **تعديل مصفوفة بـ `push`** → React لن تلاحظ. الصح: `setItems([...items, newItem])`\n6. **اسم مكوّن بحرف صغير** `function card()` → React تظنّه وسم HTML. لازم `Card`',
+    ['errors', 'mistakes', 'أخطاء', 'gotchas'],
+    [],
+  );
+
+  return group(
+    'fe-fw-react',
+    'React',
+    'مكتبة UI من Meta — نفس فكرة Vue (رسم الشاشة عند تغيّر البيانات) بطريقة مختلفة: **دوال تُعيد JSX** بدل ملفات `.vue`.\n\n**القاعدة الذهبية**: React = دوال تُعيد JSX · تغيير الحالة عبر الـ setter فقط · `{ }` تعني JavaScript هنا.',
+    ['react', 'jsx', 'hooks', 'مكتبة'],
+    [component, jsx, props, useState, conditional, lists, useEffect, translation, commonErrors],
+  );
+}
+
+// ============================================================
 // 5.1 – 5.2  Frontend › أطر العمل والمكتبات (استخراج من fe-vue القديمة)
 // ============================================================
 function buildFrameworksSection(oldVue) {
@@ -412,9 +532,8 @@ function buildFrameworksSection(oldVue) {
     [{ title: 'من يستدعي مَن', lang: 'js', code: "// Library: أنت تستدعيها\nimport { debounce } from 'lodash';\ndebounce(fn, 300)();\n\n// Framework: هو يستدعي كودك\nexport default {\n  mounted() { /* Vue تستدعيها هي وقتما تحتاجها */ }\n}" }],
   );
 
-  const react = group('fe-fw-react', 'React',
-    'جاهزة للإضافة — راجع [[fe-fw-what|ما هو الـ Framework؟]] و [[fe-fw-vs-library|Framework مقابل Library]] كنقطة بداية.',
-    ['react'], []);
+  // React — اليوم الثامن: محتوى كامل بدل الـ placeholder
+  const react = buildReactSection();
   const angular = group('fe-fw-angular', 'Angular',
     'جاهزة للإضافة — راجع [[fe-fw-what|ما هو الـ Framework؟]] و [[fe-fw-vs-library|Framework مقابل Library]] كنقطة بداية.',
     ['angular'], []);

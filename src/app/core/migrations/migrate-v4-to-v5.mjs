@@ -264,18 +264,128 @@ function buildFrameworksSection(oldVue) {
   );
   const performance = group('fe-fw-vue-performance', 'الأداء', 'مفاهيم مرتبطة بتحسين سرعة تحميل الـ components.', ['performance', 'أداء'], [perfAsync]);
 
-  // الراوتر و Vuex: إعادة تسمية فقط في هذا الإصدار — تفكيك محتواها الداخلي مؤجَّل لـ P1 (مُوثَّق في التقرير)
+  // ---------- Vue Router (P1 من التقرير السابق — أُنجز الآن: تفكيك كامل بدل إعادة تسمية فقط) ----------
+  const routerGuardsChildren = [
+    term('fe-fw-vue-router-guards-scroll', 'scrollBehavior(to, from, savedPosition)',
+      'التحكم بموضع التمرير عند التنقل.', ['scrollBehavior'],
+      [{ title: 'العودة لأعلى الصفحة', lang: 'js', code: "const router = createRouter({\n  scrollBehavior() { return { top: 0 }; },\n});" }]),
+    term('fe-fw-vue-router-guards-beforeeach', 'router.beforeEach(to, from, next)',
+      'منع/إجبار الانتقال لرابط قبل الذهاب إليه (مثل حماية المسارات لغير المسجّلين).', ['beforeEach'],
+      [{ title: 'حماية مسار', lang: 'js', code: "router.beforeEach((to, from, next) => {\n  if (to.meta.requiresAuth && !isLoggedIn()) next('/login');\n  else next();\n});" }]),
+    term('fe-fw-vue-router-guards-beforeenter', 'beforeEnter(to, from, next)',
+      'نفس فكرة `beforeEach` لكن مرتبطة بـ path محدَّد فقط.', ['beforeEnter'],
+      [{ title: 'حارس على مسار واحد', lang: 'js', code: "{ path: '/admin', component: Admin, beforeEnter: (to, from, next) => next() }" }]),
+    term('fe-fw-vue-router-guards-aftereach', 'router.afterEach(to, from)',
+      'تعمل بعد الانتقال (لإرسال داتا تتبّع مثلاً).', ['afterEach'],
+      [{ title: 'تتبّع تغيّر الصفحة', lang: 'js', code: "router.afterEach((to) => {\n  analytics.trackPageView(to.fullPath);\n});" }]),
+    term('fe-fw-vue-router-guards-beforerouteleave', 'beforeRouteLeave(to, from, next)',
+      'داخل الكمبوننت نفسه، للتحكم عند مغادرته (مثل تحذير عند وجود تعديلات غير محفوظة).', ['beforeRouteLeave'],
+      [{ title: 'تحذير قبل المغادرة', lang: 'js', code: "beforeRouteLeave(to, from, next) {\n  if (this.unsaved && !confirm('مغادرة بلا حفظ؟')) next(false);\n  else next();\n}" }]),
+    term('fe-fw-vue-router-guards-meta', "meta في الـ route",
+      'بيانات تُستخدم في route guards (مثل منع الدخول لغير المسجّلين).', ['meta'],
+      [{ title: 'وسم مسار محمي', lang: 'js', code: "{ path: '/admin', component: Admin, meta: { requiresAuth: true } }" }]),
+    term('fe-fw-vue-router-guards-view', '<router-view>', 'الوسم الذي يعرض المسار الحالي.', ['router-view'],
+      [{ title: 'مكان عرض الصفحات', lang: 'html', code: '<router-view></router-view>' }]),
+    term('fe-fw-vue-router-guards-link', "<router-link to=''>", 'بديل وسم `a` مرتبط بالـ routes.', ['router-link'],
+      [{ title: 'رابط تنقّل', lang: 'html', code: '<router-link to="/about">عن الموقع</router-link>' }]),
+  ];
+  const oldRouterGuards = oldRouter?.children?.find((c) => c.id === 'fe-vue-router-guards');
+  const routerGuards = group(
+    'fe-fw-vue-router-guards',
+    oldRouterGuards?.title ?? 'Navigation Guards',
+    'أدوات التحكم بالتنقّل بين المسارات ومتى يُسمح به.',
+    oldRouterGuards?.tags ?? ['navigation guards'],
+    routerGuardsChildren,
+  );
+
+  const routerChildren = [
+    term('fe-fw-vue-router-routes', 'routes: [{}]', 'كل object فيها property باسم `path` و `component`.', ['routes'],
+      [{ title: 'تعريف route', lang: 'js', code: "const routes = [\n  { path: '/team/:teamId', component: TeamView, props: true },\n];" }]),
+    term('fe-fw-vue-router-alias', 'alias', 'رابطان مختلفان لنفس الكمبوننت.', ['alias'],
+      [{ title: 'مسار بديل', lang: 'js', code: "{ path: '/home', alias: '/', component: Home }" }]),
+    term('fe-fw-vue-router-redirect', 'redirect', 'تحويل رابط لآخر.', ['redirect'],
+      [{ title: 'إعادة توجيه', lang: 'js', code: "{ path: '/old', redirect: '/new' }" }]),
+    term('fe-fw-vue-router-props', 'props: true', 'تصدير قيمة الـ params مباشرة كـ props في الكمبوننت.', ['props'],
+      [{ title: 'params كـ props', lang: 'js', code: "{ path: '/user/:id', component: User, props: true }" }]),
+    term('fe-fw-vue-router-route-params', 'this.$route.params',
+      "لجلب قيم مكتوبة بعد `:` في الـ path مثل `path:'/team/:teamId'`.", ['route.params'],
+      [{ title: 'قراءة param', lang: 'js', code: 'const teamId = this.$route.params.teamId;' }]),
+    term('fe-fw-vue-router-catchall', "path:'/:notFound(.*)'", 'صفحة اصطياد أي رابط غير موجود.', ['catch-all', '404'],
+      [{ title: 'صفحة 404', lang: 'js', code: "{ path: '/:notFound(.*)', component: NotFound }" }]),
+    term('fe-fw-vue-router-query', 'Query Parameter', 'إضافات على الرابط بعد `?`.', ['query'],
+      [{ title: 'قراءة query', lang: 'js', code: '// /search?q=vue\nconst q = this.$route.query.q;' }]),
+    routerGuards,
+  ];
   const router = oldRouter
-    ? { ...oldRouter, id: 'fe-fw-vue-router', kind: 'group',
-        children: (oldRouter.children ?? []).map((c) =>
-          c.id === 'fe-vue-router-guards' ? { ...c, id: 'fe-fw-vue-router-guards', kind: (c.children?.length ? 'group' : 'term') } : c,
-        ) }
+    ? group(
+        'fe-fw-vue-router',
+        oldRouter.title ?? 'Vue Router',
+        'يتحكم في وجود أكثر من رابط متفرّع من الرابط الأساسي. بعد `install`، يُستدعى ويُخزَّن في متغيّر `router`، فيصبح متاحاً عبر `this.$router` في أي مكان.',
+        oldRouter.tags ?? ['router'],
+        routerChildren,
+      )
     : null;
+
+  // ---------- Vuex (P1 من التقرير السابق — أُنجز الآن: تفكيك كامل بدل إعادة تسمية فقط) ----------
+  const vuexState = group(
+    'fe-fw-vue-vuex-state',
+    'State',
+    'مكان تخزين البيانات المُدارة، بنوعين حسب النطاق.',
+    ['state'],
+    [
+      term('fe-fw-vue-vuex-state-local', 'Local State', 'يُدار في كمبوننت واحد (أو أبنائه فقط).', ['local state'],
+        [{ title: 'state محلي داخل module', lang: 'js', code: "const userModule = {\n  state: () => ({ profile: null }),\n};" }]),
+      term('fe-fw-vue-vuex-state-global', 'Global State', 'يُدار عبر أكثر من كمبوننت.', ['global state'],
+        [{ title: 'state عام في الجذر', lang: 'js', code: 'const store = createStore({\n  state: () => ({ theme: "dark" }),\n});' }]),
+    ],
+  );
+  const vuexModules = term(
+    'fe-fw-vue-vuex-modules', 'Modules',
+    'object يحوي `state` و `mutation` و `getter` و `action` خاصة به لتقليل التكرار وزيادة التنظيم؛ يُستدعى في `createStore` الرئيسي، ويكون الـ state بداخله **local**.',
+    ['modules'],
+    [{ title: 'تسجيل module', lang: 'js', code: "const store = createStore({\n  modules: { user: userModule },\n});" }],
+  );
+  const vuexNamespaced = term(
+    'fe-fw-vue-vuex-namespaced', 'Namespaced',
+    'يجعل الـ module يعمل كـ mainStore منفصل، لتجنّب تعارض الأسماء بين module محلي وآخر عام.',
+    ['namespaced'],
+    [{ title: 'تفعيل namespaced', lang: 'js', code: "const userModule = {\n  namespaced: true,\n  state: () => ({ profile: null }),\n};" }],
+  );
+
+  const vuexMutationActionChildren = [
+    term('fe-fw-vue-vuex-mutation', 'Mutation', 'methods تُستخدم في أكثر من كمبوننت، تُستدعى عبر `commit`.', ['mutation', 'commit'],
+      [{ title: 'استدعاء mutation', lang: 'js', code: "this.$store.commit('increment');" }]),
+    term('fe-fw-vue-vuex-payload', 'Payload', 'argument يُمرَّر للـ mutation عند الاستدعاء.', ['payload'],
+      [{ title: 'commit مع payload', lang: 'js', code: "this.$store.commit('setUser', { name: 'Ali' });" }]),
+    term('fe-fw-vue-vuex-action', 'Action',
+      'تأخذ methods من الـ Mutation وتُنفَّذها **بعد مهلة** (تُستخدم لطلبات http غير المتزامنة) عبر `context`، وتحوي `context` أيضاً: `getters`، `dispatch`، `state`، `rootGetter`/`rootState` (للربط بين modules مختلفة).',
+      ['action', 'dispatch'],
+      [{ title: 'action غير متزامن', lang: 'js', code: "actions: {\n  async fetchUser(context) {\n    const res = await api.getUser();\n    context.commit('setUser', res.data);\n  }\n}\n// من الكمبوننت:\nthis.$store.dispatch('fetchUser');" }]),
+    term('fe-fw-vue-vuex-getters', 'Getters',
+      'لا تُغيّر قيمة، بل تُخرج قيمة جديدة معتمدة على الـ state — لتُستخدم في أكثر من component دون تكرار المنطق.',
+      ['getters'],
+      [{ title: 'getter بسيط', lang: 'js', code: "getters: {\n  doneTodos(state) { return state.todos.filter(t => t.done); }\n}" }]),
+    term('fe-fw-vue-vuex-map-helpers', 'Map Helpers',
+      'اختصارات (`mapActions`, `mapGetters`, `mapMutations`…) بدل كتابة `this.$store.commit/dispatch/getter` بالكامل في كل مرة.',
+      ['map helpers', 'mapActions', 'mapGetters', 'mapMutations'],
+      vuexMutationExample.length ? vuexMutationExample : [{ title: 'استخدام mapActions', lang: 'js', code: "import { mapActions } from 'vuex';\n\nexport default {\n  methods: {\n    ...mapActions({ nicName: 'action method name' })\n  }\n}" }]),
+  ];
+  const vuexMutationAction = group(
+    'fe-fw-vue-vuex-mutation-action',
+    'Mutation و Action و Getters',
+    'آلية تعديل الحالة في Vuex وقراءتها منها.',
+    ['mutation', 'action', 'getters'],
+    vuexMutationActionChildren,
+  );
+
   const vuex = oldVuex
-    ? { ...oldVuex, id: 'fe-fw-vue-vuex', kind: 'group',
-        children: (oldVuex.children ?? []).map((c) =>
-          c.id === 'fe-vuex-mutation-action' ? { ...c, id: 'fe-fw-vue-vuex-mutation-action', kind: 'term', examples: c.examples?.length ? c.examples : vuexMutationExample } : c,
-        ) }
+    ? group(
+        'fe-fw-vue-vuex',
+        oldVuex.title ?? 'Vuex — إدارة الحالة',
+        'مكتبة لإدارة المحتوى التفاعلي في Vue.',
+        oldVuex.tags ?? ['vuex'],
+        [vuexState, vuexModules, vuexNamespaced, vuexMutationAction],
+      )
     : null;
 
   const vue = group(
@@ -445,6 +555,108 @@ function splitHtmlTags(htmlTagsNode) {
   }
 }
 
+// ============================================================
+// 5.4  Frontend › CSS › وحدات القياس — تفكيك الـ God Node
+// ============================================================
+/**
+ * يحوّل fe-css-units من عقدة term تسرد ٦ وحدات في الـ def
+ * إلى group بستة أبناء مستقلين (em / rem / px / vh / vw / %).
+ * الدالة idempotent: إن وجدت children أصلاً لا تفعل شيئاً.
+ */
+function splitCssUnits(frontendNode) {
+  const units = findNode(frontendNode.children ?? [], 'fe-css-units');
+  if (!units || (units.children?.length ?? 0) > 0) return; // idempotent
+
+  units.def =
+    'الوحدات الأكثر استخداماً في CSS — مرجع كل وحدة مختلف عن الأخرى.';
+  units.kind = 'group';
+  units.examples = [];
+  units.tags = ['em', 'rem', 'px', 'vh', 'vw', '%', 'وحدات', 'units'];
+  units.children = [
+    term(
+      'fe-css-units-em',
+      'em',
+      'نسبية إلى حجم الخط في الـ **parent**. إن كان الأب `font-size: 20px` فإن `1em = 20px`. تتضاعف عند التداخل.',
+      ['em', 'relative', 'وحدات'],
+      [{ title: 'em نسبي للأب', lang: 'css', code: '.parent { font-size: 20px; }\n.child  { font-size: 1.5em; } /* = 30px */' }],
+    ),
+    term(
+      'fe-css-units-rem',
+      'rem',
+      'نسبية إلى جذر المستند `html`، لا إلى الـ parent — لا تتضاعف عند التداخل وهذا يجعلها أكثر قابلية للتنبؤ.',
+      ['rem', 'root', 'وحدات'],
+      [{ title: 'rem نسبي لـ html', lang: 'css', code: 'html { font-size: 16px; }\n.box  { font-size: 1.5rem; } /* = 24px دائماً مهما تداخل */' }],
+    ),
+    term(
+      'fe-css-units-px',
+      'px',
+      'قيمة ثابتة مطلقة لا تُنسب إلى أي عنصر — تبقى كما هي بغض النظر عن الـ parent أو حجم نافذة المتصفح.',
+      ['px', 'pixel', 'ثابت', 'وحدات'],
+      [{ title: 'حجم ثابت', lang: 'css', code: '.icon { width: 24px; height: 24px; }' }],
+    ),
+    term(
+      'fe-css-units-vh',
+      'vh',
+      '**Viewport Height** — نسبة من ارتفاع نافذة المتصفح مباشرةً، **بغض النظر عن الـ parent**. `100vh` = ارتفاع النافذة كاملاً.',
+      ['vh', 'viewport height', 'وحدات'],
+      [{ title: 'قسم يملأ الشاشة طولاً', lang: 'css', code: '.hero { height: 100vh; } /* ارتفاع النافذة كاملاً */' }],
+    ),
+    term(
+      'fe-css-units-vw',
+      'vw',
+      '**Viewport Width** — نسبة من عرض نافذة المتصفح مباشرةً، **بغض النظر عن الـ parent**. `50vw` = نصف عرض النافذة.',
+      ['vw', 'viewport width', 'وحدات'],
+      [{ title: 'عرض نسبة من النافذة', lang: 'css', code: '.sidebar { width: 30vw; }' }],
+    ),
+    term(
+      'fe-css-units-percent',
+      '%',
+      'نسبة مئوية من الـ **parent** — تُحسب من عرضه عند استخدامها في `width`، ومن ارتفاعه في `height`.',
+      ['%', 'percent', 'نسبة', 'وحدات'],
+      [{ title: 'نصف عرض الأب', lang: 'css', code: '.child { width: 50%; } /* = نصف عرض الـ parent */' }],
+    ),
+  ];
+}
+
+// ============================================================
+// 5.5  Frontend › JS › AJAX و JSON — فصل مفهومين مختلطين
+// ============================================================
+/**
+ * يحوّل fe-js-ajax من term يخلط AJAX/XHR مع JSON
+ * إلى group بعقدتين مستقلتين: fe-js-ajax-core و fe-js-json.
+ * الدالة idempotent: إن وجدت children أصلاً لا تفعل شيئاً.
+ */
+function splitJsAjax(frontendNode) {
+  const ajax = findNode(frontendNode.children ?? [], 'fe-js-ajax');
+  if (!ajax || (ajax.children?.length ?? 0) > 0) return; // idempotent
+
+  // نحفظ الأمثلة الأصلية ونُوزّعها على العقدتين الجديدتين
+  const xhrExample = ajax.examples?.[0] ?? null;
+  const jsonExample = ajax.examples?.[1] ?? null;
+
+  const ajaxCore = term(
+    'fe-js-ajax-core',
+    'AJAX و XHR',
+    '**AJAX** — *Asynchronous JavaScript and XML* — تقنية تتيح إرسال واستقبال البيانات مع السيرفر **دون إعادة تحميل الصفحة**.\n\n- **Synchronous**: لا يُرسَل طلب جديد إلا بعد الرد على السابق\n- **Asynchronous**: يمكن إرسال أكثر من طلب في نفس الوقت، والرد يأتي بأي ترتيب\n\n**XHR (XMLHttpRequest)** — الـ API القديم لعمل AJAX، له properties منها `readyState` (0 uninitialized → 4 complete) و `status` (200s نجاح، 400s خطأ عميل، 500s خطأ سيرفر)، ومethods مثل `.open()` و `.send()`.',
+    ['ajax', 'xhr', 'xmlhttprequest', 'synchronous', 'asynchronous'],
+    xhrExample ? [xhrExample] : [],
+  );
+
+  const json = term(
+    'fe-js-json',
+    'JSON',
+    '**JSON** — *JavaScript Object Notation* — تنسيق نصي خفيف الوزن لنقل البيانات وتخزينها، حلّ محلّ XML لأنه أسهل هيكلةً وتوليداً في JavaScript.\n\n- **`JSON.parse(text)`** — يحوّل النص (string) إلى كائن JavaScript قابل للتعامل\n- **`JSON.stringify(obj)`** — يحوّل كائن JavaScript إلى نص لإرساله أو حفظه',
+    ['json', 'parse', 'stringify', 'json.parse', 'json.stringify'],
+    jsonExample ? [jsonExample] : [],
+  );
+
+  ajax.def = 'إرسال واستقبال البيانات دون إعادة تحميل الصفحة (AJAX/XHR)، ومعيار JSON لتبادلها وتخزينها.';
+  ajax.kind = 'group';
+  ajax.examples = [];
+  ajax.tags = ['ajax', 'json', 'xhr', 'asynchronous'];
+  ajax.children = [ajaxCore, json];
+}
+
 /**
  * نقطة الدخول الوحيدة. تُعيد نسخة جديدة من `data` بعد الترحيل، أو `data` كما هي
  * إن كانت بالفعل v5 أو لم تحتوِ العُقَد المتوقَّعة (idempotent + آمنة).
@@ -458,11 +670,16 @@ export function migrateV4ToV5(data) {
   const frontend = next.categories.find((c) => c?.id === 'frontend');
 
   if (frontend && Array.isArray(frontend.children)) {
+    // P0 — §5.1–5.3: أطر العمل + HTML Tags
     const oldVue = findAndRemove(frontend.children, 'fe-vue');
     if (oldVue) frontend.children.push(buildFrameworksSection(oldVue));
 
     const htmlTagsNode = findNode(frontend.children, 'fe-html-tags');
     if (htmlTagsNode) splitHtmlTags(htmlTagsNode);
+
+    // P1 — §5.4–5.5: CSS Units + JS AJAX/JSON
+    splitCssUnits(frontend);
+    splitJsAjax(frontend);
   }
 
   applyIdMapToRefs(next, ID_MAP_V4_V5);

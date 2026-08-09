@@ -1,0 +1,2882 @@
+{
+  "version": 4,
+  "updatedAt": "2026-08-05",
+  "categories": [
+    {
+      "id": "frontend",
+      "title": "Frontend",
+      "subtitle": "كل ما يعمل في المتصفح",
+      "icon": "🎨",
+      "color": "#6366f1",
+      "children": [
+        {
+          "id": "fe-html",
+          "title": "HTML",
+          "def": "**HyperText Markup Language** — ليست لغة برمجة، بل لغة **توصيف** تحدّد عناصر الصفحة وهيكلتها (Structure) وترتيبها.\n\n- **Hyper text**: نص يحتوي رابطاً ينقلك إلى نص آخر، وهكذا.\n- **Markup**: تحديد ما يمثّله كل محتوى — نص داخل `h1` = عنوان رئيسي، داخل `p` = فقرة، داخل `title` = عنوان الصفحة.\n- **Language**: لها كودها الخاص الذي يجب معرفته لإخراج المحتوى بالشكل المطلوب.",
+          "tags": [
+            "html",
+            "markup",
+            "هيكلة",
+            "توصيف"
+          ],
+          "examples": [],
+          "children": [
+            {
+              "id": "fe-html-basics",
+              "title": "مفاهيم أساسية",
+              "def": "",
+              "tags": [
+                "أساسيات"
+              ],
+              "examples": [],
+              "children": [
+                {
+                  "id": "fe-html-caseins",
+                  "title": "HTML لغة غير حسّاسة لحالة الأحرف",
+                  "def": "**case-insensitive** — لا فرق إن كتبت الوسم بحروف كبيرة أو صغيرة.\n\nكذلك لا تُحتسب المسافات الزائدة ولا الانتقال لسطر جديد، مما يجعل الكود سهل القراءة والتنسيق.",
+                  "tags": [
+                    "case-insensitive",
+                    "مسافات",
+                    "whitespace"
+                  ],
+                  "examples": [],
+                  "children": []
+                },
+                {
+                  "id": "fe-html-container-empty",
+                  "title": "Container Tag و Empty Tag",
+                  "def": "**Container tag**: له وسم فتح ووسم إغلاق — مثل `<button>` و `<h1>`→`<h6>` و `<p>`.\n\n**Empty tag** (أو self-closing): له وسم فتح فقط — مثل `<img>` و `<hr>` و `<br>`.",
+                  "tags": [
+                    "container",
+                    "empty tag",
+                    "self close"
+                  ],
+                  "examples": [],
+                  "children": []
+                },
+                {
+                  "id": "fe-html-brackets",
+                  "title": "الأقواس والمسافات البادئة",
+                  "def": "- **The angle brackets**: الأقواس المحيطة بالوسم `< >`\n- **Indentation**: المسافة البادئة قبل الوسم — لتنظيم الكتابة وسهولة القراءة\n- **Forward slash**: العلامة `/` المستخدمة في وسم الإغلاق",
+                  "tags": [
+                    "indentation",
+                    "angle brackets",
+                    "أقواس"
+                  ],
+                  "examples": [],
+                  "children": []
+                },
+                {
+                  "id": "fe-html-entities",
+                  "title": "HTML Entities Reference",
+                  "def": "بعض العلامات لا يمكن كتابتها مباشرة داخل المحتوى لأنها محجوزة في اللغة، فنستخدم بدلاً منها قيماً دالّة عليها.",
+                  "tags": [
+                    "entities",
+                    "amp",
+                    "lt",
+                    "gt",
+                    "nbsp"
+                  ],
+                  "examples": [
+                    {
+                      "title": "أشهر الـ Entities",
+                      "lang": "html",
+                      "code": "&amp;    =>  &\n&lt;     =>  <\n&gt;     =>  >\n&nbsp;   =>  مسافة غير قابلة للكسر: تربط كلمتين فلا تنفصلان عند تصغير الصفحة\n&quot;   =>  علامة التنصيص \" — تفيد إن تغيّر الـ charset عن UTF-8 فتلفت العلامة"
+                    }
+                  ],
+                  "children": []
+                },
+                {
+                  "id": "fe-html-textformat",
+                  "title": "Text Formatting",
+                  "def": "**Text formatting**: إظهار المحتوى المهم في الصفحة، مما يجعل الموقع أوضح وأشمل.\n\n**Formatting tags**: تغيّر شكل النص الظاهر للمستخدم — `<b>` `<i>` `<strong>` `<em>` وغيرها. ويمكن وضعها داخل وسوم أخرى كـ **nested tag**.",
+                  "tags": [
+                    "formatting",
+                    "تنسيق النص"
+                  ],
+                  "examples": [],
+                  "children": []
+                },
+                {
+                  "id": "fe-html-nesting-quirks",
+                  "title": "سلوكيات التداخل بين العناصر",
+                  "def": "**div داخل span**: سيعمل، لكن الـ `div` عنصر **block** فسينزل لسطر جديد، ويأخذ من الـ `span` خصائص مثل `color` لكن **لا يأخذ** `background-color` لأن الـ `span` عنصر **inline**.\n\n**div داخل p**: المتصفح يُخرج الـ `div` خارج الـ `p`، فيصبح الترتيب: `p` ثم `div` ثم `p` فارغة بعده.",
+                  "tags": [
+                    "div",
+                    "span",
+                    "block",
+                    "inline",
+                    "تداخل"
+                  ],
+                  "examples": [],
+                  "children": []
+                }
+              ]
+            },
+            {
+              "id": "fe-html-semantic",
+              "title": "Semantic HTML5",
+              "def": "عناصر تصف نفسها بوضوح للمتصفح وللمطوّر — تحسّن الـ SEO وإتاحة الوصول.\n\nمثل `<main>` و `<header>` و `<footer>` و `<nav>` و `<article>` و `<section>` و `<aside>`.",
+              "tags": [
+                "semantic",
+                "html5",
+                "دلالي",
+                "seo"
+              ],
+              "examples": [
+                {
+                  "title": "هيكل صفحة دلالي",
+                  "lang": "html",
+                  "code": "<body>\n  <header><nav>…</nav></header>\n  <main>\n    <article>\n      <h1>عنوان</h1>\n      <section>…</section>\n    </article>\n    <aside>محتوى جانبي</aside>\n  </main>\n  <footer>…</footer>\n</body>"
+                }
+              ],
+              "children": []
+            },
+            {
+              "id": "fe-html-tags",
+              "title": "الوسوم (Tags)",
+              "def": "مرجع الوسوم مقسّماً حسب الوظيفة.",
+              "tags": [
+                "tags",
+                "وسوم"
+              ],
+              "examples": [],
+              "children": [
+                {
+                  "id": "fe-html-tags-struct",
+                  "title": "الوسوم الهيكلية",
+                  "def": "- `<html>` جذر المستند\n- `<head>` بيانات تقنية عن الموقع لا تظهر فيه لكنه يحتاجها للـ SEO والـ meta\n- `<title>` عنوان الصفحة\n- `<meta>` بيانات وصفية (keywords, description, charset…)\n- `<body>` وسم حاوٍ يُستخدم كجزء رئيسي لإظهار كل محتوى الصفحة\n- `<div>` حاوية block عامة\n- الوسوم الدلالية: `<header>` `<nav>` `<main>` `<article>` `<section>` `<aside>` `<footer>`",
+                  "tags": [
+                    "html",
+                    "head",
+                    "body",
+                    "meta",
+                    "title",
+                    "div"
+                  ],
+                  "examples": [
+                    {
+                      "title": "داخل الـ head",
+                      "lang": "html",
+                      "code": "<title>Gardening</title>\n<meta name=\"keywords\" content=\"apple, tree\">"
+                    }
+                  ],
+                  "children": []
+                },
+                {
+                  "id": "fe-html-tags-text",
+                  "title": "وسوم النصوص والتنسيق",
+                  "def": "- `<h1>` → `<h6>` عناوين بمستويات\n- `<p>` فقرة\n- `<b>` وسم حاوٍ يجعل النص **bold**\n- `<i>` وسم حاوٍ يجعل النص *italic* مائلاً\n- `<u>` وسم حاوٍ يضع خطاً تحت النص\n- `<strong>` يُظهر النص كمهم — ويُستخدم مع ضعاف البصر وصعوبة التعلم لجعل الموقع أكثر قابلية للاستخدام\n- `<em>` يُظهر النص كمؤكَّد ويظهر مائلاً، لكن قارئ الشاشة **يشدّد عليه** عند نطقه\n- `<small>` نص أصغر\n- `<ul><li></li></ul>` قائمة غير مرتّبة\n- `<br>` سطر جديد — `<hr>` خط فاصل\n- `<blockquote cite=''>` اقتباس",
+                  "tags": [
+                    "h1",
+                    "p",
+                    "strong",
+                    "em",
+                    "b",
+                    "i",
+                    "u",
+                    "ul",
+                    "li",
+                    "br",
+                    "hr"
+                  ],
+                  "examples": [],
+                  "children": []
+                },
+                {
+                  "id": "fe-html-tags-a",
+                  "title": "<a> — الروابط",
+                  "def": "**anchor tag / hyper link reference** — تُستخدم لنقل المستخدم من صفحة لأخرى عبر رابط يوضع بداخلها.\n\nفي HTML5 تعتبر من عناصر الـ **inline والـ block معاً**، فيمكن أن تضع بداخلها `div` ببساطة.\n\n**الـ Attributes:**\n- `href=''` الرابط المراد الذهاب إليه\n- `title=''` وصف الرابط — يجب وضعه للخروج بأفضل performance و SEO\n- `target='_blank'` لفتح الرابط في تبويب جديد وترك الصفحة القديمة كما هي\n- `name=''` يوضع فيه اسم لعنصر في الصفحة، فعند ربطه بـ `href=\"#name\"` ينتقل إليه مباشرة",
+                  "tags": [
+                    "a",
+                    "anchor",
+                    "href",
+                    "target",
+                    "link",
+                    "روابط"
+                  ],
+                  "examples": [
+                    {
+                      "title": "الانتقال داخل نفس الصفحة",
+                      "lang": "html",
+                      "code": "<body style=\"height: 1000vh;\">\n    <a href=\"#lol\" title=\"lol id\">go to lol id</a>\n    <br>\n    <a name=\"lol\" style=\"position:absolute; bottom:0\"\n       title=\"welcome to lol id\">welcome to lol id</a>\n    <script src=\"script.js\"></script>\n</body>"
+                    }
+                  ],
+                  "children": []
+                },
+                {
+                  "id": "fe-html-tags-media",
+                  "title": "الوسائط: img / video / audio",
+                  "def": "**`<img src='' alt=''>`** — وسم يُظهر الصور الموجودة مسبقاً على السيرفر المرتبط بالموقع. `src` يوضع فيه رابط الصورة، و `alt` نص بديل (مهم للـ SEO وقارئ الشاشة).\n\n**`<video>` = `<audio>`** — يوضع مسار الملف في `src`. أهم الـ attributes:\n- `autoplay` تشغيل تلقائي بمجرد تحميل الصفحة\n- `controls` أدوات تحكم: تشغيل/إيقاف، الصوت، ملء الشاشة\n- `poster=''` صورة تظهر على الفيديو قبل التشغيل\n\n**`<source src='' type=''>`** — توضع داخل الفيديو، ويمكن وضع أكثر من واحدة: إن لم يدعم المتصفح الصيغة الأولى انتقل للتالية. و `type` توضّح صيغة الملف.\n\n**`<figure>`** — يجمع مجموعة صور ليفهم المتصفح أنها مرتبطة معاً.\n**`<figcaption>`** — وصف أو تعليق يوضع تحت الصورة.",
+                  "tags": [
+                    "img",
+                    "video",
+                    "audio",
+                    "source",
+                    "figure",
+                    "figcaption",
+                    "alt",
+                    "صور"
+                  ],
+                  "examples": [
+                    {
+                      "title": "فيديو بعدة صيغ",
+                      "lang": "html",
+                      "code": "<video controls poster=\"cover.jpg\" autoplay>\n  <source src=\"clip.webm\" type=\"video/webm\">\n  <source src=\"clip.mp4\"  type=\"video/mp4\">\n</video>"
+                    }
+                  ],
+                  "children": []
+                },
+                {
+                  "id": "fe-html-tags-form",
+                  "title": "النماذج (Forms)",
+                  "def": "- `<form action=''>` الحاوية\n- `<label for=''>` تسمية الحقل\n- `<input type='' id='' value='' placeholder='' name='' required>`\n- `<select name='' id=''><option value=''></option></select>` قائمة منسدلة\n- `<textarea name='' id='' cols='' placeholder=''>` صندوق نص متعدد الأسطر\n- `<fieldset>` تضع حدوداً حول مجموعة من الـ inputs\n- `<legend>` عنوان يوضع بمحاذاة خط الـ border في الـ fieldset\n- `<details><summary></summary></details>` يصنع سهماً يُظهر ويُخفي المحتوى بداخله\n\n**autofocus**: attribute يجعل مؤشر الكتابة يقف في الحقل تلقائياً بعد تحميل الصفحة.",
+                  "tags": [
+                    "form",
+                    "input",
+                    "select",
+                    "textarea",
+                    "fieldset",
+                    "legend",
+                    "details",
+                    "autofocus",
+                    "نماذج"
+                  ],
+                  "examples": [],
+                  "children": []
+                },
+                {
+                  "id": "fe-html-tags-table",
+                  "title": "الجداول (Table)",
+                  "def": "وسم وعنصر لعمل جداول: `<table>` ← `<thead>` `<tbody>` `<tfoot>` ← `<tr>` ← `<th>` / `<td>`.\n\n- **Cell padding**: المسافة من الكلام المكتوب في الخلية إلى حوافها\n- **Cell spacing**: المسافة بين الخلايا وبعضها\n- `colspan` لدمج أعمدة",
+                  "tags": [
+                    "table",
+                    "thead",
+                    "tbody",
+                    "tfoot",
+                    "tr",
+                    "td",
+                    "th",
+                    "جداول",
+                    "cellpadding",
+                    "cellspacing"
+                  ],
+                  "examples": [
+                    {
+                      "title": "جدول كامل",
+                      "lang": "html",
+                      "code": "<table>\n  <thead>\n    <tr>\n      <th>first name</th>\n      <th>last name</th>\n      <th>age</th>\n      <th>salary</th>\n    </tr>\n  </thead>\n  <tbody>\n    <tr>\n      <td>ahmed</td>\n      <td>ali</td>\n      <td>26</td>\n      <td>5000</td>\n    </tr>\n  </tbody>\n  <tfoot>\n    <tr><td colspan=\"3\">sum</td></tr>\n  </tfoot>\n</table>"
+                    }
+                  ],
+                  "children": []
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "fe-css",
+          "title": "CSS",
+          "def": "**Cascading Style Sheets** — هي ما يحدّد الـ style لكل عنصر في الصفحة.",
+          "tags": [
+            "css",
+            "styling",
+            "تنسيق"
+          ],
+          "examples": [],
+          "children": [
+            {
+              "id": "fe-css-units",
+              "title": "وحدات القياس (Measurement Units)",
+              "def": "**`em`** — تتبع الـ parent، وتكون نسبية إلى عنصر آخر.\n\n**`rem`** — نسبة إلى الجذر `html` (⚠️ موضع تدقيق في ملاحظاتك الأصلية).\n\n**`px`** — قيمة ثابتة لا تُنسب إلى أحد.\n\n**`vh`** — ارتفاع الصفحة. `height: 50vh` = نصف ارتفاع نافذة المتصفح، **بغض النظر عن الـ parent**.\n\n**`vw`** — عرض الصفحة. `width: 50vw` = نصف عرض النافذة، بغض النظر عن الـ parent.\n\n**`%`** — نسبة مئوية من الـ **parent**، حسب ما إذا كانت مكتوبة في العرض أو الطول.",
+              "tags": [
+                "rem",
+                "em",
+                "px",
+                "vh",
+                "vw",
+                "وحدات",
+                "units"
+              ],
+              "examples": [],
+              "children": []
+            },
+            {
+              "id": "fe-css-specificity",
+              "title": "الأولوية والمحدِّدات (Specificity & Selectors)",
+              "def": "الأولوية تكون لأقوى مُحدِّد، لا لترتيب الكتابة:\n\n`element` ⟸ `class` ⟸ `id` ⟸ `inline`\n\nأي أن الأقوى هو **inline** (كتابة الـ style في attribute داخل العنصر نفسه)، ثم **id**، ثم **class**، ثم **element**.",
+              "tags": [
+                "specificity",
+                "selector",
+                "أولوية",
+                "id",
+                "class",
+                "inline"
+              ],
+              "examples": [],
+              "children": [
+                {
+                  "id": "fe-css-combinators",
+                  "title": "المُدمِجات: + و ~",
+                  "def": "**`+`** — العنصر الذي قبل العلامة يرى **أول** عنصر بعده مباشرة من النوع المحدَّد ويمسكه.\n\n**`~`** — العنصر الذي قبل العلامة يرى **كل** العناصر التي بعده من النوع المحدَّد ويمسكها.",
+                  "tags": [
+                    "combinator",
+                    "sibling",
+                    "+",
+                    "~"
+                  ],
+                  "examples": [
+                    {
+                      "title": "الفرق بينهما",
+                      "lang": "css",
+                      "code": "/* أول p تلي div مباشرة فقط */\ndiv + p { color: red; }\n\n/* كل الـ p التي تلي div على نفس المستوى */\ndiv ~ p { color: blue; }"
+                    }
+                  ],
+                  "children": []
+                },
+                {
+                  "id": "fe-css-attr-selectors",
+                  "title": "محدِّدات الـ Attributes",
+                  "def": "- `[attr ^= value]` يبدأ بالقيمة\n- `[attr $= value]` ينتهي بالقيمة\n- `[attr *= value]` يحتوي القيمة في أي موضع\n- `[attr ~= value]` يحتوي الكلمة كاملة ضمن القيمة\n- `[attr |= value]` يبدأ بالكلمة ضمن القيمة",
+                  "tags": [
+                    "attribute selector",
+                    "محددات"
+                  ],
+                  "examples": [
+                    {
+                      "title": "أمثلة عملية",
+                      "lang": "css",
+                      "code": "/* أي رابط ينتهي بـ .com */\na[href$='.com'] { color: green; }\n\n/* أي رابط يحتوي كلمة google */\na[href*='google'] { font-weight: bold; }"
+                    }
+                  ],
+                  "children": []
+                },
+                {
+                  "id": "fe-css-pseudo",
+                  "title": "Pseudo Class",
+                  "def": "`::after` — `::before` — `:hover` — `::selection`\n\n**selection**: الشيء الذي أعمل عليه select يأخذ الـ style الذي أحدّده.",
+                  "tags": [
+                    "pseudo",
+                    "hover",
+                    "before",
+                    "after",
+                    "selection"
+                  ],
+                  "examples": [],
+                  "children": []
+                }
+              ]
+            },
+            {
+              "id": "fe-css-layout",
+              "title": "التخطيط والمسافات",
+              "def": "",
+              "tags": [
+                "layout",
+                "تخطيط"
+              ],
+              "examples": [],
+              "children": [
+                {
+                  "id": "fe-css-margin-collapse",
+                  "title": "Margin Collapse",
+                  "def": "سلوك تتخذه العناصر عند عمل `margin-bottom` لعنصر و `margin-top` للعنصر الذي تحته: **يؤخذ الأكبر منهما فقط** ويوضع بين العنصرين — فيما يُعرف بتداخل الـ margin.",
+                  "tags": [
+                    "margin",
+                    "collapse",
+                    "تداخل"
+                  ],
+                  "examples": [],
+                  "children": []
+                },
+                {
+                  "id": "fe-css-border",
+                  "title": "Border",
+                  "def": "كل العناصر تحتوي على `border` في الـ default الخاص بها (بقيمة `none`/شفاف غالباً).",
+                  "tags": [
+                    "border",
+                    "حدود"
+                  ],
+                  "examples": [],
+                  "children": []
+                },
+                {
+                  "id": "fe-css-nesting",
+                  "title": "CSS Nesting",
+                  "def": "خاصية أُضيفت في آخر تحديثات CSS: يمكن أن يكون الـ parent وبداخله الـ children مباشرة، مثل SCSS تماماً — دون الحاجة لمعالج مسبق.",
+                  "tags": [
+                    "nesting",
+                    "scss",
+                    "تداخل"
+                  ],
+                  "examples": [
+                    {
+                      "title": "الصيغة",
+                      "lang": "css",
+                      "code": "div {\n  color: #333;\n  p {\n    font-size: 14px;\n  }\n}"
+                    }
+                  ],
+                  "children": []
+                },
+                {
+                  "id": "fe-css-lists",
+                  "title": "تنسيق القوائم",
+                  "def": "- `list-style-type` — الشكل الذي يوضع بجانب عناصر `li` في `ul` أو `ol`\n- `list-style-image` — صورة توضع بجانب العناصر بدل الشكل\n- `list-style-position` — مكان الشكل، وقيمها `inside` أو `outside`",
+                  "tags": [
+                    "list-style",
+                    "قوائم",
+                    "ul",
+                    "ol"
+                  ],
+                  "examples": [],
+                  "children": []
+                },
+                {
+                  "id": "fe-css-fonts",
+                  "title": "Web Safe Fonts",
+                  "def": "هي الخطوط المتوفّرة في كل الأنظمة، فلا نحتاج لتنزيلها أو استضافتها.",
+                  "tags": [
+                    "fonts",
+                    "خطوط",
+                    "web safe"
+                  ],
+                  "examples": [],
+                  "children": []
+                }
+              ]
+            },
+            {
+              "id": "fe-css-animation",
+              "title": "الانتقالات والحركة (Transition & Animation)",
+              "def": "",
+              "tags": [
+                "animation",
+                "transition",
+                "حركة"
+              ],
+              "examples": [],
+              "children": [
+                {
+                  "id": "fe-css-timing",
+                  "title": "transition-timing-function",
+                  "def": "تحدّد السرعة التي يحدث بها التغيير في `style` العنصر. قيمها:\n\n- **ease** — يبدأ ببطء ثم ينتهي بسرعة (القيمة الافتراضية إن لم تحدّد)\n- **ease-in** — يبدأ ببطء ثم يتسارع ثم ينتهي فجأة\n- **ease-out** — يبدأ بسرعة ثم يتباطأ حتى ينتهي\n- **ease-in-out** — مثل ease لكن مع تباطؤ وتسارع أبسط\n- **linear** — يسير بشكل متساوٍ",
+                  "tags": [
+                    "transition",
+                    "ease",
+                    "linear",
+                    "timing"
+                  ],
+                  "examples": [],
+                  "children": []
+                },
+                {
+                  "id": "fe-css-anim-timing",
+                  "title": "animation-timing-function",
+                  "def": "تحدّد السرعة التي يحدث بها التغيير في `animation` العنصر. قيمها:\n\n- **ease** — يبدأ ببطء ثم يعمل بسرعة ثم ينتهي ببطء (الافتراضي)\n- **ease-in** — يبدأ ببطء ثم يتسارع\n- **ease-out** — يبدأ بسرعة ثم يتباطأ حتى ينتهي\n- **ease-in-out** — مثل ease لكن مع تباطؤ وتسارع أبسط\n- **linear** — يسير بشكل متساوٍ",
+                  "tags": [
+                    "animation",
+                    "ease",
+                    "linear"
+                  ],
+                  "examples": [],
+                  "children": []
+                },
+                {
+                  "id": "fe-css-anim-count",
+                  "title": "animation-iteration-count",
+                  "def": "تحدّد كم مرة سيتكرر الـ animation (رقم أو `infinite`).",
+                  "tags": [
+                    "iteration",
+                    "تكرار"
+                  ],
+                  "examples": [],
+                  "children": []
+                },
+                {
+                  "id": "fe-css-anim-direction",
+                  "title": "animation-direction",
+                  "def": "تحدّد الاتجاه الذي يسير فيه الـ animation، من `0%`/`from` إلى `100%`/`to` أو العكس:\n\n- **normal** — من `from` إلى `to`\n- **reverse** — من `to` إلى `from`\n- **alternate** — من `from` إلى `to` ثم من `to` إلى `from` ثم يعيد\n- **alternate-reverse** — من `to` إلى `from` ثم من `from` إلى `to` ثم يعيد",
+                  "tags": [
+                    "direction",
+                    "alternate",
+                    "reverse",
+                    "اتجاه"
+                  ],
+                  "examples": [],
+                  "children": []
+                }
+              ]
+            },
+            {
+              "id": "fe-css-tools",
+              "title": "CSS Overview (أداة الفحص)",
+              "def": "أداة في DevTools تُستخدم لعمل **check** على شكل الصفحة: هل هي متوافقة أم لا، وعمل test لمعرفة جودة الـ performance.",
+              "tags": [
+                "devtools",
+                "css overview",
+                "فحص"
+              ],
+              "examples": [],
+              "children": []
+            }
+          ]
+        },
+        {
+          "id": "fe-js",
+          "title": "JavaScript",
+          "def": "هي ما يحدّد **سلوك** الصفحة والـ actions التي فيها، وتعطيها ديناميكية وحركة.\n\n**طريقة عمل JS على مرحلتين:**\n1. **Memory Allocation Phase** — وفيها يحدث الـ Hoisting\n2. **Code Execution Phase** — تنفيذ الكود سطراً سطراً",
+          "tags": [
+            "javascript",
+            "js"
+          ],
+          "examples": [],
+          "children": [
+            {
+              "id": "fe-js-engine",
+              "title": "كيف تعمل JavaScript (المحرّك)",
+              "def": "",
+              "tags": [
+                "engine",
+                "محرك"
+              ],
+              "examples": [],
+              "children": [
+                {
+                  "id": "fe-js-parser",
+                  "title": "Parser",
+                  "def": "جزء من **engine of code** (يوجد parser للـ HTML وآخر للـ JS وآخر للـ CSS…). يترجم الكود من صيغته إلى صيغة يفهمها المتصفح ليُخرج النتائج.\n\n**مثال:** عندما يمر الـ parser على `<title>` داخل الـ `<head>` يترجمها على أنها عنوان يوضع للصفحة.\n\nوعندما يجد `<script></script>` يقوم **JS parser** بترجمة الكود بداخلها وإرسال الترجمة إلى **HTML parser**، وبدوره يترجم لإخراج المعلومات للمتصفح.",
+                  "tags": [
+                    "parser",
+                    "engine",
+                    "ترجمة"
+                  ],
+                  "examples": [],
+                  "children": []
+                },
+                {
+                  "id": "fe-js-callstack",
+                  "title": "Call Stack",
+                  "def": "هو المكان الذي يتم فيه **execute** الكود.\n\n**Call stack function**: عملية استدعاء — وهو stack أو مخزن مؤقت لـ data structure يُستخدم لتنظيم عملية execution الخاصة بالـ function.",
+                  "tags": [
+                    "call stack",
+                    "execution"
+                  ],
+                  "examples": [],
+                  "children": []
+                },
+                {
+                  "id": "fe-js-singlethread",
+                  "title": "Single Threaded و Event Loop",
+                  "def": "**JS تكون single thread** لأنها تعمل execute للكود سطراً سطراً (synchronous code)، ولأن لديها **call stack واحد**.\n\nفإن وُجد أمر أو method لا يقرأه الـ call stack أو سيأخذ وقتاً — مثل `setTimeout` وغيرها من methods الخاصة بـ `window` — يُرسَل إلى **Web API**، وبعد انتهاء الوقت واستعداده للتنفيذ يُرسَل إلى **Callback Queue**، ثم يأخذ دوره التالي في الـ call stack بواسطة **Event Loop**.\n\n**Event loop**: هو كبوابة مسؤولة عن دخول الـ callback من الـ callback queue إلى الـ call stack.\n\n**Concurrency mode**: يعمل عندما تعمل الـ Web APIs بجانب الـ call stack.",
+                  "tags": [
+                    "single thread",
+                    "event loop",
+                    "callback queue",
+                    "web api",
+                    "concurrency"
+                  ],
+                  "examples": [],
+                  "children": []
+                },
+                {
+                  "id": "fe-js-webworkers",
+                  "title": "Web Workers",
+                  "def": "هو المسار الذي تتخذه JS من خلف الشاشة ولا يظهر في الصفحة — أي مسار آخر غير مسار الـ JS الرئيسي، ويُستخدم لجعل **JS ⟵ multi thread**.\n\n**الفرق عن الـ main thread:** في الـ web workers **لا يمكن** استخدام DOM manipulation، بينما الـ main thread يمكنه ذلك.\n\n**متى تستخدمه؟** مع الـ loop الذي يأخذ وقتاً ويعطّل عمل الصفحة كلها حتى ينتهي — فيُنشأ ملف جديد مثل `worker.js` ويوضع فيه الـ loop، فيعمل في الخلفية دون إيقاف الصفحة.",
+                  "tags": [
+                    "web worker",
+                    "multi thread",
+                    "الخلفية"
+                  ],
+                  "examples": [
+                    {
+                      "title": "إنشاء worker",
+                      "lang": "js",
+                      "code": "// main.js\nconst worker = new Worker('worker.js');\nworker.postMessage({ start: true });\nworker.onmessage = (e) => console.log('النتيجة:', e.data);\n\n// worker.js\nonmessage = () => {\n  let sum = 0;\n  for (let i = 0; i < 1e9; i++) sum += i;\n  postMessage(sum);   // بدون تجميد الصفحة\n};"
+                    }
+                  ],
+                  "children": []
+                },
+                {
+                  "id": "fe-js-console",
+                  "title": "Console",
+                  "def": "خاصية خاصة بـ JavaScript تمكّنك من كتابة أشياء لأشخاص معيّنين لا لكل الناس، ولها أكثر من prototype:\n\n- `console.log(\"\")` لطباعة شيء\n- `console.error(\"\")` لطباعة خطأ\n- وغيرها\n\nويمكن تغيير الـ style لما يُكتب في الكونسول عبر `%c`.",
+                  "tags": [
+                    "console",
+                    "log",
+                    "error"
+                  ],
+                  "examples": [
+                    {
+                      "title": "تلوين مخرجات الكونسول",
+                      "lang": "js",
+                      "code": "console.log(\"%c hello\", \"color:blue\");\n// يطبع كلمة hello بلون أزرق"
+                    }
+                  ],
+                  "children": []
+                }
+              ]
+            },
+            {
+              "id": "fe-js-types",
+              "title": "المتغيّرات والأنواع",
+              "def": "**Variable**: قيم نضعها لنرجع إليها في أي وقت. في JS تُكتب بعد `var` أو `let` أو `const`.\n\n**Variables are loosely typed** — أي غير مجبر على استخدام نوع واحد فقط.\n\nكل متغير له مرحلتان: **declaration** (`var icon`) و **initialization** (`= \"car\"`).",
+              "tags": [
+                "variable",
+                "متغيرات",
+                "types",
+                "أنواع"
+              ],
+              "examples": [],
+              "children": [
+                {
+                  "id": "fe-js-primitive",
+                  "title": "Primitive Data Types",
+                  "def": "قيم محدّدة، وعند نسخ متغير من متغير آخر يحمل قيمة primitive وتغيير قيمة المتغير الجديد **لا تتغير** قيمة الأصل — لهذا يُقال إن الـ primitive **immutable**.\n\n**الأنواع:** `String` — `Number` — `Boolean` — `Null` — `Undefined` — `BigInt` — `Symbol`\n\nويُحدَّد النوع بـ `typeof`.",
+                  "tags": [
+                    "primitive",
+                    "immutable",
+                    "string",
+                    "number",
+                    "boolean",
+                    "null",
+                    "undefined",
+                    "bigint",
+                    "symbol",
+                    "typeof"
+                  ],
+                  "examples": [
+                    {
+                      "title": "Primitive تُمرَّر بالقيمة (pass by value)",
+                      "lang": "js",
+                      "code": "let x = 10;\nlet y = x;\ny++;\nconsole.log(x); // 10  ← الأصل لم يتغيّر\nconsole.log(y); // 11"
+                    }
+                  ],
+                  "children": []
+                },
+                {
+                  "id": "fe-js-reference",
+                  "title": "Reference Data Types",
+                  "def": "**الأنواع:** `object` — `array`\n\nتُخزَّن في الـ memory في مكان اسمه **الـ Heap**. وإذا حدث نسخ لـ array أو object وتم تغيير أحدهما **يتغيّر الأصل** — على خلاف الـ primitive — لهذا يُقال إن الـ reference **mutable**.\n\n**Structural data types:**\n- `Object` [ new Object – array – map – set – weakMap – Date ]\n- `Function`",
+                  "tags": [
+                    "reference",
+                    "mutable",
+                    "heap",
+                    "object",
+                    "array",
+                    "structural"
+                  ],
+                  "examples": [
+                    {
+                      "title": "Reference تُمرَّر بالمرجع",
+                      "lang": "js",
+                      "code": "let xArray = [1, 2, 3];\nlet yArray = xArray;\nyArray.push(4);\nconsole.log(yArray); // [1,2,3,4]\nconsole.log(xArray); // [1,2,3,4]  ← الأصل تغيّر!"
+                    }
+                  ],
+                  "children": []
+                },
+                {
+                  "id": "fe-js-copy",
+                  "title": "النسخ: Shallow Copy و Deep Copy",
+                  "def": "**Shallow copy**: عند نسخ object من object، إذا كان بداخلهما nested object أو array فتغييره في أحدهما يغيّر في الآخر.\n\n**Deep copy**: عند النسخ، تغيير أحدهما لا يؤثر على الآخر إطلاقاً — الطريقة الصحيحة عبر JSON.\n\n**Object.freeze()**: لا تسمح بتغيير الـ properties في الـ object، **لكن** في حالة وجود nested obj يمكن تغييره — وهذا ما يُسمى **Shallow freeze**.\n\n**Object.seal()**: تسمح بتغيير الـ property لكن لا تسمح بمسحه.\n\n**Pure Function**: الدالة التي تمكّنك من أخذ نسخة من متغير أو array أو object، وعند التغيير في النسخة **لا** يتغيّر الأصل.\n\n**Impure function**: تعتبر mutable data — تعدّل على الأصل مباشرة.",
+                  "tags": [
+                    "shallow copy",
+                    "deep copy",
+                    "freeze",
+                    "seal",
+                    "pure function",
+                    "impure",
+                    "نسخ"
+                  ],
+                  "examples": [
+                    {
+                      "title": "1) النسخ المباشر — shallow (الأسوأ)",
+                      "lang": "js",
+                      "code": "let obj1 = { name: 'ALi', details: { age: 10 } };\nlet obj2 = obj1;\nobj2.name = 'Bkr';\nconsole.log(obj1); // {name:'Bkr', details:{age:10}}  ← الأصل تغيّر\n// العيب: أي تغيير في النسخة أو الأصل يغيّر في الآخر"
+                    },
+                    {
+                      "title": "2) Spread ‎...‎ — يحلّ المستوى الأول فقط",
+                      "lang": "js",
+                      "code": "let obj1 = { name: 'ALi', details: { age: 10 } };\nlet obj2 = { ...obj1 };\nobj2.name = 'Bkr';\nobj2.details.age = 50;\nconsole.log(obj1); // {name:'ALi', details:{age:50}}  ← الـ nested تغيّر!\nconsole.log(obj2); // {name:'Bkr', details:{age:50}}\n// العيب: لو فيه nested object فالتغيير ينعكس على الاثنين"
+                    },
+                    {
+                      "title": "3) طريقة JSON — deep copy صحيحة",
+                      "lang": "js",
+                      "code": "let obj1 = { name: 'ALi', details: { age: 10 } };\n\nlet obj2 = JSON.parse(JSON.stringify(obj1));\n\nobj2.name = 'Bkr';\nobj2.details.age = 50;\nconsole.log(obj1); // {name:'ALi', details:{age:10}}  ← سليم\nconsole.log(obj2); // {name:'Bkr', details:{age:50}}"
+                    },
+                    {
+                      "title": "4) دالة deepClone يدوية + pure function",
+                      "lang": "js",
+                      "code": "const deepClone = (obj) => {\n  if (typeof obj !== 'object' || obj === null) return obj;\n  const newObject = Array.isArray(obj) ? [] : {};\n  for (let key in obj) {\n    newObject[key] = deepClone(obj[key]);\n  }\n  return newObject;\n};\n\n// impure: تعدّل على الأصل\nconst addToScoreHistory = (array, score) => {\n  array.push(score);\n  return array;\n};\n\n// pure: تنسخ أولاً ثم تضيف\nconst pureAddToScoreHistory = (array, score, cloneFunction) => {\n  const newArray = cloneFunction(array);\n  newArray.push(score);\n  return newArray;\n};\n\nconst scoreArray = [12, 213, 31231, 321];\nconst result = pureAddToScoreHistory(scoreArray, 18, deepClone);\nconsole.log(scoreArray); // [12, 213, 31231, 321]      ← لم يتغيّر\nconsole.log(result);     // [12, 213, 31231, 321, 18]"
+                    }
+                  ],
+                  "children": []
+                },
+                {
+                  "id": "fe-js-varletconst",
+                  "title": "var و let و const",
+                  "def": "**var**\n- يمكن إنشاؤه في الـ global scope أو block scope واستدعاؤه في أي مكان\n- لكن إن أُنشئ في **function scope** لا يمكن استدعاؤه إلا داخلها\n- يحدث فيه **auto coercion**\n- يحدث له **hoist** لكن الـ initialization توضع افتراضياً بـ `undefined`\n\n**let**\n- إن أُنشئ في function scope أو **block scope** لا يمكن استدعاؤه إلا بداخله\n- **لا** يحدث فيه auto coercion\n- لا يحدث له hoist بالمعنى المفيد — يُرسل error إن استُدعي قبل إنشائه (Temporal Dead Zone)\n\n**const**\n- ثابت: يمكن استخدامه في مكان آخر لكن **لا يمكن التعديل عليه**\n- نفس قواعد النطاق والـ hoisting كـ let\n\n> ملاحظة: يقول البعض إن `let` و `const` يُحوَّلان عند الـ compile إلى `var` **لكن بقيود**: يُرسل error إن استُدعيا قبل الإنشاء أو خارج الـ block scope الذي أُنشئا فيه.",
+                  "tags": [
+                    "var",
+                    "let",
+                    "const",
+                    "hoisting",
+                    "tdz"
+                  ],
+                  "examples": [],
+                  "children": []
+                }
+              ]
+            },
+            {
+              "id": "fe-js-scope",
+              "title": "النطاق (Scope) والـ Closure",
+              "def": "**Scope**: أي مساحة تحوي أكثر من سطر، أو كل سياق (context) لإضافة variable أو methods، أو أي مساحة محصورة بين `{}`.",
+              "tags": [
+                "scope",
+                "نطاق"
+              ],
+              "examples": [],
+              "children": [
+                {
+                  "id": "fe-js-scope-types",
+                  "title": "أنواع النطاق",
+                  "def": "**Global scope**: النطاق الرئيسي، وهو دائماً الذي يعمل override على غيره. يُعرَّف بأي مساحة غير محصورة بين أقواس `{}`.\n\n**Local scope**: المساحة المحصورة بين `{}`. المتغير الذي في الـ function لا يمكن استدعاؤه خارجها إلا إذا حُوِّل إلى global. ونوعاه:\n\n- **Function scope**: المساحة المحصورة بين قوسي الـ function. ويعتبر منه `var` و `let` و `const` — إن أُنشئوا بداخله لا يمكن استدعاؤهم بالخارج.\n- **Block scope**: المساحة المحصورة بين قوسين ليسا لـ function — مثل `if` و `for loop`. ويعتبر منه `let` و `const` فقط.\n\n**Lexical scope**: هو function scope بداخله function scope آخر (nested function)، بحيث يكون للدالة الداخلية **access** على النطاق الخارجي.\n\n**Scope chain**: حركة الـ engine بحيث يخرج من الـ inner scope إلى الـ outer scope ومنه إلى الـ global scope ليصل لكل الداتا المطلوبة.",
+                  "tags": [
+                    "global",
+                    "local",
+                    "function scope",
+                    "block scope",
+                    "lexical",
+                    "scope chain"
+                  ],
+                  "examples": [],
+                  "children": []
+                },
+                {
+                  "id": "fe-js-hoisting",
+                  "title": "Hoisting",
+                  "def": "يضع المتغير `var` أو الـ function في أول الـ memory ليمكن استدعاؤها في أي وقت، حتى لو استُدعيت **قبل** صنعها.\n\n⚠️ لكن إن أُنشئت الـ function باستخدام **function expression** فلن تعمل.",
+                  "tags": [
+                    "hoisting",
+                    "رفع"
+                  ],
+                  "examples": [
+                    {
+                      "title": "يعمل مع var و function declaration",
+                      "lang": "js",
+                      "code": "console.log(name); // undefined (وليس error)\nvar name = \"Ali\";\n\nnewName(); // Bkr  ✅\nfunction newName() {\n  console.log(\"Bkr\");\n}"
+                    },
+                    {
+                      "title": "لا يعمل مع function expression",
+                      "lang": "js",
+                      "code": "ourName();\n// ReferenceError: Cannot access 'ourName' before initialization\nlet ourName = function () {\n  console.log(\"Bdr\");\n};"
+                    }
+                  ],
+                  "children": []
+                },
+                {
+                  "id": "fe-js-shadowing",
+                  "title": "Shadowing",
+                  "def": "عملية وضع متغير بنفس اسم متغير قبله، فيعمل **override** عليه.\n\n⚠️ انتبه: المتغير الذي يُكتب **بدون** `var`/`let`/`const` داخل دالة يصبح **global** تلقائياً.",
+                  "tags": [
+                    "shadowing",
+                    "override",
+                    "global"
+                  ],
+                  "examples": [
+                    {
+                      "title": "shadowing وتسريب المتغيرات",
+                      "lang": "js",
+                      "code": "var a = 10;\n\nfunction sum(x) {\n  var z = 5;\n  a = 15;    // override على الـ a العلوية (لم تُكتب var)\n  n = 15;    // ← أصبحت global scope!\n  var t = 10;\n  return z + a;\n}\n\nlet newX = sum(a);\nconsole.log(newX); // 20\nconsole.log(n);    // 15  ← قُرئت بالخارج لأنها global\nconsole.log(t);    // ❌ not defined  ← لأنها local"
+                    }
+                  ],
+                  "children": []
+                },
+                {
+                  "id": "fe-js-closure",
+                  "title": "Closure",
+                  "def": "هي function عندها القدرة على **expose** داتا من الـ function الخارجية، في حالة وجود function بداخلها (nested function).\n\nوتكون هذه الداتا **غير متاحة** لو استُدعيت وحدها — فلا يمكن الدخول عليها إلا من خلال الـ closure. وهذا ما يُستخدم للقول إن **JavaScript is OOP**.\n\n⚠️ كل closure لازم تكون **lexical scope**، والعكس غير صحيح.",
+                  "tags": [
+                    "closure",
+                    "lexical",
+                    "private"
+                  ],
+                  "examples": [
+                    {
+                      "title": "عدّاد خاص (private counter)",
+                      "lang": "js",
+                      "code": "const privateCounter = (() => {\n  let count = 0;\n  console.log(`initial value: ${count}`);\n\n  return () => {\n    count += 1;\n    console.log(count);\n  };\n})();\n\nprivateCounter(); // 1\nprivateCounter(); // 2\n// المتغير count غير قابل للوصول من الخارج إطلاقاً"
+                    }
+                  ],
+                  "children": []
+                },
+                {
+                  "id": "fe-js-iife",
+                  "title": "IIFE",
+                  "def": "**Immediately Invoked Function Expression** — عندما تُستدعى الدالة فوراً في نفس مكان كتابتها.",
+                  "tags": [
+                    "iife",
+                    "immediately invoked"
+                  ],
+                  "examples": [
+                    {
+                      "title": "الصيغة",
+                      "lang": "js",
+                      "code": "const counter = (() => {\n  console.log('initial value');\n  return () => {\n    let count = 0;\n    count++;\n    console.log(count);\n  };\n})();"
+                    }
+                  ],
+                  "children": []
+                }
+              ]
+            },
+            {
+              "id": "fe-js-operators",
+              "title": "المعاملات (Operators)",
+              "def": "",
+              "tags": [
+                "operator",
+                "معاملات"
+              ],
+              "examples": [],
+              "children": [
+                {
+                  "id": "fe-js-op-unary",
+                  "title": "Unary Operator",
+                  "def": "العملية فيه زيادة واحد أو تقليل واحد **لمتغيّر واحد**، ويندرج تحت **arithmetic operators**: `x++` أو `x--`.\n\nويوجد أيضاً **logical operator** في الـ unary وهو `!` لنفي عمل الـ method أو المتغير.",
+                  "tags": [
+                    "unary",
+                    "++",
+                    "--",
+                    "!"
+                  ],
+                  "examples": [
+                    {
+                      "title": "علامة النفي",
+                      "lang": "js",
+                      "code": "console.log(!x); // false  ← ترجع false إذا كان المتغير موجوداً\nconsole.log(x);  // true"
+                    }
+                  ],
+                  "children": []
+                },
+                {
+                  "id": "fe-js-op-binary",
+                  "title": "Binary Operator",
+                  "def": "العملية فيه زيادة أو تقليل أو ضرب أو قسمة لأكثر من متغيّر — ويندرج تحت **arithmetic operators**: `x+y` `x-y` `x/y` `x*y`.\n\n**Comparison operators**: علامات تدل على أن أحد المتغيرات أكبر أو أصغر أو مساوٍ: `x<y` `x>y` `x==y`.\n\n**Logical operators** (`&&` و `||`) — وهما من أنواع الـ **short circuit**:\n- `&&` لا تُخرج ناتجاً إلا إذا كان كل ما بينها يعطي `true`\n- `||` لا تُخرج ناتجاً إلا إذا كانت قيمة واحدة من بينها تعطي `true`",
+                  "tags": [
+                    "binary",
+                    "comparison",
+                    "logical",
+                    "short circuit",
+                    "&&",
+                    "||"
+                  ],
+                  "examples": [
+                    {
+                      "title": "فهم الـ short circuit",
+                      "lang": "js",
+                      "code": "console.log(8 && 9);            // 9\n// 8 ليست false ولا 0 ولا null ولا undefined ولا \"\"\n// فينتقل إلى 9 وهي true أيضاً، فيُخرجها لأنها آخر ما وقف عنده\n\nconsole.log(8 && 9 && 0 && 7 && 1); // 0\n// يقف عند 0 لأنها false ولا ينظر لما بعدها\n\nconsole.log(8 || 9);            // 8\n// 8 ليست false فلا ينظر لما بعدها\n\nconsole.log(0 || 9 || 0 || 7 || 1); // 9\n// 0 قيمة false فينظر للتالي 9 وهي true فيتوقف"
+                    }
+                  ],
+                  "children": []
+                },
+                {
+                  "id": "fe-js-op-string",
+                  "title": "String Operator",
+                  "def": "علامة `+` تُستخدم مع الـ string لجمع أكثر من string variable معاً.",
+                  "tags": [
+                    "string operator",
+                    "concat",
+                    "+"
+                  ],
+                  "examples": [
+                    {
+                      "title": "دمج نصوص",
+                      "lang": "js",
+                      "code": "var fName = \"Ali\";\nvar lName = \"Bkr\";\nvar fullName = fName + lName;\nconsole.log(fullName); // AliBkr"
+                    }
+                  ],
+                  "children": []
+                },
+                {
+                  "id": "fe-js-op-special",
+                  "title": "Special Operators",
+                  "def": "**Comma operator** `,` — يوضع بين العناصر المتشابهة أو التي ستُجرى عليها نفس العملية.\n\n**Ternary operator** — يكون بها شرط مثل `if` لكن بالرموز:\n`condition ? val1 : val2`\n\n**typeof** — لتحديد نوع المحتوى.",
+                  "tags": [
+                    "comma",
+                    "ternary",
+                    "typeof",
+                    "شرط"
+                  ],
+                  "examples": [
+                    {
+                      "title": "typeof",
+                      "lang": "js",
+                      "code": "let x = 10;\nconsole.log(typeof x); // number"
+                    }
+                  ],
+                  "children": []
+                },
+                {
+                  "id": "fe-js-coercion",
+                  "title": "⚠️ مشكلة الـ Coercion و ===",
+                  "def": "هناك مشكلة في الـ **comparison operators**: يقوم **auto coercion** في الـ engine بتحويل القيم المتشابهة من `Boolean` إلى `number` إلى `string`.\n\n**الحل:** استخدام `===` (**strict equality**) التي توقف عمل الـ auto coercion وتبحث في **النوع** أيضاً.",
+                  "tags": [
+                    "coercion",
+                    "===",
+                    "==",
+                    "strict equality"
+                  ],
+                  "examples": [
+                    {
+                      "title": "المشكلة الأولى: مقارنة أنواع مختلفة",
+                      "lang": "js",
+                      "code": "var x = \"5\", y = 5;\nconsole.log(x == y);  // true  ❌ رغم اختلاف النوع\nconsole.log(x === y); // false ✅ الحل"
+                    },
+                    {
+                      "title": "المشكلة الثانية: سلسلة مقارنات",
+                      "lang": "js",
+                      "code": "console.log(3 < 2 < 1); // true  ❌ !!\n/* الشرح:\n   1) ينفّذ 3 < 2  ⟵ false\n   2) يحوّل false من Boolean إلى number ⟵ 0\n   3) تصبح المعادلة 0 < 1 ⟵ true\n*/\nconsole.log(3 < (2 < 1)); // الحل: وضع الأقواس"
+                    }
+                  ],
+                  "children": []
+                },
+                {
+                  "id": "fe-js-optional-chain",
+                  "title": "Optional Chaining ‎?.‎ و Nullish ‎??‎",
+                  "def": "`?.` تقوم مقام `&&` في التحقق من وجود القيمة قبل الوصول إليها، ويمكن استخدامها أكثر من مرة في نفس السطر.\n\n`??` إن كانت القيمة على يسارها موجودة (ليست null/undefined) تأخذها، وإلا تأخذ التي على اليمين.",
+                  "tags": [
+                    "optional chaining",
+                    "nullish",
+                    "?.",
+                    "??"
+                  ],
+                  "examples": [
+                    {
+                      "title": "التحقق من مصفوفة فارغة",
+                      "lang": "js",
+                      "code": "const myItems = [];\nconsole.log(myItems && myItems.length ? true : false); // false\n// أو بشكل أقصر\nconsole.log(myItems?.length ? true : false); // false\n\nconst myitem = [{ id: 1 }];\nconsole.log(myitem?.[0]?.id ? true : false); // true\nconsole.log(myitem?.length);                // 1"
+                    },
+                    {
+                      "title": "قيمة افتراضية بـ ??",
+                      "lang": "js",
+                      "code": "const myitem = [{ id: 5 }];\nconsole.log(myitem[0]?.id ?? 'Not Id Found'); // 5\nconsole.log(myitem?.name ?? 'Not Id Found'); // Not Id Found"
+                    }
+                  ],
+                  "children": []
+                }
+              ]
+            },
+            {
+              "id": "fe-js-flow",
+              "title": "التحكّم في المسار (Conditions & Loops)",
+              "def": "",
+              "tags": [
+                "condition",
+                "loop",
+                "شروط",
+                "تكرار"
+              ],
+              "examples": [],
+              "children": [
+                {
+                  "id": "fe-js-conditions",
+                  "title": "Condition Statements",
+                  "def": "أدوات شرطية: إذا لم يتحقق الشرط في الأقواس أمامها لا يُنفَّذ ما بداخلها.\n\n- `if / else`\n- `switch`",
+                  "tags": [
+                    "if",
+                    "else",
+                    "switch",
+                    "شرط"
+                  ],
+                  "examples": [
+                    {
+                      "title": "if condition",
+                      "lang": "js",
+                      "code": "var yourName = prompt(\"enter your Name\", \"Ali\");\n\nif (yourName) {\n  document.write(\"<br> welcome \" + yourName);\n} else {\n  alert(\"you don't write your name\");\n}"
+                    },
+                    {
+                      "title": "switch condition",
+                      "lang": "js",
+                      "code": "var favColor = prompt(\"enter your fav color\",\n  \"1)red 2)blue 3)white 4)yellow 5)black\");\nvar hidden = 1, color;\n\nswitch (favColor) {\n  case \"1\": color = \"red\";    break;\n  case \"2\": color = \"blue\";   break;\n  case \"3\": color = \"white\";  break;\n  case \"4\": color = \"yellow\"; break;\n  case \"5\": color = \"black\";  break;\n  default:\n    hidden = 0;\n    alert(\"you don't sign your fav color\");\n}\n\nif (hidden) {\n  document.write(\"your favourite color is \" + color);\n}"
+                    }
+                  ],
+                  "children": []
+                },
+                {
+                  "id": "fe-js-loops",
+                  "title": "Loop Statements",
+                  "def": "أدوات تقوم بتكرار عملية معيّنة إلى الوصول للشرط أو الحد المسموح به.",
+                  "tags": [
+                    "for",
+                    "while",
+                    "do while",
+                    "loop",
+                    "تكرار"
+                  ],
+                  "examples": [
+                    {
+                      "title": "for loop",
+                      "lang": "js",
+                      "code": "for (let i = 1; i < 10; i++) {\n  document.write(\"<br>the value of i is \" + i);\n}"
+                    },
+                    {
+                      "title": "while loop",
+                      "lang": "js",
+                      "code": "var i = 1;\nwhile (i < 10) {\n  document.write(\"<br>the value of i is \" + i);\n  i++;\n}"
+                    },
+                    {
+                      "title": "do…while — ينفّذ مرة على الأقل",
+                      "lang": "js",
+                      "code": "do {\n  var yourName = prompt(\"what is your name\", \"\");\n} while (!yourName);"
+                    }
+                  ],
+                  "children": []
+                },
+                {
+                  "id": "fe-js-dialogs",
+                  "title": "Dialog Boxes",
+                  "def": "صندوق يعطّل كل عمل الصفحة حتى تنتهي من الأمر الذي فيه.\n\n- **alert**: رسالة تحذيرية أو ترحيبية لا تختفي إلا بعد ضغط OK\n- **prompt**: مربع يضع سؤالاً أو طلباً يكتبه المستخدم ثم OK أو Cancel\n- **confirm**: يطبع جملة إجابتها إما OK أو Cancel، ولا يكتب المستخدم شيئاً",
+                  "tags": [
+                    "alert",
+                    "prompt",
+                    "confirm",
+                    "dialog"
+                  ],
+                  "examples": [
+                    {
+                      "title": "الثلاثة معاً",
+                      "lang": "js",
+                      "code": "let x = 10;\nalert(\"this is an alert\");\nalert(\"value of x is \" + x);\n\nvar name = prompt(\"your name is \", \"Ali\");\n\nvar conf = confirm(\"are you sure you want to continue\");"
+                    }
+                  ],
+                  "children": []
+                }
+              ]
+            },
+            {
+              "id": "fe-js-functions",
+              "title": "الدوال (Functions)",
+              "def": "",
+              "tags": [
+                "function",
+                "دوال"
+              ],
+              "examples": [],
+              "children": [
+                {
+                  "id": "fe-js-fn-types",
+                  "title": "طرق إنشاء الدوال",
+                  "def": "**1) Function Statement (Declaration)**\n- ✅ يمكن عملها hoisted — أي استدعاؤها قبل كتابتها\n- ✅ يمر عليها الـ JS parser مرة واحدة فقط\n\n**2) Function Expression** (وتسمى أيضاً anonymous / literal function)\n- ❌ لا يمكن عملها hoisted\n- ✅ يمر عليها الـ parser مرة واحدة فقط\n\n**3) Function Constructor** (`new Function`)\n- ❌ لا يمكن عملها hoisted\n- ❌ يمر عليها الـ parser أكثر من مرة (الأبطأ)",
+                  "tags": [
+                    "declaration",
+                    "expression",
+                    "constructor",
+                    "hoisted"
+                  ],
+                  "examples": [
+                    {
+                      "title": "المقارنة",
+                      "lang": "js",
+                      "code": "// 1) statement\nconsole.log(sum(1, 2)); // 3 ✅\nfunction sum(a, b) { return a + b; }\n\n// 2) expression\nconsole.log(sub(1, 2)); // ❌ error\nlet sub = function (a, b) { return a - b; };\n\n// 3) constructor (تجنّبه)\nlet mul = new Function('a', 'b', 'return a * b');"
+                    }
+                  ],
+                  "children": []
+                },
+                {
+                  "id": "fe-js-fn-params",
+                  "title": "المعاملات والقيم الافتراضية",
+                  "def": "**Default value**: وضع قيم للمتغيرات المطلوبة في الـ function عند استدعائها، حتى لا تكون النتيجة `undefined` إن لم تُكتب.\n\n> `argument` = `parameter`\n\n**arguments**: تُستخدم في حالة عدم وجود متغيّرات معرَّفة في الـ function — وهي كائن يشبه المصفوفة يحوي كل ما مُرِّر.",
+                  "tags": [
+                    "default",
+                    "parameters",
+                    "arguments",
+                    "معاملات"
+                  ],
+                  "examples": [
+                    {
+                      "title": "قيمة افتراضية",
+                      "lang": "js",
+                      "code": "function addTwoParam(x = 0, y = 0) {\n  return x + y;\n}\nconsole.log(addTwoParam(15)); // 15 (بدل NaN)"
+                    },
+                    {
+                      "title": "كائن arguments",
+                      "lang": "js",
+                      "code": "let calc = function () {\n  console.log(\"length: \" + arguments.length);\n  var sum = 0;\n  for (let i = 0; i < arguments.length; i++) {\n    sum += arguments[i];\n  }\n  return sum;\n};\n\nconsole.log(calc(1, 2, 3));                // 6\nconsole.log(calc(1, 2, 3, 4, 5, 6, 7));    // 28"
+                    }
+                  ],
+                  "children": []
+                },
+                {
+                  "id": "fe-js-fn-nested",
+                  "title": "الدوال المتداخلة (Nested / Inner Function)",
+                  "def": "يمكن عمل function بداخل function. وتُستدعى الـ **inner function** بداخل الـ **main function** لتعمل عند استدعاء الرئيسية.\n\nوهنا يُطبَّق **scope chain**: حركة الـ engine من الـ inner scope إلى الـ outer scope ثم الـ global scope للوصول لكل الداتا المطلوبة.",
+                  "tags": [
+                    "nested",
+                    "inner",
+                    "scope chain"
+                  ],
+                  "examples": [
+                    {
+                      "title": "دالة ترجع دالة",
+                      "lang": "js",
+                      "code": "let funct = function (x, y, z) {\n  return function () {\n    return x + y + z;\n  };\n};\nlet myFunc = funct(1, 2, 3);\nconsole.log(myFunc()); // 6"
+                    }
+                  ],
+                  "children": []
+                },
+                {
+                  "id": "fe-js-fn-this",
+                  "title": "this في regular مقابل arrow function",
+                  "def": "يظهر الاختلاف بين **regular function** و **arrow function** في سياق `this`.\n\nفي حالة الـ regular function يأخذ قيمة المتغيّر من **أقرب lexical scope** موجود فيه المتغيّر.\n\nأما الـ arrow function فلا يكون لها `this` خاص بها، بل ترث `this` من النطاق المحيط بها وقت التعريف.",
+                  "tags": [
+                    "this",
+                    "arrow",
+                    "regular",
+                    "lexical"
+                  ],
+                  "examples": [
+                    {
+                      "title": "this في regular function",
+                      "lang": "js",
+                      "code": "const x = 1;\nconst a = {\n  x: 2,\n  b: {\n    x: 3,\n    c: function () {\n      return this.x;\n    },\n  },\n};\nconsole.log(a.b.c()); // 3  ← أقرب lexical scope"
+                    }
+                  ],
+                  "children": []
+                },
+                {
+                  "id": "fe-js-fn-borrowing",
+                  "title": "Function Borrowing: call / apply / bind",
+                  "def": "طرق لجعل دالة تعمل على كائن آخر — مثل استخدام `join` الخاصة بالـ Array على الـ String.\n\n- **apply** — تمرّر الوسائط كـ **array**\n- **call** — تمرّر الوسائط **مفصولة بفواصل**\n- **bind** — **لا تُنفّذ فوراً**، بل تُرجع دالة جديدة يمكنك تشغيلها متى شئت والتحكم في شكل الخروج أثناء الطباعة",
+                  "tags": [
+                    "call",
+                    "apply",
+                    "bind",
+                    "borrowing"
+                  ],
+                  "examples": [
+                    {
+                      "title": "الثلاثة",
+                      "lang": "js",
+                      "code": "let str = \"1sdfsaf 2fsdfsd\";\n\n// apply\nconsole.log([].join.apply(str, [' ']));\n\n// call\nconsole.log([].join.call(str, '**'));\n// 1**s**d**f**s**a**f** **2**f**s**d**f**s**d\n\n// bind — تُرجع دالة تستدعيها لاحقاً\nlet result = [].join.bind(str);\nconsole.log(result(\". .\"));"
+                    }
+                  ],
+                  "children": []
+                },
+                {
+                  "id": "fe-js-curry",
+                  "title": "Curry Function",
+                  "def": "تُستخدم في حالة الرغبة في استخدام function في أكثر من مكان، وتشغيل جزء منها في مكان وجزء آخر في مكان آخر.\n\n**Using currying**: عملية تصدير function من ملف إلى آخر عن طريق `export` و `import`.",
+                  "tags": [
+                    "curry",
+                    "currying",
+                    "closure"
+                  ],
+                  "examples": [
+                    {
+                      "title": "الصيغة",
+                      "lang": "js",
+                      "code": "let multFun = function (x) {\n  return function (y) {\n    return x + y;\n  };\n};\nconsole.log(multFun(2)(3)); // 5"
+                    }
+                  ],
+                  "children": []
+                },
+                {
+                  "id": "fe-js-builtin-fn",
+                  "title": "Built-in Functions",
+                  "def": "دوال موجودة في نظام JavaScript جاهزة من المبرمجين.\n\n- **parseInt** — تُرجع الأرقام في الـ string بشرط أن تكون في **أوله**، ولا تُرجع ما بعد النقطة\n- **parseFloat** — مثلها لكن تُرجع ما بعد أول نقطة\n- **isFinite** — تُرجع `true` إذا كان المحتوى رقماً فقط بلا حروف\n- **isNaN** — تُرجع `true` إذا كان المحتوى **ليس** رقماً\n- `decodeURI()` / `encodeURI()`",
+                  "tags": [
+                    "parseInt",
+                    "parseFloat",
+                    "isFinite",
+                    "isNaN",
+                    "built in"
+                  ],
+                  "examples": [
+                    {
+                      "title": "المقارنة العملية",
+                      "lang": "js",
+                      "code": "let x = \"fdsfdsfs123123\";\nlet y = \"13434sfsdf\";\nlet z = \"13434.56444.464sfsdf\";\nlet b = 13.23;\nlet c = \"132.3\";\n\nconsole.log(parseInt(x)); // NaN   ← الأرقام ليست في الأول\nconsole.log(parseInt(y)); // 13434\nconsole.log(parseInt(z)); // 13434 ← توقّف عند النقطة\n\nconsole.log(parseFloat(z)); // 13434.56444\n\nconsole.log(isFinite(b)); // true\nconsole.log(isFinite(c)); // true\nconsole.log(isFinite(y)); // false\n\nconsole.log(isNaN(x)); // true\nconsole.log(isNaN(b)); // false"
+                    }
+                  ],
+                  "children": []
+                }
+              ]
+            },
+            {
+              "id": "fe-js-string",
+              "title": "النصوص (String)",
+              "def": "طرق إنشاء string وخصائصه.\n\n- **Literal creation** — الناتج `string` وليس object\n- **Constructor** (`new String()`) — يصنع string له بعض خصائص الـ object، ونوعه `object`\n- **String function** (`String()`) — الناتج `string`\n\n**Property**: `length` — عدد الأحرف مع الفواصل والمسافات.",
+              "tags": [
+                "string",
+                "نصوص",
+                "length"
+              ],
+              "examples": [
+                {
+                  "title": "الفرق بين الطرق الثلاث",
+                  "lang": "js",
+                  "code": "var myStr  = \"welcome to javaScript\";       // literal\nvar newStr = new String(\"hello from JS\");    // constructor\nvar str    = String(\"my create string\");     // function\n\nconsole.log(typeof myStr);  // string\nconsole.log(typeof newStr); // object  ⚠️\nconsole.log(typeof str);    // string\n\nconsole.log(myStr.length);  // 21"
+                }
+              ],
+              "children": [
+                {
+                  "id": "fe-js-string-methods",
+                  "title": "String Methods",
+                  "def": "- **charAt(index)** — تعطيها رقم index فتُرجع الحرف الموجود فيه\n- **indexOf(\"…\")** — تُرجع أول index يبدأ به الحرف/الكلمة، بحثاً **من أول** الجملة\n- **lastIndexOf(\"…\")** — نفس الشيء لكن بحثاً **من آخر** الجملة\n- **substring(start, end)** — تقص ما بين الرقمين، أو من الرقم إلى النهاية إن كتبت رقماً واحداً\n- **split(\"\")** — تضع الجملة في array: `\"\"` تجعل كل **حرف** index، و `\" \"` تجعل كل **كلمة** index\n- **replace(old, new)** — تغيّر جزءاً من string بجزء آخر",
+                  "tags": [
+                    "charAt",
+                    "indexOf",
+                    "lastIndexOf",
+                    "substring",
+                    "split",
+                    "replace"
+                  ],
+                  "examples": [
+                    {
+                      "title": "أمثلة على النص: \"welcome to javaScript\"",
+                      "lang": "js",
+                      "code": "var myStr = \"welcome to javaScript\";\n\nconsole.log(myStr.charAt(3));                  // c\nconsole.log(myStr.charAt(myStr.length - 1));   // t\n\nconsole.log(myStr.indexOf(\"ava\"));      // 12\nconsole.log(myStr.indexOf(\"e\"));        // 1\nconsole.log(myStr.lastIndexOf(\"e\"));    // 6\nconsole.log(myStr.lastIndexOf(\"t\"));    // 20\n\nconsole.log(myStr.substring(10));       // javaScript\nconsole.log(myStr.substring(5, 10));    // me to\n\nconsole.log(myStr.split(\"\"));   // ['w','e','l','c',...]\nconsole.log(myStr.split(\" \"));  // ['welcome','to','javaScript']"
+                    },
+                    {
+                      "title": "replace",
+                      "lang": "js",
+                      "code": "console.log(myStr.replace(\"to\", \"for\"));\n// welcome for javaScript\n\nconsole.log(myStr.replace(\"a\", \"e\"));\n// welcome to jevaScript  ← أول حرف فقط\n\nconsole.log(myStr.replace(/c/igm, \"k\"));\n// welkome to javaSkript  ← كل الحروف بفضل flag الـ g"
+                    }
+                  ],
+                  "children": []
+                },
+                {
+                  "id": "fe-js-regex",
+                  "title": "Regular Expression (Regex)",
+                  "def": "يمكن إنشاؤها بطريقتين:\n\n1. **Regex constructor**: `let pattern = new RegExp('hello')`\n2. **Regex literal**: `let pattern = /hello/` ← وهي الأشيع",
+                  "tags": [
+                    "regex",
+                    "regular expression",
+                    "تعابير نمطية"
+                  ],
+                  "examples": [],
+                  "children": [
+                    {
+                      "id": "fe-js-regex-patterns",
+                      "title": "أنواع الأنماط",
+                      "def": "1. **Literal characters** — تكتب الكلمة مباشرة: `/hello/`\n2. **Character classes** — البحث عن حروف: `/[ariou]/`\n3. **Range** — نطاق: `/[a-z]/` كل الحروف من a إلى z\n4. **Meta characters** — `/a.b/` حرف a ثم حرف مجهول ثم b\n5. **`^` caret** — `/^Hello/` الجملة **تبدأ** بـ Hello\n6. **`$`** — `/world$/` الجملة **تنتهي** بـ world\n7. **`\\`** — لإيقاف عمل الرموز الخاصة: `/\\$Hello/` يبحث عن Hello قبلها `$`\n8. **`*`** (zero or more) — قد لا يأتي الحرف أو يأتي مرة أو أكثر\n9. **`+`** (one or more) — على الأقل مرة واحدة\n10. **`?`** — قد لا يأتي أو يأتي **مرة واحدة فقط**: `/mohamm?ed/`\n11. **`\\d`** — يساوي `[0-9]`\n12. **`{n}`** — عدد التكرار: `/k{3}/` ثلاث مرات وراء بعض، `/k{2,4}/` من 2 إلى 4\n13. **`\\s`** — يفحص المسافات\n14. **`|`** — أو: `/[A-Z]|[a-z]/`\n15. **`^` داخل `[]`** — نفي: `/[^A-Z]/` أي أن الجملة لا تحوي حروفاً كبيرة",
+                      "tags": [
+                        "pattern",
+                        "caret",
+                        "meta characters",
+                        "range",
+                        "أنماط"
+                      ],
+                      "examples": [],
+                      "children": []
+                    },
+                    {
+                      "id": "fe-js-regex-methods",
+                      "title": "Regex Methods و Flags",
+                      "def": "**Methods:**\n- **test()** — تُرجع `true` إن وُجد النمط في الجملة، وإلا `false`\n- **exec()** — تُخرج أول جزء يتماشى مع النمط\n- **match()** — تُرجع كل ما يتوافق، ويجب وضع flag الـ `g`\n- **replace(pattern, new)** — تغيير جزء بجزء آخر\n\n**Flags [i, m, g]:**\n- **i** — يغض الطرف عن حالة الأحرف (capital/small)\n- **m** — يعمل عبر الأسطر المتعدّدة (multiple lines)\n- **g** — يغيّر كل المطابقات دفعة واحدة لا الأولى فقط",
+                      "tags": [
+                        "test",
+                        "exec",
+                        "match",
+                        "flags",
+                        "i",
+                        "m",
+                        "g"
+                      ],
+                      "examples": [
+                        {
+                          "title": "test و exec",
+                          "lang": "js",
+                          "code": "let pattern = /hello/;\nlet text = \"hello world\";\nconsole.log(pattern.test(text));          // true\nconsole.log(pattern.test(\"Hello world\")); // false (بدون flag i)\n\nlet p2 = /\\d+/;\nconsole.log(p2.exec(\"abc123de5f6\"));\n// ['123', index: 3, input: 'abc123de5f6']"
+                        },
+                        {
+                          "title": "match — الفرق بوجود g",
+                          "lang": "js",
+                          "code": "let text = \"abc123de5f6\";\n\nconsole.log(text.match(/\\d+/));\n// ['123', index: 3, ...]   ← أول مطابقة فقط\n\nconsole.log(text.match(/\\d+/g));\n// ['123', '5', '6']        ← كل المطابقات"
+                        }
+                      ],
+                      "children": []
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "fe-js-array",
+              "title": "المصفوفات (Array)",
+              "def": "مجموعة تُعمل لكتابة data معيّنة يمكن التحكم فيها واستخدامها في وقت لاحق أو الإضافة عليها ديناميكياً أو يدوياً.\n\n**طرق الإنشاء:**\n- **Literal notation** — الطريقة العادية `[]`\n- **Constructor** — `new Array()` ثم إضافة كل index يدوياً\n- **Dense Array** — `new Array('red','blue')` بكتابة المحتوى أثناء الإنشاء",
+              "tags": [
+                "array",
+                "مصفوفات"
+              ],
+              "examples": [
+                {
+                  "title": "Literal notation وسلوك الـ length",
+                  "lang": "js",
+                  "code": "let myArray = [1,2,3,,,\"gdfgd\",[\"fdsfs\",12,[]],false,12,412];\n\nconsole.log(typeof myArray);      // object ⚠️\nconsole.log(myArray.length);      // 10\nconsole.log(myArray[3]);          // undefined (فراغ)\nconsole.log(myArray[6].length);   // 3 (مصفوفة متداخلة)\n\nmyArray[99] = 12;\nconsole.log(myArray.length);      // 100 ← الـ length يتبع أكبر index"
+                }
+              ],
+              "children": [
+                {
+                  "id": "fe-js-array-methods",
+                  "title": "Array Methods",
+                  "def": "دوال جاهزة في اللغة:\n\n- **join()** — تحوّل محتوى الـ array إلى string، ويختلف الشكل حسب ما بين الأقواس\n- **pop()** — تمسح آخر index، وتُخرج العنصر المحذوف\n- **push()** — تضيف عنصراً في الآخر، وتُخرج **عدد** العناصر الجديد\n- **shift()** — تمسح أول index، وتُخرج العنصر المحذوف\n- **unshift()** — تضيف عنصراً في الأول، وتُخرج عدد العناصر\n- **sort()** — ⚠️ ترتّب الأرقام **كنصوص**: 1 ومشتقاته أولاً ثم 2 ثم 3… ولترتيب تصاعدي صحيح تكتب دالة مقارنة بداخلها",
+                  "tags": [
+                    "join",
+                    "pop",
+                    "push",
+                    "shift",
+                    "unshift",
+                    "sort"
+                  ],
+                  "examples": [
+                    {
+                      "title": "الاستخدام",
+                      "lang": "js",
+                      "code": "var myArray = [1,2,3,5,79,,0,9];\n\nconsole.log(myArray.join());     // 1,2,3,5,79,,0,9\nconsole.log(myArray.join(\"\"));   // 12357909\nconsole.log(myArray.join(\" \"));  // 1 2 3 5 79  0 9\n\nconsole.log(myArray.pop());      // 9 (العنصر المحذوف)\nconsole.log(myArray.push(\"welcom\")); // 8 (العدد الجديد)\nconsole.log(myArray.shift());    // 1\nconsole.log(myArray.unshift(10));// 8"
+                    },
+                    {
+                      "title": "⚠️ مشكلة sort والحل",
+                      "lang": "js",
+                      "code": "console.log([0,10,2,3,5,79].sort());\n// [0, 10, 2, 3, 5, 79]  ❌ ترتيب نصّي\n\nconsole.log([0,10,2,3,5,79].sort((a,b) => a - b));\n// [0, 2, 3, 5, 10, 79]  ✅ تصاعدي صحيح"
+                    }
+                  ],
+                  "children": []
+                },
+                {
+                  "id": "fe-js-assoc-array",
+                  "title": "Associative Array",
+                  "def": "array تُستخدم في حالة وجود **key–value** ونريد تخزينها في الـ array، لكنها **لا تأخذ** methods الـ array.\n\n**Key value**: دائماً عبارة عن `string`.",
+                  "tags": [
+                    "associative",
+                    "key value"
+                  ],
+                  "examples": [
+                    {
+                      "title": "الإنشاء والمرور عليها",
+                      "lang": "js",
+                      "code": "var associativeArray = new Array();\nlet x = \"thanks\";\n\nassociativeArray[x] = 1223;\nassociativeArray[\"sdfsdf\"] = \"fsdfsdf\";\nassociativeArray[\"1\"] = [\"a\", \"b\", \"c\"];\n\nfor (let i in associativeArray) {\n  console.log(i + \":\" + associativeArray[i]);\n}\n// thanks:1223\n// sdfsdf:fsdfsdf"
+                    }
+                  ],
+                  "children": []
+                }
+              ]
+            },
+            {
+              "id": "fe-js-object",
+              "title": "الكائنات (Object)",
+              "def": "الـ object يعتبر **reference** — أي قيم و methods يمكن العودة إليها في أي وقت وتُخزَّن في الـ memory.\n\n**طرق الوصول للخصائص:**\n- **Dot notation**: `obj.name`\n- **Bracket notation**: `obj[\"name\"]` — وتُستخدم إذا كان اسم الـ property رقماً، أو نصاً فيه مسافات، أو متغيراً يحوي نصاً",
+              "tags": [
+                "object",
+                "كائنات",
+                "dot notation",
+                "bracket"
+              ],
+              "examples": [
+                {
+                  "title": "الإنشاء بالطريقتين",
+                  "lang": "js",
+                  "code": "let cap = \"capital\";\n\n// 1) constructor\nlet myObj = new Object();\nmyObj.name = \"Ali\";\nmyObj.age = 30;\nmyObj.fun = function () { return \"let's go\"; };\nmyObj[cap] = \"cairo\";       // subscript notation\nmyObj[\"phone\"] = \"01272010077\";\n// ⚠️ ضع الأرقام داخل \"\" ليقرأها الـ parser سليمة\n\n// 2) literal\nlet obj = {\n  name: \"Ali\",\n  age: 30,\n  fun: function () { return \"let's go\"; },\n  [\"city\"]: \"zagazig\",\n  [cap]: \"cairo\"\n};"
+                }
+              ],
+              "children": [
+                {
+                  "id": "fe-js-obj-static",
+                  "title": "Object Static Methods",
+                  "def": "- **Object.keys(obj)** — تُخرج الـ keys\n- **Object.values(obj)** — تُخرج الـ values\n- **delete obj.prop** — لمسح أي property\n- **Object.create(obj)** — استنساخ object آخر بكل خصائصه\n- **Object.assign({}, o1, o2)** — دمج أكثر من object في object جديد\n\n**Instance methods:**\n- `obj.hasOwnProperty(\"name\")` — هل الـ key موجود في الـ object؟\n- `obj.toString()`\n\n⚠️ لا يُحذف الـ object نفسه، بل يُحذف ما بداخله فقط.",
+                  "tags": [
+                    "Object.keys",
+                    "Object.values",
+                    "Object.assign",
+                    "Object.create",
+                    "delete",
+                    "hasOwnProperty"
+                  ],
+                  "examples": [
+                    {
+                      "title": "الاستخدام",
+                      "lang": "js",
+                      "code": "console.log(Object.keys(emp3));      // ['name','age','salary']\nconsole.log(Object.values(emp3)[0]); // Ahmed\n\ndelete emp3.salary;\nconsole.log(emp3.salary);            // undefined\n\nconsole.log(emp3.hasOwnProperty(\"name\")); // true\n\n// نسخ ودمج\nlet newObject = Object.create(myObject);\nlet obj1 = Object.assign({}, newObject, myObject);\n\n// المرور على المحتوى\nfor (let info in myObject) {\n  console.log(`${info} => ${myObject[info]}`);\n}"
+                    }
+                  ],
+                  "children": []
+                },
+                {
+                  "id": "fe-js-obj-descriptors",
+                  "title": "Property Descriptors و Meta Data",
+                  "def": "**Meta data**: تفاصيل ومعلومات عن الداتا في الـ object وخواص تتحكم فيها.\n\n**1) Data descriptor:**\n- `writable` — تسمح بتعديل قيمة الـ property من عدمه\n- `enumerable` — تسمح بدخول الـ property في loop من عدمه\n- `configurable` — تسمح بحذف الـ property من عدمه\n- `value` — القيمة\n\n⚠️ إن لم تكتب هذه الخواص فقيمتها الافتراضية `false` — أي لا تعديل ولا loop ولا حذف.\n\n**2) Accessor descriptor:**\n- `get: function(){}` — لجعل الـ property قابلة للقراءة\n- `set: function(value){}` — لجعلها قابلة للتعديل",
+                  "tags": [
+                    "defineProperty",
+                    "descriptor",
+                    "writable",
+                    "enumerable",
+                    "configurable",
+                    "get",
+                    "set",
+                    "metadata"
+                  ],
+                  "examples": [
+                    {
+                      "title": "defineProperty و defineProperties",
+                      "lang": "js",
+                      "code": "let myObject = { a: 1, b: 2 };\n\nObject.defineProperty(myObject, 'c', {\n  writable: true,\n  enumerable: true,\n  configurable: true,\n  value: 3,\n});\n\nObject.defineProperties(myObject, {\n  d: { writable: true, enumerable: true, configurable: true, value: 15 },\n  e: { writable: true, enumerable: true, configurable: true, value: 20 },\n});"
+                    },
+                    {
+                      "title": "أثر القيم false",
+                      "lang": "js",
+                      "code": "Object.defineProperties(emp3, {\n  name: {\n    value: \"Ali\",\n    writable: false,\n    configurable: false,\n    enumerable: false\n  }\n});\n\nfor (let i in emp3) console.log(i);\n// ❌ لا يظهر name لأن enumerable = false\n\ndelete emp3.name;   // ❌ لا يُحذف لأن configurable = false\nemp3.name = \"Bkr\";  // ❌ لا يتغيّر لأن writable = false"
+                    },
+                    {
+                      "title": "get و set",
+                      "lang": "js",
+                      "code": "Object.defineProperties(emp3, {\n  name: {\n    get: function () { return name; },\n    set: function (value) { name = value; }\n  }\n});\nemp3.name = \"Ali\";\nconsole.log(emp3.name);"
+                    }
+                  ],
+                  "children": []
+                }
+              ]
+            },
+            {
+              "id": "fe-js-date",
+              "title": "التاريخ (Date)",
+              "def": "تُستخدم لإخراج التاريخ والوقت، وبها ثلاث عائلات من الـ methods:\n\n- **`get…()`** — لإخراج التاريخ والوقت\n- **`set…()`** — لتعديل التاريخ والوقت\n- **`to…()`** — لإخراج الوقت والتاريخ بشكل معيّن",
+              "tags": [
+                "date",
+                "تاريخ",
+                "getDay",
+                "toISOString"
+              ],
+              "examples": [
+                {
+                  "title": "get و set",
+                  "lang": "js",
+                  "code": "let date = new Date();\nconsole.log(date);\n// Wed Aug 23 2023 15:51:48 GMT+0300\n\nconsole.log(date.getDay());      // 3   ← اليوم كـ index من 0 إلى 6\nconsole.log(date.getDate());     // 23  ← تاريخ اليوم\nconsole.log(date.getMonth());    // 7   ← الشهر كـ index من 0 إلى 11\nconsole.log(date.getFullYear()); // 2023\n\ndate.setDate(10);\ndate.setFullYear(2022);\ndate.setMonth(10);"
+                },
+                {
+                  "title": "صيغ العرض to…()",
+                  "lang": "js",
+                  "code": "console.log(date.toDateString());       // Thu Nov 10 2022\nconsole.log(date.toLocaleDateString()); // 11/10/2022\nconsole.log(date.toISOString());        // 2022-11-10T13:51:48.204Z\nconsole.log(date.toJSON());             // 2022-11-10T13:51:48.204Z\nconsole.log(date.toLocaleString());     // 11/10/2022, 3:51:48 PM\nconsole.log(date.toTimeString());       // 15:51:48 GMT+0200"
+                }
+              ],
+              "children": []
+            },
+            {
+              "id": "fe-js-errors",
+              "title": "الأخطاء ومعالجتها (Error Handling)",
+              "def": "**Error Object**: طريقة لإخراج error بصيغة يحدّدها المبرمج.\n\n**أنواع الأخطاء:** `Error` — `RangeError` — `SyntaxError` — `TypeError` — `ReferenceError` — `EvalError` — `URIError`\n\n**Properties:**\n- `name` — تُخرج نوع الـ error\n- `message` — تُخرج ما بداخله\n\n⚠️ يجب استخدام `throw` لتفعيل الـ error.",
+              "tags": [
+                "error",
+                "throw",
+                "try",
+                "catch",
+                "finally",
+                "أخطاء"
+              ],
+              "examples": [
+                {
+                  "title": "إنشاء ورمي خطأ",
+                  "lang": "js",
+                  "code": "var myError = new Error(\"custom error\");\nconsole.log(myError.name);    // Error\nconsole.log(myError.message); // custom error\n// throw myError;"
+                },
+                {
+                  "title": "try / catch / finally",
+                  "lang": "js",
+                  "code": "let range = prompt(\"sign number from 10 to 20\", \"15\");\n\ntry {\n  if (range < 10) {\n    throw \"this number is less than required number\";\n  } else if (range > 20) {\n    let rangError = new RangeError(\"out of range\");\n    throw rangError;\n  } else {\n    alert(\"exactly number\");\n  }\n} catch (e) {\n  if (e instanceof RangeError) {\n    console.log(\"this is range error\");\n  } else if (e === \"this number is less than required number\") {\n    console.log(\"low value\");\n  }\n  console.log(\"from catch\");\n} finally {\n  console.log(\"done\");   // تعمل دائماً\n}"
+                },
+                {
+                  "title": "onerror — الطريقة الثانية",
+                  "lang": "js",
+                  "code": "onerror = errorHandle;\n\nfunction errorHandle(msg, url, line, col, err) {\n  console.log(msg);\n  console.log(url);  // http://127.0.0.1:5500/javascript.js\n  console.log(line); // 470\n  console.log(col);  // 19\n  console.log(err);  // RangeError: out of range\n\n  return false;\n  // return false ⟵ يظهر الخطأ في خانة حمراء\n  // return true  ⟵ يظهر النص الذي كتبناه فقط\n}"
+                }
+              ],
+              "children": []
+            },
+            {
+              "id": "fe-js-iterator",
+              "title": "Iterator و Generator",
+              "def": "",
+              "tags": [
+                "iterator",
+                "generator",
+                "تكرار"
+              ],
+              "examples": [],
+              "children": [
+                {
+                  "id": "fe-js-iterator-basic",
+                  "title": "Iterator",
+                  "def": "عملية تكرار تحدث للقيم ويتم عرضها. يوجد iterator للـ **reference value** والـ **primitive value** مثل `array` و `string`، ولكن **لا يوجد** iteration للـ `object` أو `number`.\n\nيُشغَّل بـ `next()`، ومع كل استدعاء يردّ بقيمتين: `value` و `done`. تكون `done` بـ `false` حتى انتهاء القيم، فتصبح `value` بـ `undefined` و `done` بـ `true`.\n\n**`for…of`** تُخرج القيم — و **`for…in`** تُخرج المفاتيح (indexes كـ string).",
+                  "tags": [
+                    "Symbol.iterator",
+                    "next",
+                    "for of",
+                    "for in",
+                    "done"
+                  ],
+                  "examples": [
+                    {
+                      "title": "أي الأنواع قابلة للتكرار؟",
+                      "lang": "js",
+                      "code": "let myString = 'lover';\nlet myNumber = 7;\nlet myArray  = [1, 2, 3, 4];\nlet myObject = { lover: 'dasd' };\n\nconsole.log(typeof myString[Symbol.iterator]); // function ✅\nconsole.log(typeof myNumber[Symbol.iterator]); // undefined ❌\nconsole.log(typeof myArray[Symbol.iterator]);  // function ✅\nconsole.log(typeof myObject[Symbol.iterator]); // undefined ❌"
+                    },
+                    {
+                      "title": "استخدام next()",
+                      "lang": "js",
+                      "code": "let it = [1,2,3,4][Symbol.iterator]();\n\nconsole.log(it.next()); // {value: 1, done: false}\nconsole.log(it.next()); // {value: 2, done: false}\nconsole.log(it.next()); // {value: 3, done: false}\nconsole.log(it.next()); // {value: 4, done: false}\nconsole.log(it.next()); // {value: undefined, done: true}"
+                    },
+                    {
+                      "title": "for…of مقابل for…in",
+                      "lang": "js",
+                      "code": "for (let va of myArray) {\n  console.log(va, typeof va); // 1 number, 2 number, ...\n}\n\nfor (let va in myArray) {\n  console.log(va, typeof va); // 0 string, 1 string, ...\n}\n// ⚠️ تُستخدم for…of عادةً مع الـ array"
+                    }
+                  ],
+                  "children": []
+                },
+                {
+                  "id": "fe-js-custom-iterable",
+                  "title": "Custom Iterable Object",
+                  "def": "لجعل الـ object قابلاً للتكرار، نُضيف بداخله `[Symbol.iterator]` كـ method تُخرج الـ iterator.",
+                  "tags": [
+                    "custom iterable",
+                    "Symbol.iterator",
+                    "object"
+                  ],
+                  "examples": [
+                    {
+                      "title": "بدون custom ← خطأ",
+                      "lang": "js",
+                      "code": "let myObj = { name: 'Ali', age: 28 };\n\nfor (let va of myObj) {\n  console.log(va);\n}\n// ❌ Uncaught TypeError: myObj is not iterable"
+                    },
+                    {
+                      "title": "مع custom iterator ← يعمل",
+                      "lang": "js",
+                      "code": "let myObject = {\n  name: 'Ali',\n  age: 28,\n  adress: 'fsdfsd',\n  favFriend: 'ahmed',\n  [Symbol.iterator]() {\n    let step = 0;\n    let properties = Object.keys(this);\n    return {\n      next() {\n        return {\n          value: myObject[properties[step]],\n          done: step++ === properties.length,\n        };\n      },\n    };\n  },\n};\n\nfor (let va of myObject) {\n  console.log(va); // Ali, 28, fsdfsd, ahmed\n}"
+                    }
+                  ],
+                  "children": []
+                },
+                {
+                  "id": "fe-js-generator",
+                  "title": "Generator",
+                  "def": "تُستخدم لوقف أو تشغيل وإظهار مجموعة من القيم. تتكون من **generator function** تُرجع **generator object** (أو iterator object).\n\n**استخداماتها:** infinity scroll، بيانات الموجات الصوتية، وكبديل عن الـ promise و async/await — تجعل التعامل مع الكود غير المتزامن أكثر وضوحاً وقابلية للقراءة.\n\n**الصيغة:** `function*`\n\n⚠️ لا يمكن إنشاؤها عبر **arrow function** ولا باستخدام `new`.",
+                  "tags": [
+                    "generator",
+                    "function*",
+                    "yield",
+                    "next"
+                  ],
+                  "examples": [
+                    {
+                      "title": "طرق الإنشاء",
+                      "lang": "js",
+                      "code": "// declaration\nfunction* generatorFunction() {}\n\n// expression\nconst gen2 = function* () {};\n\n// كـ method في object\nconst generatorObj = {\n  *generatorMethod() {},\n};\n\n// كـ method في class\nclass GeneratorClass {\n  *generatorMethod() {}\n}"
+                    },
+                    {
+                      "title": "yield — إيقاف عند كل قيمة",
+                      "lang": "js",
+                      "code": "function* generatorFunction() {\n  yield 'Neo';\n  yield 'Morpheus';\n  yield 'Trinity';\n  return 'The Oracle';\n}\n\nconst generator = generatorFunction();\ngenerator.next(); // {value: \"Neo\",        done: false}\ngenerator.next(); // {value: \"Morpheus\",   done: false}\ngenerator.next(); // {value: \"Trinity\",    done: false}\ngenerator.next(); // {value: \"The Oracle\", done: true}\n// ← done صارت true بسبب الـ return"
+                    },
+                    {
+                      "title": "for…of و spread",
+                      "lang": "js",
+                      "code": "for (const value of generator) {\n  console.log(value); // Neo, Morpheus, Trinity\n}\n\nconst values = [...generator];\nconsole.log(values); // ['Neo','Morpheus','Trinity']\n// ⚠️ 'The Oracle' غير موجودة لأن الـ return لا تُطبع"
+                    },
+                    {
+                      "title": "Closing generator و throw",
+                      "lang": "js",
+                      "code": "const generator = generatorFunction();\ngenerator.next();                       // {value:'Neo', done:false}\ngenerator.return('There is no spoon!'); // {value:'There is no spoon!', done:true}\ngenerator.next();                       // {value: undefined, done: true}\n\n// رمي خطأ عند قيمة معيّنة\nfunction* g2() {\n  try {\n    yield 'Neo';\n    yield 'Morpheus';\n  } catch (error) {\n    console.log(error);\n  }\n}\nconst g = g2();\ng.next();\ng.throw(new Error('Agent Smith!'));"
+                    }
+                  ],
+                  "children": []
+                }
+              ]
+            },
+            {
+              "id": "fe-js-oop",
+              "title": "OOP في JavaScript",
+              "def": "**Object Oriented Programming** — طريقة لكتابة الكود، وتحتوي على ثلاث مبادئ:\n\n1. **Inheritance** — التوريث\n2. **Encapsulation** — التغليف\n3. **Polymorphism** — تعدّد الأشكال\n\nإضافة إلى **Abstraction** — استخدام كائنات/كلاسات جاهزة عبر معرفة *كيفية استخدامها* دون الحاجة لمعرفة الكود الداخلي (implementation) بداخلها.",
+              "tags": [
+                "oop",
+                "inheritance",
+                "encapsulation",
+                "polymorphism",
+                "abstraction"
+              ],
+              "examples": [],
+              "children": [
+                {
+                  "id": "fe-js-oop-create",
+                  "title": "طرق إنشاء الكائنات",
+                  "def": "**1) Factory function** — دالة تُرجع object، **لا** تحتاج `new`.\n\n**2) Constructor function** — يجب استخدام `new` معها، وتُستخدم `this`، ويكتب اسمها بحرف كبير.\n\n**Overloading**: وضع قيم افتراضية إن لم تُمرَّر معاملات (مثال: `nm ? nm : \"abc\"`).\n\n⚠️ عند فحص قيمة رقمية قد تكون `0`، استخدم `age !== undefined` لا `age ? age : …` — لأن `0` تُقيَّم كـ falsy فتُستبدل خطأً بالقيمة الافتراضية.",
+                  "tags": [
+                    "factory function",
+                    "constructor function",
+                    "overloading",
+                    "new"
+                  ],
+                  "examples": [
+                    {
+                      "title": "Factory function",
+                      "lang": "js",
+                      "code": "var student = function (nm, age) {\n  nm = nm ? nm : \"abc\";\n  age = (age !== undefined) ? age : 10; // تجنّب الخطأ مع age=0\n  return { name: nm, age: age };\n};\nlet st1 = student(\"_\", 0);\nconsole.log(st1.age); // 0 وليس 10"
+                    },
+                    {
+                      "title": "Constructor function + Prototype",
+                      "lang": "js",
+                      "code": "let Employee = function (nm, age, salary) {\n  this.name = nm ? nm : \"Nour\";\n  this.age = age ? age : 10;\n  this.salary = salary ? salary : 5000;\n};\n\n// إضافة method واحدة يشترك فيها كل الكائنات بدل تكرارها\nEmployee.prototype.edintifyMsg = function () {\n  return `hello ${this.name} your age is ${this.age} and your salary is ${this.salary}`;\n};\n\nlet emp1 = new Employee(\"Ali\", 25, 5000);\nconsole.log(emp1.edintifyMsg());"
+                    }
+                  ],
+                  "children": []
+                },
+                {
+                  "id": "fe-js-oop-overload-override",
+                  "title": "Overloading مقابل Overriding",
+                  "def": "**Overriding**: العلاقة بين parent و children أن يكون لهما نفس اسم الـ method، ويُستخدَم في الابن بنفس الاسم مع تغيير جزء من محتواها — فيحدث استبدال (override) لما في الأب.\n\n**Overloading**: في نفس الكلاس، تعدّد صور استخدام الدالة بوضع أكثر من شرط (`if`) بداخلها بحسب المعاملات الممرَّرة.\n\n**Private member**: متغيّر داخل constructor function يُتحكَّم فيه فقط عبر **privileged method** (method توضع بداخل الـ constructor لغرض محدد فقط — get/set).",
+                  "tags": [
+                    "overriding",
+                    "overloading",
+                    "private member",
+                    "privileged method"
+                  ],
+                  "examples": [],
+                  "children": []
+                },
+                {
+                  "id": "fe-js-prototype",
+                  "title": "Prototype",
+                  "def": "كل الخواص التي يرثها الـ object أو الـ array تكون بداخل الـ **prototype** — سواء functions أو properties. وكل object لديه prototype (كل ما يُستدعى بالنقطة `.` بعد الـ object يكون مسجَّلاً داخل الـ prototype).\n\n**`__proto__`** — property تحمل اسم الـ prototype، وكانت تُستخدم قديماً، والآن يُفضَّل:\n- `Object.getPrototypeOf(obj)` — لإحضار الـ prototype\n- `Object.setPrototypeOf(obj, proto)` — لتعيينه",
+                  "tags": [
+                    "prototype",
+                    "__proto__",
+                    "getPrototypeOf",
+                    "setPrototypeOf"
+                  ],
+                  "examples": [
+                    {
+                      "title": "إضافة function أو property للـ prototype",
+                      "lang": "js",
+                      "code": "User.prototype.addTitle = function () {\n  return `Mr. ${this.name}`;\n};\n// أُضيفت لكل ما يستخدم User\n\nObject.prototype.Kewan = 'welcome Back';\n// أُضيفت لكل الـ objects في الكود"
+                    }
+                  ],
+                  "children": []
+                },
+                {
+                  "id": "fe-js-class",
+                  "title": "Class",
+                  "def": "طريقة تُستخدم كبديل للـ function constructor، مستعارة من Python ولغات أخرى. أول ما يُنفَّذ بداخلها هو تعريف الـ properties في الـ `constructor`.",
+                  "tags": [
+                    "class",
+                    "constructor",
+                    "static",
+                    "extends",
+                    "super"
+                  ],
+                  "examples": [
+                    {
+                      "title": "Class أساسي",
+                      "lang": "js",
+                      "code": "class User {\n  constructor(name, email) {\n    this.name = name;\n    this.email = email;\n  }\n  sayHello() {\n    return `Hello ${this.name}`;\n  }\n}\n\nlet user1 = new User('osama', 'o@nn.sa');\nlet user2 = new User('Ahmed');   // email = undefined"
+                    },
+                    {
+                      "title": "Static members",
+                      "lang": "js",
+                      "code": "class User {\n  static counter = 0;\n  constructor(name) {\n    this.name = name;\n    User.counter++;\n  }\n  static countObjects() {\n    return `${this.counter} objects created.`;\n  }\n}\nconsole.log(User.countObjects());\n// ← تُستدعى على الكلاس نفسه، لا على أي instance"
+                    },
+                    {
+                      "title": "Inheritance — extends و super",
+                      "lang": "js",
+                      "code": "class Child extends User {\n  constructor(name, email) {\n    super(name, email); // استدعاء constructor الأب\n  }\n  adminMsg() {\n    return `you are admin`;\n  }\n  // override لـ method موجودة في الأب\n  showEmail() {\n    return `this is your email ${this.email}`;\n  }\n}"
+                    },
+                    {
+                      "title": "get و set في class",
+                      "lang": "js",
+                      "code": "class User {\n  constructor(name, email) {\n    this.name = name;\n    this.email = email;\n  }\n  get sayHello() {\n    return `Hello ${this.name}`;\n  }\n  set changeEmail(newEmail) {\n    this.email = newEmail;\n  }\n}\nlet user1 = new User('osama', 'o@nn.sa');\nuser1.changeEmail = 'ooo@n.sa'; // تُستخدم كـ property لا كدالة\nconsole.log(user1.email);"
+                    }
+                  ],
+                  "children": []
+                }
+              ]
+            },
+            {
+              "id": "fe-js-bom-dom",
+              "title": "BOM و DOM",
+              "def": "",
+              "tags": [
+                "bom",
+                "dom",
+                "browser",
+                "document"
+              ],
+              "examples": [],
+              "children": [
+                {
+                  "id": "fe-js-bom",
+                  "title": "BOM — Browser Object Model",
+                  "def": "عبارة عن 6 objects موجودة ومخصصة لصفحة المتصفح، ويكون **`window`** الـ parent object الرئيسي الذي يندرج تحته البقية:\n\n1. `document` — يحوي كل عناصر الـ HTML تقريباً\n2. `screen`\n3. `navigator`\n4. `location`\n5. `history`",
+                  "tags": [
+                    "bom",
+                    "window",
+                    "document",
+                    "screen",
+                    "navigator",
+                    "location",
+                    "history"
+                  ],
+                  "examples": [],
+                  "children": [
+                    {
+                      "id": "fe-js-window-methods",
+                      "title": "Window Methods",
+                      "def": "- `open(url, name, features)` — فتح صفحة جديدة بعرض وارتفاع محدَّدين\n- `close()` — إغلاق النافذة\n- `focus()` — التركيز على النافذة بعد تنفيذ أمر\n- `moveTo(x,y)` / `moveBy(dx,dy)` — نقل موضع النافذة\n- `resizeTo(w,h)` / `resizeBy(dw,dh)` — تغيير حجم النافذة\n- `scrollTo(x,y)` / `scrollBy(dx,dy)` — التمرير لمكان أو بمقدار معيّن",
+                      "tags": [
+                        "open",
+                        "close",
+                        "focus",
+                        "moveTo",
+                        "resizeTo",
+                        "scrollTo"
+                      ],
+                      "examples": [
+                        {
+                          "title": "فتح نافذة والتحكم بها",
+                          "lang": "js",
+                          "code": "var win;\nfunction openWin(){\n  win = open(\"/child.html\", \"\", \"width=150,height=150\");\n}\nfunction closeWin(){ win.close(); }\nfunction moveTo(){ win.moveTo(150,150); win.focus(); }"
+                        }
+                      ],
+                      "children": []
+                    },
+                    {
+                      "id": "fe-js-interval-timeout",
+                      "title": "setInterval و setTimeout",
+                      "def": "**setInterval**: تُكرِّر تنفيذ أمر كل مدّة زمنية محدَّدة، حتى يُوقَف بـ `clearInterval`.\n\n**setTimeout**: تُنفِّذ أمراً **مرة واحدة** بعد مدّة، ثم تتوقف، ويُوقَف قبل حلول الوقت بـ `clearTimeout`. ولتكرارها، يُستدعى اسم الدالة نفسها بداخل `setTimeout` (self-scheduling).",
+                      "tags": [
+                        "setInterval",
+                        "setTimeout",
+                        "clearInterval",
+                        "clearTimeout"
+                      ],
+                      "examples": [
+                        {
+                          "title": "الفرق بينهما",
+                          "lang": "js",
+                          "code": "var inter;\nfunction start(){\n  inter = setInterval(() => alert(\"from set interval\"), 5000);\n}\nfunction stop(){ clearInterval(inter); }\n\nvar time;\nfunction setTIme(x){\n  alert(\"from time out \" + x);\n  x++;\n  time = setTimeout(setTIme, 4000, x); // تكرار يدوي\n}\nfunction stopTime(){ clearTimeout(time); }"
+                        }
+                      ],
+                      "children": []
+                    },
+                    {
+                      "id": "fe-js-history-location",
+                      "title": "History و Location Objects",
+                      "def": "**History** (للتحكم في تبويب المتصفح):\n- `history.length` — عدد الصفحات التي مررنا بها\n- `history.back()` / `history.forward()` — الذهاب للسابق/التالي\n- `history.go(index)` — الذهاب لصفحة بمعلومية index\n\n**Location** (لمعرفة مسار الصفحة):\n- `location.href` — الرابط الكامل\n- `location.protocol` — http أو https\n- `location.host` — من `www` إلى `.com`\n- `location.search` — بيانات مُرسَلة بعد `?` في الرابط\n- `location.replace(url)` — استبدال الصفحة الحالية\n- `location.assign(url)` — إضافة صفحة جديدة بعد الحالية في التبويب",
+                      "tags": [
+                        "history",
+                        "location",
+                        "href",
+                        "protocol"
+                      ],
+                      "examples": [],
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "id": "fe-js-dom-core",
+                  "title": "DOM — Document Object Model",
+                  "def": "واجهة برمجية (API) تحتوي properties و methods و events تصف عمل الـ DOM وتخوّلك التواصل معه — مثل `document.querySelectorAll(\"p\")`. لا تُعتبر لغة برمجة، لكنها مهمة جداً في JS وتقلّل الحاجة لاستخدام Web APIs مباشرة.\n\n**Standard DOM** (من صنع W3C): platform-independent و language-independent.\n**DOM** الفعلي = المعيار + إضافات BOM الخاصة بالمتصفح.",
+                  "tags": [
+                    "dom",
+                    "document object model",
+                    "w3c"
+                  ],
+                  "examples": [
+                    {
+                      "title": "إنشاء عنصر عند تحميل الصفحة",
+                      "lang": "html",
+                      "code": "<script>\n  window.onload = () => {\n    const heading = document.createElement(\"h1\");\n    const headingText = document.createTextNode(\"Big Head!\");\n    heading.appendChild(headingText);\n    document.body.appendChild(heading);\n  };\n</script>"
+                    }
+                  ],
+                  "children": [
+                    {
+                      "id": "fe-js-dom-nodetypes",
+                      "title": "أنواع الـ Node (12 نوعاً)",
+                      "def": "أهمها:\n1. **root node** — `<html>`\n2. **element node** — `<head>` `<body>` `<div>` `<ul>`…\n3. **text node** — النص داخل عنصر\n4. **comment node** — `//تعليق`\n5. **attribute node** — مثل `class='c1'` أو `id='div1'`\n6. **document node** — كل صفحة HTML",
+                      "tags": [
+                        "node",
+                        "root node",
+                        "element node",
+                        "text node"
+                      ],
+                      "examples": [],
+                      "children": []
+                    },
+                    {
+                      "id": "fe-js-dom-select",
+                      "title": "طرق تحديد العناصر (Selecting)",
+                      "def": "1. **العلاقات (Relationships)** — `children[i]` / `nextElementSibling` / `nextSibling`\n2. **بمعلومية id** — `getElementById(\"id\")`\n3. **بمعلومية class** — `getElementsByClassName(\"class\")` (تُرجع HTMLCollection)\n4. **بمعلومية tagName** — `getElementsByTagName(\"div\")`\n5. **Query Selector** — `querySelector(sel)` لعنصر واحد، `querySelectorAll(sel)` لكل العناصر المطابقة",
+                      "tags": [
+                        "getElementById",
+                        "getElementsByClassName",
+                        "querySelector",
+                        "querySelectorAll"
+                      ],
+                      "examples": [
+                        {
+                          "title": "الفرق بين querySelector و querySelectorAll",
+                          "lang": "js",
+                          "code": "document.querySelector('input[type=\"text\"]')\n  .style.backgroundColor = \"red\";  // أول عنصر فقط\n\nfunction changBgColor(){\n  const inpText = document.querySelectorAll('input[type=\"text\"]');\n  for (var i = 0; i < inpText.length; i++)\n    inpText[i].style.backgroundColor = \"red\"; // كل العناصر\n}"
+                        }
+                      ],
+                      "children": []
+                    },
+                    {
+                      "id": "fe-js-dom-manipulate",
+                      "title": "التعديل: innerHTML / innerText / style / classList",
+                      "def": "- **innerHTML** — إضافة عنصر HTML بداخل العنصر المحدَّد\n- **innerText** — إضافة نص فقط\n- **style** — إضافة تنسيق مباشر\n- **classList** — `.add()` `.remove()` لإدارة الأصناف",
+                      "tags": [
+                        "innerHTML",
+                        "innerText",
+                        "style",
+                        "classList"
+                      ],
+                      "examples": [
+                        {
+                          "title": "التحكم بالأصناف",
+                          "lang": "js",
+                          "code": "let el = document.querySelector(\"#divone\");\nel.innerText = \"hello world\";\nel.classList;              // DOMTokenList ['c1']\nel.classList.add(\"c2\");    // ['c1','c2']\nel.classList.remove(\"c1\"); // ['c2']"
+                        }
+                      ],
+                      "children": []
+                    },
+                    {
+                      "id": "fe-js-dom-create",
+                      "title": "إنشاء عناصر جديدة",
+                      "def": "- `document.createTextNode(text)` — إنشاء نص\n- `parent.appendChild(node)` — إضافة في نهاية الأب\n- `parent.insertBefore(newNode, refNode)` — إضافة قبل عنصر محدَّد",
+                      "tags": [
+                        "createElement",
+                        "createTextNode",
+                        "appendChild",
+                        "insertBefore"
+                      ],
+                      "examples": [
+                        {
+                          "title": "إضافة نص لعنصر",
+                          "lang": "js",
+                          "code": "let textElm = document.createTextNode(\"let's do it\");\nlet divBox = document.querySelector(\"#div\");\ndivBox.appendChild(textElm);\n\n// إضافة قبل عنصر معيّن\ndocument.body.insertBefore(textElm, divBox);"
+                        }
+                      ],
+                      "children": []
+                    },
+                    {
+                      "id": "fe-js-aria",
+                      "title": "WAI-ARIA وإتاحة الوصول برمجياً",
+                      "def": "تتأكد من أن الموقع يحوي معايير قياسية لإتاحة الوصول.\n\n- **role** — كلمات معروفة لقارئ الشاشة (مثل `img` أو `contentinfo`) توضع مع `div` لتُلمِّح بأن هذا الجزء header أو footer مثلاً، دون تغيير المحتوى الظاهر\n- **aria-hidden** — تُخفي المحتوى عن قارئ الشاشة مع بقائه ظاهراً بصرياً. ⚠️ لا تُستخدم مع عناصر تفاعلية مثل `a` أو `button` لأنها تمنع قارئ الشاشة من قراءتها للمستخدم",
+                      "tags": [
+                        "aria",
+                        "role",
+                        "aria-hidden",
+                        "wai-aria"
+                      ],
+                      "examples": [
+                        {
+                          "title": "role يصف المحتوى لقارئ الشاشة",
+                          "lang": "html",
+                          "code": "<div role='banner'></div>\n<!-- يُعرِّف قارئ الشاشة أن هذا القسم مثل header -->\n\n<div role=\"img\">\n  <img src=\"img1.png\" alt=\"img1\">\n  <img src=\"img2.png\" alt=\"img2\">\n</div>\n<!-- يُعرَّف الصورتان ككتلة واحدة -->"
+                        }
+                      ],
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "id": "fe-js-events",
+                  "title": "Events",
+                  "def": "أنواع كثيرة تمكّنك من عمل أفعال بناءً على الفأرة أو الكيبورد أو أحداث أخرى.",
+                  "tags": [
+                    "events",
+                    "addEventListener",
+                    "أحداث"
+                  ],
+                  "examples": [],
+                  "children": [
+                    {
+                      "id": "fe-js-events-list",
+                      "title": "أهم الأحداث",
+                      "def": "**رد فعل للفأرة:** `onclick` — `ondblclick` — `onmouseover` (hover) — `onmousemove` — `onmousedown`\n\n**رد فعل للكيبورد:**\n- `onkeydown` — لحظة الضغط قبل رفع اليد\n- `onkeypress` — عند الضغط على زر غير الأزرار الرئيسية (alt, ctrl…)\n- `onkeyup` — بعد رفع اليد عن الزر\n\n**أفعال أخرى:**\n- `onfocus` — عند الدخول لمربع كتابة\n- `onblur` — عند الخروج منه (يمكن استخدام `this.value` وقتها)\n- `onload` / `onunload` — بعد التحميل / قبل الخروج\n- `onerror` — عند ظهور خطأ\n- `onreset` / `onsubmit` — في الـ form",
+                      "tags": [
+                        "onclick",
+                        "onkeydown",
+                        "onfocus",
+                        "onblur",
+                        "onsubmit"
+                      ],
+                      "examples": [],
+                      "children": []
+                    },
+                    {
+                      "id": "fe-js-events-phases",
+                      "title": "Capturing و Bubbling",
+                      "def": "**Capturing phase**: الترتيب الطبيعي لاتجاه الكود: Grandparent → Parent → Child.\n\n**Bubbling phase**: عكس Capturing — عند الضغط على أعمق عنصر، يظهر وكأن كل العناصر التي بداخلها تعرَّضت للضغط أيضاً.\n\n**`event.stopPropagation()`** — تُوقف عمل الـ bubbling.\n\n**addEventListener(type, fn, useCapture)** — المعامل الثالث `true` يعني تنفيذ عبر capturing (الآباء أولاً)، و`false` (أو تركه) يعني bubbling (الأبناء أولاً).\n\n⚠️ يجب عمل `removeEventListener` عند الحاجة للحفاظ على الـ performance — لأنه يبقى يعمل في الخلفية دون ذلك.",
+                      "tags": [
+                        "capturing",
+                        "bubbling",
+                        "stopPropagation",
+                        "addEventListener"
+                      ],
+                      "examples": [],
+                      "children": []
+                    },
+                    {
+                      "id": "fe-js-events-target",
+                      "title": "Event Target / Type / Coordinates",
+                      "def": "- `event.target` — العنصر الذي حدث عليه الـ event\n- `event.type` — نوع الـ event\n- `event.offsetX/Y` — الإحداثيات نسبة لبداية الصفحة\n- `event.clientX/Y` — الإحداثيات نسبة لبداية نافذة العرض\n- `dispatchEvent()` — لعمل fire يدوي للـ event",
+                      "tags": [
+                        "event.target",
+                        "offsetX",
+                        "clientX",
+                        "dispatchEvent"
+                      ],
+                      "examples": [],
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "id": "fe-js-ajax",
+                  "title": "AJAX و JSON",
+                  "def": "**AJAX** — *Asynchronous JavaScript and XML* — مجموعة من HTML و CSS و JS تسمح بإرسال واستقبال داتا **دون إعادة تحميل الصفحة**.\n\n- **Synchronous**: لا يُرسَل طلب جديد إلا بعد الرد على السابق\n- **Asynchronous**: يمكن إرسال أكثر من طلب في نفس الوقت، والرد يأتي بأي ترتيب\n\n**XHR (XMLHttpRequest)** — الـ API القديم لعمل AJAX، له properties منها `readyState` (0 uninitialized → 4 complete) و `status` (200s نجاح، 400s خطأ عميل، 500s خطأ سيرفر)، وmethods مثل `.open()` و `.send()`.",
+                  "tags": [
+                    "ajax",
+                    "xhr",
+                    "xmlhttprequest",
+                    "json",
+                    "synchronous",
+                    "asynchronous"
+                  ],
+                  "examples": [
+                    {
+                      "title": "طلب XHR كامل",
+                      "lang": "js",
+                      "code": "document.querySelector(\"#btn1\").addEventListener(\"click\", function(){\n  let xhr = new XMLHttpRequest();\n  xhr.onreadystatechange = function(){\n    if (xhr.readyState == 4) {          // انتهت كل المراحل\n      if (xhr.status == 200) {          // لا مشاكل\n        let text = xhr.responseText;\n        document.getElementsByTagName(\"div\")[0].innerHTML = text;\n      }\n    }\n  };\n  xhr.open(\"GET\", \"AJAX.txt\");\n  xhr.send(\"\");\n});"
+                    },
+                    {
+                      "title": "JSON.parse و JSON.stringify",
+                      "lang": "js",
+                      "code": "// من نص إلى كائن JS (بعد استلام البيانات)\nlet obj = JSON.parse('{\"name\":\"Ali\"}');\n\n// من كائن JS إلى نص (قبل الإرسال أو الحفظ)\nlet str = JSON.stringify({ name: \"Ali\" });\n// حلّت محل XML لأنها أسهل هيكلة وتوليداً"
+                    }
+                  ],
+                  "children": []
+                },
+                {
+                  "id": "fe-js-cookies",
+                  "title": "Cookies",
+                  "def": "ملف يُنشئه الـ web server ويوضع عند المستخدم عند تسجيل الدخول لتتذكّره الصفحة دون طلب تسجيل الدخول مرة أخرى. يتبع نظام **Same Origin Policy** — أن السيرفر الذي أنشأ الـ cookie هو الوحيد القادر على التحكم به أو الوصول إليه.\n\n**النوعان:**\n- **Persistent cookies** — لها تاريخ انتهاء (مثل زر \"تذكرني\")\n- **Non-persistent (session) cookies** — تُحذف بمجرد إغلاق المتصفح",
+                  "tags": [
+                    "cookie",
+                    "same origin policy",
+                    "persistent",
+                    "session"
+                  ],
+                  "examples": [
+                    {
+                      "title": "إنشاء وقراءة cookie",
+                      "lang": "js",
+                      "code": "let date = new Date();\ndate.setMonth(date.getMonth() + 3);   // صلاحية 3 أشهر\n\ndocument.cookie = \"userName=\" + userName + \";expiry=\" + date;\n\n// القراءة والتحويل لكائن key:value\nvar assoiativeCookie = [];\nvar splitCookie = document.cookie.split(\";\");\nfor (let i = 0; i < splitCookie.length; i++) {\n  assoiativeCookie[splitCookie[i].split(\"=\")[0].trim()] = splitCookie[i].split(\"=\")[1];\n}"
+                    }
+                  ],
+                  "children": []
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "fe-typescript",
+          "title": "TypeScript",
+          "def": "تشبيه: JavaScript مثل الكتابة بلا تدقيق إملائي — تكتشف الأخطاء بعد أن يقرأها الناس. **TypeScript** يضيف \"مدقّقاً\" يحذّرك من الخطأ وأنت تكتب، قبل أن يصل للمستخدم.\n\nلغة صنعتها Microsoft، مشتقّة من JavaScript، أضافت دعم **الأنواع (Types)** لتجنّب الأخطاء وتسهيل القراءة. بعد الكتابة تُحوَّل (`.ts` → `.js`) لتعمل في المتصفح.\n\n`.ts is static type` — لا يمكن تغيير نوع المتغيّر بعد تحديده.\n`.js is dynamic type` — يمكن تغيير النوع في أي وقت.",
+          "tags": [
+            "typescript",
+            "ts",
+            "types",
+            "static type"
+          ],
+          "examples": [
+            {
+              "title": "الفرق الجوهري عن JS",
+              "lang": "ts",
+              "code": "// JavaScript — لا أحد يمنعك من الخطأ\nlet age = 25;\nage = \"خمسة وعشرون\";   // ✅ يمرّ! ثم ينهار لاحقاً\n\n// TypeScript — يمنعك فوراً\nlet age: number = 25;\nage = \"خمسة وعشرون\";   // ❌ خطأ: النوع نص لا رقم"
+            },
+            {
+              "title": "الأنواع الأساسية",
+              "lang": "ts",
+              "code": "let name: string = \"إبراهيم\";\nlet age: number = 30;\nlet isActive: boolean = true;\nlet tags: string[] = [\"a\", \"b\"];\nlet ids: number[] = [1, 2, 3];\n\nfunction add(a: number, b: number): number {\n  return a + b;\n}\n\n// string | number | boolean | any (تجنّبه) | void (لا تُرجع شيئاً)"
+            }
+          ],
+          "children": [
+            {
+              "id": "fe-ts-interface",
+              "title": "Interface و Union و Optional",
+              "def": "تشبيه الـ interface: مثل \"استمارة رسمية\" تحدّد الحقول المطلوبة وأنواعها؛ أي كائن يجب أن يملأ الاستمارة كما هي.\n\n**الفرق بين interface و type**: كلاهما يصف شكل البيانات. استخدم `interface` للكائنات (الأشيع)، و`type` عند الحاجة لـ union أو دمج أنواع. في البداية `interface` يكفيك.\n\n**Union**: النوع واحد من عدة احتمالات محدَّدة فقط.\n**Optional** (`?`): حقل قد يوجد أو لا — مفيد جداً مع بيانات API قد تنقص بعض حقولها.",
+              "tags": [
+                "interface",
+                "type",
+                "union",
+                "optional"
+              ],
+              "examples": [
+                {
+                  "title": "Interface أساسي",
+                  "lang": "ts",
+                  "code": "interface User {\n  id: number;\n  name: string;\n  email: string;\n  isAdmin: boolean;\n}\n\nconst u: User = {\n  id: 1, name: \"سارة\", email: \"sara@mail.com\", isAdmin: false\n}; // يجب أن يطابق الشكل تماماً"
+                },
+                {
+                  "title": "Union و Optional",
+                  "lang": "ts",
+                  "code": "let status: \"active\" | \"pending\" | \"banned\" = \"active\";\nstatus = \"deleted\"; // ❌ خطأ: ليست ضمن القائمة\n\ninterface Product {\n  id: number;\n  name: string;\n  discount?: number; // اختياري — قد لا يُرسل\n}\nconst p: Product = { id: 1, name: \"قميص\" }; // ✅ بدون discount"
+                }
+              ],
+              "children": []
+            },
+            {
+              "id": "fe-ts-generics",
+              "title": "Generics",
+              "def": "تشبيه: مثل \"صندوق فارغ\" — نفس الصندوق يصلح لأي محتوى، وتحدّد أنت نوعه وقت الاستخدام. بدل صندوق للتفاح وآخر للبرتقال، تصنع صندوقاً واحداً `<T>` يتكيّف.\n\nلماذا تهمّك؟ ستراها كثيراً في React (`useState<User>`) وفي دوال جلب البيانات — نوع مرن تحدّده وقت الاستخدام.",
+              "tags": [
+                "generics",
+                "<T>"
+              ],
+              "examples": [
+                {
+                  "title": "دالة عامة واستجابة API عامة",
+                  "lang": "ts",
+                  "code": "function wrapInArray<T>(item: T): T[] {\n  return [item];\n}\nwrapInArray<string>(\"مرحبا\"); // string[]\nwrapInArray<number>(5);       // number[]\n\ninterface ApiResponse<T> {\n  data: T;\n  success: boolean;\n}\ntype UsersResponse = ApiResponse<User[]>;\ntype ProductResponse = ApiResponse<Product>;"
+                }
+              ],
+              "children": []
+            },
+            {
+              "id": "fe-ts-async",
+              "title": "Async/Await ونمذجة API",
+              "def": "تشبيه: جلب البيانات يأخذ وقتاً، مثل طلب قهوة — لا تقف منتظراً، بل تكمل عملك ويُنادى عليك عند الجاهزية. `Promise` هو \"إيصال الطلب\"، و`await` تعني \"انتظر حتى يجهز ثم كمّل\".\n\n**العادة القوية:** عرّف `interface` لكل كيان (User, Note, Product…) واستخدمه في كل الطلبات — يوفّر عليك أخطاء لا تُحصى ويمنحك autocomplete.",
+              "tags": [
+                "async",
+                "await",
+                "promise",
+                "api",
+                "interface"
+              ],
+              "examples": [
+                {
+                  "title": "دالة async تُرجع Promise موصوفة بنوع",
+                  "lang": "ts",
+                  "code": "interface Note {\n  id: number;\n  title: string;\n  body: string;\n  createdAt: string;\n}\n\nasync function getNotes(): Promise<Note[]> {\n  const res = await fetch(\"/api/notes\");\n  return res.json();\n}\n\nconst notes = await getNotes();\nnotes[0].title;  // ✅ autocomplete\nnotes[0].titel;  // ❌ خطأ إملائي يُكتشف فوراً"
+                }
+              ],
+              "children": []
+            }
+          ]
+        },
+        {
+          "id": "fe-rendering",
+          "title": "استراتيجيات العرض: SSR / CSR / SSG / ISG",
+          "def": "",
+          "tags": [
+            "ssr",
+            "csr",
+            "ssg",
+            "isg",
+            "spa",
+            "rendering"
+          ],
+          "examples": [],
+          "children": [
+            {
+              "id": "fe-render-ssr",
+              "title": "SSR — Server Side Rendering",
+              "def": "عملية إنشاء ملف الـ HTML وبناؤه في الـ **server بالكامل**.\n\n**مشاكلها**: لو حدث تغيير في الـ server بعد الإرسال، لن يُقرأ أو يُضاف إلا بعمل reload للصفحة.\n\n**api response**: عملية إرجاع البيانات التي أخذها الـ server من الـ database، وتنسيقها (format) لتخرج كـ data فقط، ثم إرسالها للـ client browser.",
+              "tags": [
+                "ssr",
+                "server side rendering"
+              ],
+              "examples": [],
+              "children": []
+            },
+            {
+              "id": "fe-render-csr",
+              "title": "CSR — Client Side Rendering و SPA",
+              "def": "تتم على عاتق إطار عمل الـ JS (Vue أو React أو Angular). عند فتح الصفحة يرسل الـ browser الطلب للـ server، فيرسل الـ server `index.html` فارغاً تقريباً، ثم يبحث إطار العمل عن الـ route الموجود في الـ browser ليحوّله لصيغة HTML بسيطة، وبهذا يكتمل الملف **في المتصفح**.\n\nعند الحاجة لـ API معيّن، يطلب الـ browser من السيرفر، والسيرفر من الـ database، فتتم عملية الـ api response، ويضع إطار العمل البيانات في مكانها.\n\n**SPA (Single Page Application)**: ملف HTML واحد، وتتغيّر الصفحات عبر تغيير الـ component.\n\n**مشاكل CSR**: مشكلة SEO — بوتات جوجل تبحث عن الكلمات الافتتاحية في السيرفر لتصنيف الموقع فلا تجد شيئاً، لأن الصفحة كلها تُصنع من طرف العميل (على عكس SSR).\n\n**الحل**: استخدام **Nuxt** مع Vue أو **Next** مع React — بضبط `ssr: true` في إعدادات Nuxt، يُرسَل الكود الناتج من Vue للسيرفر، فتجد البوتات الكلمات المطلوبة.",
+              "tags": [
+                "csr",
+                "client side rendering",
+                "spa",
+                "nuxt",
+                "next",
+                "seo"
+              ],
+              "examples": [],
+              "children": []
+            },
+            {
+              "id": "fe-render-ssg-isg",
+              "title": "SSG و ISG",
+              "def": "**SSG — Static Site Generation**: يُعمَل render لكامل الـ HTML، ومعه render للـ API إن لم يكن متغيّراً باستمرار، ويُرسَلون للسيرفر — فيكون أسرع.\n\n**ISG — Incremental Static Generation**: يجمع بين SSG و SSR: عند طلب على السيرفر لصناعة الـ HTML، يُحفَظ في الـ **cache**، فيعتمد عليه لجلب الداتا، ثم يرجع للسيرفر لاحقاً ليتأكد من وجود داتا جديدة.\n\n**Cache**: ذاكرة تخزين مؤقتة.",
+              "tags": [
+                "ssg",
+                "isg",
+                "static generation",
+                "cache"
+              ],
+              "examples": [],
+              "children": []
+            }
+          ]
+        },
+        {
+          "id": "fe-vue",
+          "title": "Vue",
+          "def": "**JS framework** يمكّن من إنشاء موقع تفاعلي بسهولة، ويقلّل الرجوع للسيرفر عند بعض الطلبات. يمكن استخدامه لكامل الموقع أو في جزء منه فقط (widget) إن كان الموقع منشأً مسبقاً.\n\n**Framework**: مكتبة أو قواعد أنشأها آخرون — دوال وقواعد معيّنة، بعد تعلّمها ترشدك لبناء التطبيق بسهولة أكبر.\n\n**طريقتا التعامل:**\n- **Options API** — أصبحت قديمة؛ في المشاريع الكبيرة يصعب التنقل بين `data` و`mutations` و`computed`… المتناثرة، وتتكرر الدوال بين components\n- **Composition API** — الأفضل حالياً، عبر `setup()` بدلاً من التوزيع القديم",
+          "tags": [
+            "vue",
+            "framework",
+            "options api",
+            "composition api",
+            "setup"
+          ],
+          "examples": [],
+          "children": [
+            {
+              "id": "fe-vue-reactivity",
+              "title": "التفاعلية: ref / reactive / computed",
+              "def": "**`ref()`** — لجعل متغيّر (خصوصاً string/number) قابلاً للتغيير والتتبّع في Composition API، ويُقرأ عبر `.value`.\n\n**`toRef()`** — لتحويل object لاستخدامه بدون كتابة `.value`.\n\n**`reactive()`** — نفس فكرة `ref` لكن مخصَّصة للـ **object**.\n\n**`computed`** — لا تُستخدم لتغيير قيمة متغيّر، بل لإخراج قيمة جديدة مشتقّة من متغيّر موجود. غالباً تُستخدم لتحسين مظهر كود HTML — توضع فيها شروط `v-if` أو أي منطق كان سيُكتب مباشرة في القالب، وتُستخدم عادة مع `v-bind`.\n\n**`Beforecreated()` و `created()`** تقريباً بنفس زمن **`setup()`**.\n\n**`defineAsyncComponent`** — يجعل الـ component يُحمَّل عند الحاجة فقط، لتحسين الـ performance.",
+              "tags": [
+                "ref",
+                "reactive",
+                "toRef",
+                "computed",
+                "setup"
+              ],
+              "examples": [],
+              "children": []
+            },
+            {
+              "id": "fe-vue-vdom",
+              "title": "Virtual DOM",
+              "def": "الطريقة المستخدمة في Vue لعمل render للكود في المتصفح: يأخذ الـ virtual DOM نسخة من الصفحة، وعند تغيير عنصر تحدث مقارنة بين النسخة القديمة والجديدة، ويُغيَّر **المختلف فقط** — ثم يُحدَّث الـ browser DOM الرئيسي. بهذا يكون الموقع أسرع ولا يحتاج render لكامل الصفحة عند كل تغيير.",
+              "tags": [
+                "virtual dom",
+                "render",
+                "أداء"
+              ],
+              "examples": [],
+              "children": []
+            },
+            {
+              "id": "fe-vue-lifecycle",
+              "title": "Lifecycle Hooks",
+              "def": "hooks مرتبطة بأزمنة معيّنة: قبل إنشاء المشروع، عمل render، التحكم في الـ app وقبله، بعد mount، وغيرها:\n\n`beforeCreate()` → `created()` → `beforeMount()` → `mounted()` → `beforeUpdate()` → `updated()` → `beforeUnmount()` → `unmounted()`",
+              "tags": [
+                "lifecycle",
+                "mounted",
+                "created",
+                "beforeUnmount"
+              ],
+              "examples": [],
+              "children": []
+            },
+            {
+              "id": "fe-vue-components",
+              "title": "Components و Props و Slots",
+              "def": "**Component**: جزء من الكود يمكن تكراره في أكثر من موضع دون تكرار الكود، بحيث يكون كل component مستقلاً بذاته.\n\n**Props**: تصدّر بيانات من الأب إلى **الابن المباشر** فقط. البيانات المُرسَلة لا يمكن تغييرها في الابن مباشرة — يجب نسخها لمتغيّر جديد بداخله ثم تعديل النسخة.\n\n**Refs (في Vue)**: توضع داخل أي عنصر HTML لإعطائنا قيمة منه، تُستخدم في أي مكان دون الحاجة لعمل متغيّر في `data`. غالباً تُخرج نصاً حتى لو كُتبت أرقام.\n\n**Scoped** (`<style scoped>`): يجعل الـ style مقصوراً على الـ component الذي هو فيه فقط.\n\n**Slot**: لاستيراد كود HTML من الأب إلى الابن (child component) لعمل تنسيق خاص عليه. يمكن تسمية أكثر من slot عبر `name=''` واستدعاؤه بـ `<template v-slot:name>`. **Scoped slot**: تُستخدم لنقل داتا من child إلى parent (أو لمن هو في نفس المستوى).",
+              "tags": [
+                "component",
+                "props",
+                "refs",
+                "scoped",
+                "slot",
+                "scoped slot"
+              ],
+              "examples": [
+                {
+                  "title": "استقبال Props في الابن",
+                  "lang": "html",
+                  "code": "<!-- Child.vue -->\n<script>\nexport default {\n  props: ['name', 'age']\n}\n</script>"
+                }
+              ],
+              "children": []
+            },
+            {
+              "id": "fe-vue-emit-provide",
+              "title": "emit و provide/inject",
+              "def": "**emit**: تُستخدم في الـ child component لتشغيل method أو function موجودة في الـ **parent** عند حدوث أمر في الابن — لنقل بيانات من الابن للأب. يشترط أن يكون الكومبوننت مستخدَماً في الأب.\n\n**provide/inject**: تُستخدمان لتصدير الداتا من الأب إلى الأبناء **غير المباشرين** (الذين لم يُستدعوا مباشرة في الأب).\n\n⚠️ عند تعديل array كاملة صُدِّرت بـ `provide` (مثل حذف عنصر بـ `filter`)، لن يظهر التغيير في الواجهة لأنه لن يحدث render جديد — يجب بدلاً من ذلك إيجاد الـ index وحذفه بـ `splice` لتعديل الجزء المطلوب فقط لا الـ array كاملة.",
+              "tags": [
+                "emit",
+                "provide",
+                "inject",
+                "splice"
+              ],
+              "examples": [],
+              "children": []
+            },
+            {
+              "id": "fe-vue-directives",
+              "title": "v-model وتوابعها",
+              "def": "**v-model**: تُخرج نتائج الكتابة في `input`، وتُقابلها في الكمبوننت `props:['modelValue']` و `emit:['update:modelValue']`.\n\n- **v-model.lazy** — يُصدَّر ما يُكتب عند **الانتهاء** لا مع كل حرف\n- **v-model.number** — يجبر الإخراج كأرقام\n- **v-model.trim** — يحذف المسافات الزائدة\n\n**`@input`**: تُستخدم لإخراج ما في الحقول (مثل v-model و ref) عادةً قبل حدوث submit، للتحقق من كل حقل.",
+              "tags": [
+                "v-model",
+                "lazy",
+                "trim",
+                "@input"
+              ],
+              "examples": [],
+              "children": []
+            },
+            {
+              "id": "fe-vue-special-elements",
+              "title": "عناصر Vue الخاصة",
+              "def": "- **`<component :is=''>`** — يُظهر أي component مستورَد بحسب الاسم الممرَّر في `is`، للتبديل السريع دون render جديد\n- **`<keep-alive>`** — يُبقي الـ component محتفظاً بداتاه عند التنقل بينه وبين غيره\n- **`<teleport to=''>`** — ينقل ما بداخله لمكان محدَّد في الـ DOM (مفيد مع popups)\n- **fragments** — منذ Vue 3، يمكن وضع عدة عناصر مباشرة داخل `<template>` دون حاوية واحدة (`div`)",
+              "tags": [
+                "component dynamic",
+                "keep-alive",
+                "teleport",
+                "fragments"
+              ],
+              "examples": [],
+              "children": []
+            },
+            {
+              "id": "fe-vue-router",
+              "title": "Vue Router",
+              "def": "يتحكم في وجود أكثر من رابط متفرّع من الرابط الأساسي. بعد `install`، يُستدعى ويُخزَّن في متغيّر `router`، فيصبح متاحاً عبر `this.$router` في أي مكان.\n\n**routes: [{}]** — كل object فيها property باسم `path` و `component`.\n\n- **alias** — رابطان مختلفان لنفس الكمبوننت\n- **redirect** — تحويل رابط لآخر\n- **props: true** — تصدير قيمة الـ params مباشرة كـ props في الكمبوننت\n- **`this.$route.params`** — لجلب قيم مكتوبة بعد `:` في الـ path مثل `path:'/team/:teamId'`\n- **`path:'/:notFound(.*)'`** — صفحة اصطياد أي رابط غير موجود\n- **query parameter** — إضافات على الرابط بعد `?`",
+              "tags": [
+                "router",
+                "routes",
+                "alias",
+                "redirect",
+                "params",
+                "query"
+              ],
+              "examples": [],
+              "children": [
+                {
+                  "id": "fe-vue-router-guards",
+                  "title": "Navigation Guards",
+                  "def": "- **`scrollBehavior(to, from, savedPosition)`** — التحكم بموضع التمرير عند التنقل\n- **`router.beforeEach(to, from, next)`** — منع/إجبار الانتقال لرابط قبل الذهاب إليه (مثل حماية المسارات لغير المسجّلين)\n- **`beforeEnter(to, from, next)`** — نفس الفكرة لكن مرتبطة بـ path محدَّد\n- **`router.afterEach(to, from)`** — تعمل بعد الانتقال (لإرسال داتا مثلاً)\n- **`beforeRouteLeave(to, from, next)`** — داخل الكمبوننت نفسه، للتحكم عند مغادرته\n- **`meta`** في الـ route — بيانات تُستخدم في route guards (مثل منع الدخول لغير المسجّلين)\n- **`<router-view>`** — الوسم الذي يعرض المسار الحالي\n- **`<router-link to=''>`** — بديل وسم `a` مرتبط بالـ routes",
+                  "tags": [
+                    "beforeEach",
+                    "beforeEnter",
+                    "afterEach",
+                    "meta",
+                    "router-view",
+                    "router-link"
+                  ],
+                  "examples": [],
+                  "children": []
+                }
+              ]
+            },
+            {
+              "id": "fe-vuex",
+              "title": "Vuex — إدارة الحالة",
+              "def": "مكتبة لإدارة المحتوى التفاعلي في Vue.\n\n**State** — نوعان:\n- **Local state** — يُدار في كمبوننت واحد (أو أبنائه فقط)\n- **Global state** — يُدار عبر أكثر من كمبوننت\n\n**Modules**: object يحوي `state` و `mutation` و `getter` و `action` خاصة به لتقليل التكرار وزيادة التنظيم؛ يُستدعى في `createStore` الرئيسي، ويكون الـ state بداخله **local**.\n\n**Namespaced**: يجعل الـ module يعمل كـ mainStore منفصل، لتجنّب تعارض الأسماء بين module محلي وآخر عام.",
+              "tags": [
+                "vuex",
+                "state",
+                "modules",
+                "namespaced"
+              ],
+              "examples": [],
+              "children": [
+                {
+                  "id": "fe-vuex-mutation-action",
+                  "title": "Mutation و Action و Getters",
+                  "def": "**Mutation**: methods تُستخدم في أكثر من كمبوننت، تُستدعى عبر `commit`:\n`this.$store.commit('mutation name')`\n\n**Payload**: argument يُمرَّر للـ mutation عند الاستدعاء:\n`this.$store.commit('name', {value: x})`\n\n**Action**: تأخذ methods من الـ Mutation وتُنفَّذها **بعد مهلة** (تُستخدم لطلبات http غير المتزامنة) عبر `context`:\n`context.commit('mutation name', payload.value)`\n\nوتحوي `context` أيضاً: `getters` (لاستخدام getter موجود)، `dispatch` (لهندلة طلبات http)، `state`، `rootGetter`/`rootState` (للربط بين modules مختلفة).\n\nتُستدعى الـ action من الكمبوننت بـ:\n`this.$store.dispatch('action name', {value: x})`\n\n**Getters**: لا تُغيّر قيمة، بل تُخرج قيمة جديدة معتمدة على الـ state — لتُستخدم في أكثر من component دون تكرار المنطق.\n\n**Map helpers** (`mapActions`, `mapGetters`, `mapMutations`…): اختصارات بدل كتابة `this.$store.commit/dispatch/getter` بالكامل في كل مرة.",
+                  "tags": [
+                    "mutation",
+                    "action",
+                    "getters",
+                    "commit",
+                    "dispatch",
+                    "payload",
+                    "map helpers"
+                  ],
+                  "examples": [
+                    {
+                      "title": "استخدام mapActions",
+                      "lang": "js",
+                      "code": "import { mapActions } from 'vuex';\n\nexport default {\n  methods: {\n    ...mapActions({ nicName: 'action method name' })\n  }\n}"
+                    }
+                  ],
+                  "children": []
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "backend",
+      "title": "Backend",
+      "subtitle": "السيرفر وقواعد البيانات والـ API",
+      "icon": "⚙️",
+      "color": "#0ea5e9",
+      "children": [
+        {
+          "id": "be-database",
+          "title": "قواعد البيانات",
+          "def": "**Database (DB)**: المكان الذي يُحفَظ فيه كل الداتا الخاصة بالمشروع، بحيث يحتوي على أكثر من **table**، وكل table يحوي داتا لجزء معيّن.\n\n**SQL — Structured Query Language**: اللغة التي تُستخدَم للتحكم في الداتا بيز — أخذ داتا أو إضافتها أو حذفها وغيرها. من أشهر أنظمتها: MySQL و PostgreSQL و SQL Server.",
+          "tags": [
+            "database",
+            "db",
+            "sql",
+            "قاعدة بيانات"
+          ],
+          "examples": [],
+          "children": [
+            {
+              "id": "be-db-tables-keys",
+              "title": "الجداول والمفاتيح (Tables & Keys)",
+              "def": "الجدول يخزّن نوعاً واحداً من البيانات.\n\n- **Primary Key (PK)**: عمود يميّز كل صف بشكل فريد (غالباً `id`) — مثل رقم الهوية، لا يتكرر أبداً\n- **Foreign Key (FK)**: عمود يشير إلى صف في جدول آخر ليربط بينهما (مثلاً `user_id` في جدول الطلبات يشير إلى `users.id`)",
+              "tags": [
+                "primary key",
+                "foreign key",
+                "pk",
+                "fk",
+                "جداول"
+              ],
+              "examples": [
+                {
+                  "title": "جدول users",
+                  "lang": "text",
+                  "code": "id (PK) | name  | email\n--------|-------|----------------\n1       | أحمد  | ahmed@mail.com\n2       | سارة  | sara@mail.com"
+                }
+              ],
+              "children": []
+            },
+            {
+              "id": "be-db-crud",
+              "title": "أهم أوامر SQL (CRUD)",
+              "def": "ركّز على: `SELECT` + `WHERE` (البحث والفلترة) و `JOIN` (ربط الجداول). هذه 80% مما ستستخدمه عملياً.",
+              "tags": [
+                "sql",
+                "select",
+                "where",
+                "join",
+                "crud"
+              ],
+              "examples": [],
+              "children": []
+            },
+            {
+              "id": "be-db-index",
+              "title": "الفهرسة (Index)",
+              "def": "بنية بيانات إضافية تسرّع القراءة بشكل هائل، مقابل إبطاء بسيط في الكتابة ومساحة تخزين إضافية. ضع فهرساً على الأعمدة المستخدمة كثيراً في `WHERE` و `JOIN` و `ORDER BY`.",
+              "tags": [
+                "index",
+                "فهرس",
+                "أداء"
+              ],
+              "examples": [
+                {
+                  "title": "إنشاء فهرس",
+                  "lang": "sql",
+                  "code": "CREATE INDEX idx_posts_author ON posts (author_id);\n\n-- فهرس مركّب — ترتيب الأعمدة مهم\nCREATE INDEX idx_posts_author_date ON posts (author_id, created_at DESC);"
+                }
+              ],
+              "children": []
+            }
+          ]
+        },
+        {
+          "id": "be-api",
+          "title": "APIs",
+          "def": "**Api**: هي الطريقة التي يتحدث بها جهازان معاً — مثل الكمبيوتر والسيرفر — بحيث يستطيع كل طرف أخذ الداتا من الآخر أو إرسالها إليه.\n\n**مجموعة من الـ endpoints** يُنشئها الـ backend لتقوم بوظيفة معيّنة عند تفاعل المستخدم — وهي الـ interface التي تواجه العالم الخارجي.",
+          "tags": [
+            "api",
+            "rest",
+            "http"
+          ],
+          "examples": [],
+          "children": [
+            {
+              "id": "be-api-rest",
+              "title": "REST API",
+              "def": "عنوان URL يُستخدم للربط بين موقع أو تطبيق مع السيرفر، بحيث يرسل ويستقبل البيانات بـ `POST` أو `GET`، وعادة ما يُستخدم مع `fetch`. يُستخدم لبناء واجهات برمجية تسمح بالتواصل بين التطبيقات عبر بروتوكول HTTP.\n\n**تحسين الأداء** مع الداتا الكبيرة: إضافة `limit` و `offset` في الرابط.\n\n**Restful API**: هي REST API التي تتبع المعايير: uniform interface — client-server — stateless — cacheable — layered system — code on demand (اختياري).",
+              "tags": [
+                "rest",
+                "restful",
+                "fetch",
+                "limit",
+                "offset"
+              ],
+              "examples": [],
+              "children": [
+                {
+                  "id": "be-api-verbs",
+                  "title": "Verbs (CRUD)",
+                  "def": "ما يخبر السيرفر بما تريده بالضبط، موضّحاً في الرابط أو عبر `fetch`:\n\n- `POST` → **C**reate resource — محمّلة بالداتا المراد إنشاؤها\n- `GET` → **R**ead resource\n- `PUT` → **U**pdate resource كاملاً (استبدال)\n- `PATCH` → تعديل جزء من الداتا\n- `DELETE` → **D**elete resource\n\nهذه الأفعال الأربعة تُسمَّى **CRUD** نسبة لمعانيها.",
+                  "tags": [
+                    "post",
+                    "get",
+                    "put",
+                    "patch",
+                    "delete",
+                    "crud",
+                    "verb"
+                  ],
+                  "examples": [],
+                  "children": []
+                },
+                {
+                  "id": "be-api-versioning",
+                  "title": "API Versioning",
+                  "def": "تُستخدم هكذا تُطوَّر الـ API وتُحسَّن دون أن تكسر أحداً. رقم نسخة يُضاف حتى تتعايش النسخة القديمة والجديدة معاً — يُستخدم عادة عند تعديل شكل البيانات لكن دون إتلاف تجربة العملاء القدامى.",
+                  "tags": [
+                    "versioning",
+                    "v1",
+                    "v2"
+                  ],
+                  "examples": [
+                    {
+                      "title": "نسختان متوازيتان",
+                      "lang": "text",
+                      "code": "/api/v1/items   ← القائمة القديمة (للزبائن القدامى)\n/api/v2/items   ← القائمة الجديدة (للزبائن الجدد)"
+                    }
+                  ],
+                  "children": []
+                },
+                {
+                  "id": "be-api-endpoint",
+                  "title": "Endpoint",
+                  "def": "جزء من الـ REST API — عنوان محدَّد داخل الـ API مضافاً عليه الـ method التي سيقوم بها.\n\nمثال: إذا كان `https://example.com/api` هو الـ API، فإن الـ **endpoint** = `URL + Method`:\n`URL: /users` + `Method: GET`",
+                  "tags": [
+                    "endpoint",
+                    "url"
+                  ],
+                  "examples": [],
+                  "children": []
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "be-auth",
+          "title": "المصادقة والصلاحيات",
+          "def": "**Authentication** = من أنت؟ — **Authorization** = ماذا يحق لك؟",
+          "tags": [
+            "auth",
+            "authentication",
+            "authorization"
+          ],
+          "examples": [],
+          "children": []
+        },
+        {
+          "id": "be-http",
+          "title": "HTTP و HTTPS",
+          "def": "**HTTP** — *HyperText Transfer Protocol*\n\n- **Hyper text**: لغة ترميز خاصة (HTML) توفّر معياراً موحّداً بين المتصفح والسيرفر\n- **Transfer**: نقل الداتا من كمبيوتر لآخر — نص أو صورة أو غيرها\n- **Protocol**: بروتوكول معروف عالمياً بين الدول\n\n**HTTPS** — *HTTP Secure* — أكثر أماناً من HTTP.\n\n**HTTP Status Code**: يوضّح حالة الطلب —\n- **200-level** — نجاح\n- **400-level** — الطلب توقف بسبب العميل (مثل رابط خاطئ)\n- **500-level** — المشكلة من السيرفر",
+          "tags": [
+            "http",
+            "https",
+            "status code",
+            "protocol"
+          ],
+          "examples": [],
+          "children": []
+        },
+        {
+          "id": "be-payment",
+          "title": "بوابات الدفع (Payment Gateway)",
+          "def": "موقع يقدّم خدمة تتيح لك أخذ أموالك من بيع منتجات على الإنترنت، بوضع رقم حسابك في موقع الـ gateway (مثل PayPal أو Tap). يعالج الموقع البيانات، وعند شراء عميل يضع بطاقته للدفع، فيتواصل الـ gate مع البنك لسحب المبلغ ووضعه في حسابك مع أخذ عمولته.",
+          "tags": [
+            "payment gateway",
+            "paypal",
+            "دفع"
+          ],
+          "examples": [],
+          "children": []
+        }
+      ]
+    },
+    {
+      "id": "devops",
+      "title": "DevOps",
+      "subtitle": "الأدوات والبنية التحتية والنشر",
+      "icon": "🚀",
+      "color": "#10b981",
+      "children": [
+        {
+          "id": "do-git",
+          "title": "Git",
+          "def": "تشبيه: Git مثل \"نقاط الحفظ في لعبة\". كل commit نقطة حفظ تستطيع الرجوع إليها. تحدث أخطاء؟ ارجع لآخر نقطة سليمة. تريد تجربة فكرة دون خطر؟ افتح branch (خط موازٍ) وجرّب فيه، ولو نجح ادمجه.",
+          "tags": [
+            "git",
+            "version control",
+            "إصدارات"
+          ],
+          "examples": [],
+          "children": [
+            {
+              "id": "do-git-concepts",
+              "title": "المفاهيم الأساسية",
+              "def": "- **Repository (repo)** — مجلد مشروعك الذي يتتبّعه Git\n- **Commit** — نقطة حفظ موصوفة برسالة\n- **Branch** — خط عمل منفصل تجرّب فيه دون التأثير على `main`\n- **Merge** — دمج عمل الـ branch في الفرع الرئيسي\n- **Pull Request (PR)** — طلب مراجعة عملك قبل الدمج (على GitHub)\n- **Push / Pull** — رفع تغييراتك للسحابة / سحب تغييرات الآخرين",
+              "tags": [
+                "repo",
+                "commit",
+                "branch",
+                "merge",
+                "pull request"
+              ],
+              "examples": [],
+              "children": []
+            },
+            {
+              "id": "do-git-config",
+              "title": "الإعداد الأولي (config)",
+              "def": "",
+              "tags": [
+                "git config",
+                "ssh-keygen"
+              ],
+              "examples": [
+                {
+                  "title": "أوامر الإعداد",
+                  "lang": "bash",
+                  "code": "git config -l                       # كل الـ configuration الحالية\ngit config --list\ngit help config                     # فتح موقع التوثيق\n\ngit config --global user.email \"value\"   # تعيين قيمة\ngit config -l --show-origin          # مصدر كل config\ngit config --global --unset user.name    # إزالة قيمة\ngit config --global --edit           # فتح ملف الإعداد في المحرر\n\nssh-keygen -t rsa -b 4096 -C 'ourmail'   # مفتاح دخول\nssh -T git@github.com                     # اختبار الاتصال"
+                }
+              ],
+              "children": []
+            },
+            {
+              "id": "do-git-commands",
+              "title": "الأوامر اليومية",
+              "def": "شرح مختصر لكل أمر:\n\n- **git clone** — تنزيل repository لجهازك أول مرة تعمل فيها على مشروع\n- **git fetch** — إحضار فروع جديدة من الخادم البعيد\n- **git branch** — عرض الـ branch الحالي وبقية الفروع المحلية\n- **git checkout -b** — إنشاء branch جديد والانتقال إليه\n- **git pull** — سحب أحدث التغييرات من فرع بعيد\n- **git stash** — حفظ تغييرات غير جاهزة للـ commit مؤقتاً\n- **git add / commit / push** — تسلسل حفظ ورفع العمل\n- **git status** — التحقق من حالة الملفات (أخضر = جاهز، أحمر = غير مضاف)\n- **git log --oneline** — عرض الـ commits باختصار\n- **git cherry-pick** — أخذ commit واحد من branch آخر\n- **git diff** — مقارنة التغييرات بين commit-ين\n- **git rebase** — مواءمة الـ branch مع التزامات جديدة في فرع آخر\n- **git bisect** — البحث الثنائي عن أول commit سيّئ",
+              "tags": [
+                "clone",
+                "fetch",
+                "branch",
+                "checkout",
+                "pull",
+                "stash",
+                "add",
+                "commit",
+                "push",
+                "status",
+                "log",
+                "cherry-pick",
+                "diff",
+                "rebase",
+                "bisect"
+              ],
+              "examples": [
+                {
+                  "title": "دورة العمل الأساسية",
+                  "lang": "bash",
+                  "code": "git clone <repository-url>\ngit checkout -b <your-branch-name>\n\ncd \"/your/main/folder\"\ngit add .\ngit status\ngit commit -m \"A message that describes the changes\"\ngit push origin <your-branch-name>\n\n# تعديل آخر commit دون رسالة جديدة\ngit commit --amend --no-edit"
+                },
+                {
+                  "title": "أوامر متقدّمة",
+                  "lang": "bash",
+                  "code": "git cherry-pick <commit-hash>\ngit diff <first-commit-hash> <second-commit-hash>\ngit rebase origin/<feature-branch-name>\n\n# عند push مرفوض ولديك ثقة أن فرعك المحلي هو الأحدث\ngit push origin <your-branch-name> --force-with-lease   # أكثر أماناً من --force\n\n# البحث عن أول commit سيّئ\ngit bisect start\ngit bisect good <commit-hash>\ngit bisect bad <commit-hash>"
+                }
+              ],
+              "children": []
+            }
+          ]
+        },
+        {
+          "id": "do-server",
+          "title": "إدارة السيرفر",
+          "def": "",
+          "tags": [
+            "server",
+            "سيرفر"
+          ],
+          "examples": [],
+          "children": [
+            {
+              "id": "do-webserver",
+              "title": "Web Server",
+              "def": "كمبيوتر متصل دائماً بالإنترنت، يعمل باستمرار على طلبات المعلومات.",
+              "tags": [
+                "web server"
+              ],
+              "examples": [],
+              "children": []
+            },
+            {
+              "id": "do-ssh",
+              "title": "SSH — Secure Shell",
+              "def": "بروتوكول يسمح بالدخول على السيرفر أو كمبيوتر آخر عن بُعد، والتحكّم فيه بالأوامر — كما يمكن التحكم في لوحات مثل Webmin من خلاله.",
+              "tags": [
+                "ssh",
+                "secure shell",
+                "remote"
+              ],
+              "examples": [],
+              "children": []
+            },
+            {
+              "id": "do-ssl-tls",
+              "title": "SSL و TLS",
+              "def": "**SSL** — Secure Sockets Layer\n**TLS** — Transport Layer Security\n\nبروتوكولان يشفّران الاتصال بين الزائر والموقع، و**TLS أقوى وأكثر أماناً** فلم يعد يُستخدَم SSL. الفوائد:\n\n- حماية بيانات المستخدم (كلمة المرور والبيانات الخاصة)\n- يسمح باستخدام `https` مما يعزّز الثقة\n- تحسين الـ SEO\n- مطلوب لبوابات الدفع",
+              "tags": [
+                "ssl",
+                "tls",
+                "https",
+                "تشفير"
+              ],
+              "examples": [],
+              "children": []
+            },
+            {
+              "id": "do-webmin",
+              "title": "Webmin",
+              "def": "لوحة تحكم مجانية ومفتوحة المصدر لإدارة السيرفر، بديلة عن كتابة أوامر SSH يدوياً — سهلة الاستخدام. تمكّن من:\n\n- إدارة MySQL وملفات السيرفر\n- إدارة الـ mail server\n- إدارة عبر Apache أو LightSpeed أو غيرها\n- إدارة المستخدمين والـ firewall و SSL و cron job\n- مراقبة الـ RAM والـ CPU وغيرها",
+              "tags": [
+                "webmin",
+                "لوحة تحكم",
+                "mysql"
+              ],
+              "examples": [],
+              "children": []
+            },
+            {
+              "id": "do-cloudflare",
+              "title": "Cloudflare",
+              "def": "خدمة عالمية تعمل كوسيط بين موقعك والزائرين، هدفها تسريع الموقع وحمايته وتحسين استقراره.\n\n- حماية ممتازة عبر **Web Application Firewall**\n- **CDN**: تخزين نسخة مؤقتة للموقع، يسرّع الوصول خصوصاً للمستخدمين البعيدين عن مكان الاستضافة\n- سريع في التحديثات وسهل الاستخدام\n- يخفي الـ IP الحقيقي للسيرفر",
+              "tags": [
+                "cloudflare",
+                "cdn",
+                "waf"
+              ],
+              "examples": [],
+              "children": []
+            }
+          ]
+        },
+        {
+          "id": "do-docker",
+          "title": "Docker",
+          "def": "برنامج يقوم بتخزين الداتا والنود وكل ما يخص المشروع، ليساعد المطورين على العمل والاستكمال دون الحاجة لتثبيت إصدارات Node جديدة لكل مشروع منفرد.\n\n**Image**: جزء من Docker — نسخة والموارد التي يأخذها Docker ليستخدمها لمشروع معيّن، فيثبّت كل البرامج وإصداراتها الخاصة بهذا المشروع فقط، بلا علاقة ببرامج الجهاز أو إصداراتها.\n\n**المشكلة التي يحلّها**: مشروع يحتاج نسخة معيّنة من Node، ومشروع آخر يحتاج نسخة مختلفة — فلا تتعارض المشاريع وإصدارات البرامج فيما بينها.",
+          "tags": [
+            "docker",
+            "image",
+            "container"
+          ],
+          "examples": [],
+          "children": []
+        },
+        {
+          "id": "do-testing-debug",
+          "title": "Testing و Debugging",
+          "def": "",
+          "tags": [
+            "testing",
+            "debugging",
+            "اختبار",
+            "تتبع الأخطاء"
+          ],
+          "examples": [],
+          "children": [
+            {
+              "id": "do-debugging",
+              "title": "Debugging — تتبّع الأخطاء",
+              "def": "تشبيه: Debugging مثل عمل الطبيب — لا تخمّن الدواء، بل تقرأ الأعراض (رسالة الخطأ) وتتبّع مصدرها قبل العلاج.\n\n**Stack trace**: هو \"مسار الخطأ\" — قائمة الدوال التي أدّت إليه. اقرأها من الأعلى (نوع الخطأ ورسالته) ثم اتبع أول سطر يشير لملفك أنت — هناك غالباً المشكلة.\n\n**أدوات التشخيص:**\n- **Console (المتصفح)** — رؤية أخطاء JS ورسائل console.log\n- **Network tab** — فحص طلبات الـ API: هل نجحت؟ ماذا أرجعت؟ كود الحالة؟\n- **Logs (الباك)** — قراءة ما يطبعه الخادم لتتبّع منطق الباك\n- **Postman** — اختبار الـ API وحده بعيداً عن الفرونت لعزل المشكلة\n\n**ترتيب ذكي للتشخيص**: افتح Network tab وانظر لكود الحالة — إن كان 4xx/5xx فالمشكلة في الطلب/الباك، وإن كان الطلب ناجحاً (200) فالمشكلة في عرض الفرونت.",
+              "tags": [
+                "stack trace",
+                "console",
+                "network tab",
+                "postman"
+              ],
+              "examples": [],
+              "children": []
+            },
+            {
+              "id": "do-testing-types",
+              "title": "مفهوم الاختبار (Testing)",
+              "def": "تشبيه: الاختبار مثل فحص السيارة قبل بيعها — تتأكد أن كل شيء يعمل قبل التسليم، بدل أن يكتشف العميل العطل.\n\nلماذا نختبر؟ لنتأكد أن الكود يعمل صحيحاً، وأن تعديلاً جديداً لم يكسر شيئاً قديماً.\n\n- **Unit Test** — اختبار جزء صغير معزول (دالة واحدة): يعطي مدخلاً ويتأكد من المخرج\n- **Integration Test** — اختبار عدة أجزاء تعمل معاً (مثلاً endpoint كامل)\n- **Manual Test** — تجرّب بنفسك خطوة بخطوة وتوثّق النتيجة بالأدلة (screenshots)\n\nأمثلة أدوات: **Jest/Vitest** (جافاسكربت/فرونت)، **PHPUnit** (Laravel).",
+              "tags": [
+                "unit test",
+                "integration test",
+                "manual test",
+                "jest",
+                "vitest",
+                "phpunit"
+              ],
+              "examples": [],
+              "children": []
+            }
+          ]
+        },
+        {
+          "id": "do-cicd",
+          "title": "CI / CD",
+          "def": "**CI** (تكامل مستمر): كل دفعة كود تُختبر تلقائياً.\n**CD** (نشر مستمر): الكود الناجح يُنشر تلقائياً للبيئة المستهدفة.",
+          "tags": [
+            "ci",
+            "cd",
+            "pipeline"
+          ],
+          "examples": [],
+          "children": []
+        }
+      ]
+    },
+    {
+      "id": "ui-ux",
+      "title": "UI / UX",
+      "subtitle": "التصميم وتجربة المستخدم والـ SEO",
+      "icon": "✨",
+      "color": "#f59e0b",
+      "children": [
+        {
+          "id": "ux-diff",
+          "title": "الفرق بين UI و UX",
+          "def": "**UI** (واجهة المستخدم): ما تراه وتلمسه — الألوان والخطوط والأزرار والمسافات.\n\n**UX** (تجربة المستخدم): ما تشعر به — سهولة الوصول للهدف، وضوح المسار، قلّة الاحتكاك.\n\nواجهة جميلة بتجربة سيئة = منتج فاشل.",
+          "tags": [
+            "ui",
+            "ux",
+            "تصميم"
+          ],
+          "examples": [],
+          "children": []
+        },
+        {
+          "id": "ux-hierarchy",
+          "title": "التسلسل البصري (Visual Hierarchy)",
+          "def": "توجيه عين المستخدم لما يهم أولاً عبر:\n- **الحجم** — الأكبر يُقرأ أولاً\n- **التباين واللون** — العنصر البارز يجذب\n- **المسافة البيضاء** — العزل يخلق أهمية\n- **الموضع** — أعلى/بداية القراءة أهم",
+          "tags": [
+            "hierarchy",
+            "typography",
+            "تصميم"
+          ],
+          "examples": [],
+          "children": []
+        },
+        {
+          "id": "ux-a11y",
+          "title": "إتاحة الوصول (Accessibility / Web Accessibility)",
+          "def": "كل ما يخصّ ذوي الإعاقة (بصرية وغيرها) بحيث يمكنهم استخدام الموقع — مثل تهيئة خاصية القراءة الصوتية.\n\n**Screen readers**: برامج تجعل المحتوى قابلاً للاستخدام من فاقدي البصر أو ضعافه أو ذوي صعوبات التعلم — تعتمد على وسوم مثل `<strong>` و `<em>` لتشديد النطق.\n\n**قواعد عملية:**\n- تباين ألوان لا يقل عن **4.5:1** للنص العادي\n- كل وظيفة يمكن الوصول لها بلوحة المفاتيح\n- مساحة لمس لا تقل عن **44×44px**\n- نص بديل `alt` لكل صورة ذات معنى\n- لا تعتمد على اللون وحده لنقل المعلومة",
+          "tags": [
+            "accessibility",
+            "a11y",
+            "screen reader",
+            "wcag"
+          ],
+          "examples": [],
+          "children": []
+        },
+        {
+          "id": "ux-tokens",
+          "title": "Design Tokens",
+          "def": "متغيّرات مسمّاة تحمل قرارات التصميم (لون، مسافة، خط) لتُستخدم في كل مكان بدل القيم الصلبة — فيتغيّر النظام كله من مصدر واحد.",
+          "tags": [
+            "design system",
+            "tokens",
+            "متغيرات"
+          ],
+          "examples": [
+            {
+              "title": "توكنات كمتغيرات CSS",
+              "lang": "css",
+              "code": ":root {\n  --color-primary: #6366f1;\n  --space-2: 8px;\n  --space-4: 16px;\n  --radius-md: 12px;\n  --font-size-body: 15px;\n}"
+            }
+          ],
+          "children": []
+        },
+        {
+          "id": "ux-seo",
+          "title": "SEO — تحسين محركات البحث",
+          "def": "**SEO — Search Engine Optimization**: مدى قابلية ظهور موقعك ضمن نتائج البحث في Google، عبر بوتات/عناكب (**Crawls**) تقرأ الكلمات الافتتاحية في الموقع (غالباً في الـ `meta`) وتربطها بنتائج البحث وتصنيفها.\n\n**Crawls**: ما يستخدمه محرك البحث لربط المواقع ببعضها، بنشر عناكب للبحث عن الصفحات الجديدة عبر الروابط المضافة حديثاً، واستخراج كلمات مفتاحية من وصف الموقع لفهم موضوعه.\n\n**Indexing**: طريقة أشبه بالمجلدات تستخدمها محركات البحث لوضع المواقع المتشابهة معاً وتنظيمها بفعالية.\n\n**Serving**: عملية معالجة الطلبات وتسليم قائمة مرتّبة من النتائج عند بحث المستخدم.",
+          "tags": [
+            "seo",
+            "crawl",
+            "indexing",
+            "serving",
+            "google"
+          ],
+          "examples": [],
+          "children": [
+            {
+              "id": "ux-seo-performance",
+              "title": "عوامل تؤثر على أداء SEO",
+              "def": "للخروج بأفضل performance، تأكد من:\n\n1. عمل `clear` لأي `addEventListener` — وإلا يبقى يعمل في الخلفية ويضر بالأداء\n2. تقليل عدد العناصر في نفس الصفحة\n3. تقليل الإضافات والصور الثقيلة (heavy plugins)\n4. عدم المبالغة في عدد الإعلانات\n5. تصغير حجم الفيديوهات — تؤثر في السرعة\n6. مراعاة الموقع الجغرافي للسيرفر وعرض النطاق (Bandwidth)\n7. تجنّب الحمل الزائد على طلبات HTTP\n8. تجنّب استضافة غير كافية (Unsatisfactory server)\n9. تحسين جودة كود JS لتفادي الركود (stagnation)\n10. ملاءمة التخزين المؤقت (caching)\n11. استخدام `alt` في الصور\n12. استخدام `title` في وسم `<a>`",
+              "tags": [
+                "performance",
+                "addEventListener",
+                "caching",
+                "alt",
+                "أداء"
+              ],
+              "examples": [],
+              "children": []
+            },
+            {
+              "id": "ux-seo-tools",
+              "title": "أدوات فحص سرعة الموقع",
+              "def": "- Page Speed Test / Lab Testing\n- Google PageSpeed Insights\n- Lighthouse\n- Chrome UX Report\n- GTmetrix وغيرها",
+              "tags": [
+                "lighthouse",
+                "pagespeed",
+                "chrome ux report"
+              ],
+              "examples": [],
+              "children": []
+            },
+            {
+              "id": "ux-core-vitals",
+              "title": "Core Web Vitals",
+              "def": "ثلاثة مقاييس أساسية لجودة تجربة المستخدم يقيسها Google:\n\n- **LCP (Largest Contentful Paint)** — سرعة تحميل أكبر عنصر مرئي\n- **FID (First Input Delay)** — سرعة استجابة الصفحة لأول تفاعل\n- **CLS (Cumulative Layout Shift)** — مدى ثبات العناصر بصرياً أثناء التحميل",
+              "tags": [
+                "core web vitals",
+                "lcp",
+                "fid",
+                "cls"
+              ],
+              "examples": [],
+              "children": []
+            }
+          ]
+        },
+        {
+          "id": "ux-pwa",
+          "title": "PWA — Progressive Web App",
+          "def": "مجموعة من الشروط، إن تحقّقت أصبح التطبيق PWA:\n\n- يكون التطبيق **responsive**\n- يعمل السيرفر على **HTTPS**\n- يمكن تنزيله كتطبيق مستقل (standalone application)\n- يوجد فيه **service worker**\n\n**Service Worker**: دالة تعمل في الخلفية (background)، وتُستخدم لعمل **push notification** يرفع الجديد على التطبيقات أثناء إغلاقها — مثل تويتر.",
+          "tags": [
+            "pwa",
+            "service worker",
+            "push notification"
+          ],
+          "examples": [],
+          "children": []
+        },
+        {
+          "id": "ux-i18n",
+          "title": "I18n (Internationalization)",
+          "def": "إضافة تُستخدم لعمل ملف ترجمة للموقع لأكثر من لغة، وكتابة معاني الكلمات بشكل مخصّص لموقعك.\n\nالاختصار **I18n**: الحرف I، ثم 18 يدلّ على عدد الحروف بين أول وآخر حرف في كلمة Internationalization، ثم n آخر حرف.",
+          "tags": [
+            "i18n",
+            "internationalization",
+            "localization",
+            "ترجمة"
+          ],
+          "examples": [],
+          "children": []
+        },
+        {
+          "id": "ux-responsiveness",
+          "title": "Responsiveness",
+          "def": "قدرة تصميم الموقع على التكيّف مع أحجام الشاشات المختلفة (موبايل، تابلت، ديسكتوب) عبر media queries ووحدات مرنة مثل `%` و `vw`/`vh` وGrid/Flexbox.",
+          "tags": [
+            "responsive",
+            "media query",
+            "تجاوب"
+          ],
+          "examples": [],
+          "children": []
+        }
+      ]
+    }
+  ]
+}

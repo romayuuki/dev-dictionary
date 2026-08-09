@@ -5,6 +5,13 @@ export interface Example {
   code: string;
 }
 
+/**
+ * نوع العقدة (SPEC-001 §4.3):
+ * 'group' — عقدة مُجمِّعة، تفسّر سبب اجتماع أبنائها ولا تُعرّف أحدهم.
+ * 'term'  — عقدة طرفية (ذرّة): مفهوم واحد قابل للبحث بالاسم، ومعه مثال.
+ */
+export type NodeKind = 'group' | 'term';
+
 /** عقدة في الشجرة — قد تكون عنواناً رئيسياً أو قسماً بداخله، بأي عمق */
 export interface DictNode {
   id: string;
@@ -13,7 +20,15 @@ export interface DictNode {
   tags: string[];
   examples: Example[];
   children: DictNode[];
+  /** اختياري — غيابه يُستنتج من children.length (SPEC-001 §4.3) */
+  kind?: NodeKind;
+  /** اختياري — أسماء/نطق بديلة تُفهرَس للبحث فقط، لا تُعرض في الواجهة (SPEC-001 §4.3) */
+  aka?: string[];
 }
+
+/** يستنتج kind الفعلي لعقدة عند غيابه — منطق موحّد (SPEC-001 §4.3) */
+export const nodeKind = (node: Pick<DictNode, 'kind' | 'children'>): NodeKind =>
+  node.kind ?? ((node.children?.length ?? 0) > 0 ? 'group' : 'term');
 
 /** قسم رئيسي (Frontend / Backend / DevOps / UI-UX …) */
 export interface Category extends DictNode {

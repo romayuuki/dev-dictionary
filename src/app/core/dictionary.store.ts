@@ -8,9 +8,15 @@ import {
   uid,
 } from '../models/dict.model';
 import { SupabaseService } from './supabase.service';
+import { migrateV4ToV5 } from './migrations/migrate-v4-to-v5.mjs';
 
 const LS_DATA = 'dev-dictionary-v1';
 const LS_UI = 'dev-dictionary-ui-v1';
+
+/** رقم الإصدار الحالي لبنية البيانات (SPEC-001 §4.3 / §6.2) */
+const DATA_VERSION = 5;
+/** نسخة احتياطية تُكتب قبل أي ترحيل — لا يُكتب فوقها أبداً بعد ذلك */
+const LS_BACKUP_V4 = 'dev-dictionary-v1-backup-v4';
 
 interface UiState {
   theme: 'light' | 'dark';
@@ -63,12 +69,13 @@ export class DictionaryStore {
   private subscribeToRealtime(): void {
     this.supabase.subscribeToChanges((remoteData) => {
       if (!remoteData || !Array.isArray(remoteData.categories)) return;
-      if (JSON.stringify(remoteData) === JSON.stringify(this._data())) return;
+      const next = (remoteData.version ?? 0) < DATA_VERSION ? migrateV4ToV5(remoteData) : remoteData;
+      if (JSON.stringify(next) === JSON.stringify(this._data())) return;
 
       this.applyingRemoteUpdate = true;
-      this._data.set(remoteData);
+      this._data.set(next);
       try {
-        localStorage.setItem(LS_DATA, JSON.stringify(remoteData));
+        localStorage.setItem(LS_DATA, JSON.stringify(next));
       } catch {
         /* تجاهل — التحديث اللحظي أهم من نجاح الكاش المحلي */
       }
@@ -78,17 +85,40 @@ export class DictionaryStore {
 
   // ---------- التخزين ----------
 
+  /**
+   * يقرأ بيانات المستخدم، ويُرحّلها تلقائياً إن كانت أقدم من DATA_VERSION (SPEC-001 REQ-4.3).
+   * قبل الترحيل تُكتب نسخة احتياطية خام لا تُستبدَل لاحقاً (§6.2) — للتراجع الكامل عند الحاجة.
+   */
   private loadData(): DictData {
     try {
       const raw = localStorage.getItem(LS_DATA);
       if (raw) {
         const parsed = JSON.parse(raw) as DictData;
-        if (Array.isArray(parsed?.categories)) return parsed;
+        if (Array.isArray(parsed?.categories)) {
+          if ((parsed.version ?? 0) >= DATA_VERSION) return parsed;
+
+          try {
+            if (!localStorage.getItem(LS_BACKUP_V4)) {
+              localStorage.setItem(LS_BACKUP_V4, raw);
+            }
+          } catch {
+            /* فشل الحفظ الاحتياطي لا يوقف الترحيل — لكنه يُسجَّل */
+            console.warn('تعذّر حفظ نسخة احتياطية قبل الترحيل');
+          }
+
+          const migrated = migrateV4ToV5(parsed);
+          try {
+            localStorage.setItem(LS_DATA, JSON.stringify(migrated));
+          } catch {
+            /* لا حرج — persist() اللاحق سيعيد المحاولة */
+          }
+          return migrated;
+        }
       }
     } catch {
       /* بيانات تالفة — نتجاهلها ونبدأ من الافتراضي */
     }
-    return { version: 1, updatedAt: '', categories: deepClone(DEFAULT_CATEGORIES) };
+    return { version: DATA_VERSION, updatedAt: '', categories: deepClone(DEFAULT_CATEGORIES) };
   }
 
   private loadUi(): UiState {
@@ -131,7 +161,7 @@ export class DictionaryStore {
       return;
     }
     if (data && Array.isArray(data?.categories)) {
-      this._data.set(data);
+      this._data.set((data.version ?? 0) < DATA_VERSION ? migrateV4ToV5(data) : data);
     }
   }
 

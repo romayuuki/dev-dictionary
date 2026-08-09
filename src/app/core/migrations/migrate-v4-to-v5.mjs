@@ -1121,3 +1121,64 @@ export function migrateV4ToV5(data) {
   next.version = 5;
   return next;
 }
+
+// ============================================================
+// v5 → v6  —  حقن محتوى React (اليوم الثامن) في بيانات موجودة
+// ============================================================
+/**
+ * السبب: migrateV4ToV5 تبني React فقط عند وجود عقدة `fe-vue` القديمة،
+ * وهي غير موجودة في بيانات وصلت v5 بالفعل — فالمحتوى لم يكن يصل للمستخدم.
+ * هذه الدالة تعالج ذلك بحقن fe-fw-react مباشرةً في fe-fw الموجودة.
+ *
+ * idempotent: إن كانت العقدة تحوي أبناءً بالفعل لا تفعل شيئاً (REQ-4.4).
+ * لا فقد: لا تحذف أي عقدة — تستبدل الـ placeholder الفارغ فقط.
+ */
+function ensureReactSection(frontend) {
+  const fw = findNode(frontend.children ?? [], 'fe-fw');
+  if (!fw || !Array.isArray(fw.children)) return;
+
+  const existing = fw.children.find((c) => c?.id === 'fe-fw-react');
+  const built = buildReactSection();
+
+  // العقدة موجودة لكنها placeholder فارغ → املأها مع الحفاظ على مكانها
+  if (existing) {
+    if ((existing.children?.length ?? 0) > 0) return; // محتوى فعلي — لا تلمسه
+    existing.title    = built.title;
+    existing.def      = built.def;
+    existing.kind     = 'group';
+    existing.tags     = built.tags;
+    existing.examples = [];
+    existing.children = built.children;
+    return;
+  }
+
+  // غير موجودة أصلاً → أضفها بعد Vue مباشرةً (أو في النهاية)
+  const vueIdx = fw.children.findIndex((c) => c?.id === 'fe-fw-vue');
+  if (vueIdx === -1) fw.children.push(built);
+  else fw.children.splice(vueIdx + 1, 0, built);
+}
+
+/**
+ * ترحيل v5 → v6. يُطبَّق على أي بيانات وصلت v5، بما فيها بيانات
+ * المستخدم الحالية على الموقع المنشور.
+ */
+export function migrateV5ToV6(data) {
+  if (!data || !Array.isArray(data.categories)) return data;
+  if ((data.version ?? 0) >= 6) return data; // idempotent
+  if ((data.version ?? 0) < 5) return data;  // v4 يجب أن تمرّ بـ v4→v5 أولاً
+
+  const next = deepClone(data);
+  const frontend = next.categories.find((c) => c?.id === 'frontend');
+  if (frontend && Array.isArray(frontend.children)) ensureReactSection(frontend);
+
+  next.version = 6;
+  return next;
+}
+
+/**
+ * نقطة الدخول الموحَّدة — تُشغّل سلسلة الترحيلات بالترتيب حتى أحدث نسخة.
+ * استخدمها بدل استدعاء كل ترحيل على حدة، حتى لا يُنسى أي منها مستقبلاً.
+ */
+export function migrateToLatest(data) {
+  return migrateV5ToV6(migrateV4ToV5(data));
+}

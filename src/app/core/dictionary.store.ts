@@ -10,13 +10,14 @@ import {
   uid,
 } from '../models/dict.model';
 import { SupabaseService } from './supabase.service';
-import { migrateV4ToV5 } from './migrations/migrate-v4-to-v5.mjs';
+// migrateToLatest تُشغّل سلسلة الترحيلات كاملة (v4→v5→v6) — لا تستدعِ ترحيلاً مفرداً
+import { migrateToLatest } from './migrations/migrate-v4-to-v5.mjs';
 
 const LS_DATA = 'dev-dictionary-v1';
 const LS_UI = 'dev-dictionary-ui-v1';
 
-/** رقم الإصدار الحالي لبنية البيانات (SPEC-001 §4.3 / §6.2) */
-const DATA_VERSION = 5;
+/** رقم الإصدار الحالي لبنية البيانات (SPEC-001 §4.3 / §6.2) — v6 يضيف محتوى React */
+const DATA_VERSION = 6;
 /** نسخة احتياطية تُكتب قبل أي ترحيل — لا يُكتب فوقها أبداً بعد ذلك */
 const LS_BACKUP_V4 = 'dev-dictionary-v1-backup-v4';
 
@@ -84,7 +85,7 @@ export class DictionaryStore {
         this.http.get<DictData>('/assets/data-seed.json'),
       );
       if (!raw?.categories?.length) return;
-      const seeded = (raw.version ?? 0) >= DATA_VERSION ? raw : migrateV4ToV5(raw);
+      const seeded = (raw.version ?? 0) >= DATA_VERSION ? raw : migrateToLatest(raw);
       this._data.set(seeded);
       localStorage.setItem(LS_DATA, JSON.stringify(seeded));
     } catch {
@@ -96,7 +97,7 @@ export class DictionaryStore {
   private subscribeToRealtime(): void {
     this.supabase.subscribeToChanges((remoteData) => {
       if (!remoteData || !Array.isArray(remoteData.categories)) return;
-      const next = (remoteData.version ?? 0) < DATA_VERSION ? migrateV4ToV5(remoteData) : remoteData;
+      const next = (remoteData.version ?? 0) < DATA_VERSION ? migrateToLatest(remoteData) : remoteData;
       if (JSON.stringify(next) === JSON.stringify(this._data())) return;
 
       this.applyingRemoteUpdate = true;
@@ -133,7 +134,7 @@ export class DictionaryStore {
             console.warn('تعذّر حفظ نسخة احتياطية قبل الترحيل');
           }
 
-          const migrated = migrateV4ToV5(parsed);
+          const migrated = migrateToLatest(parsed);
           try {
             localStorage.setItem(LS_DATA, JSON.stringify(migrated));
           } catch {
@@ -187,8 +188,21 @@ export class DictionaryStore {
       console.warn('تعذّرت مزامنة Supabase:', error);
       return;
     }
-    if (data && Array.isArray(data?.categories)) {
-      this._data.set((data.version ?? 0) < DATA_VERSION ? migrateV4ToV5(data) : data);
+    if (!data || !Array.isArray(data?.categories)) return;
+
+    const needsMigration = (data.version ?? 0) < DATA_VERSION;
+    const next = needsMigration ? migrateToLatest(data) : data;
+    this._data.set(next);
+
+    // البيانات البعيدة كانت أقدم → ثبّت النتيجة محلياً وبعيداً حتى لا يتكرر
+    // الترحيل في كل تحميل، وحتى تصل النسخة الجديدة لبقية الأجهزة.
+    if (needsMigration) {
+      try {
+        localStorage.setItem(LS_DATA, JSON.stringify(next));
+      } catch {
+        /* الكاش المحلي ليس حرجاً */
+      }
+      this.persistToSupabase();
     }
   }
 

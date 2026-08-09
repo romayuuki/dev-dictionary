@@ -50,7 +50,7 @@ import { formatDefinition } from '../core/text.util';
       @if (isOpen()) {
         <div class="node-body">
           @if (node().def.trim()) {
-            <div class="def" [innerHTML]="definitionHtml()"></div>
+            <div class="def" [innerHTML]="definitionHtml()" (click)="onDefClick($event)"></div>
           }
 
           @for (ex of node().examples; track $index) {
@@ -77,7 +77,8 @@ import { formatDefinition } from '../core/text.util';
               <app-dict-node [node]="child" [depth]="depth() + 1"
                              (add)="add.emit($event)"
                              (edit)="edit.emit($event)"
-                             (remove)="remove.emit($event)" />
+                             (remove)="remove.emit($event)"
+                             (goto)="goto.emit($event)" />
             }
             <button class="add-here" (click)="add.emit(node().id)">
               ＋ إضافة قسم داخل «{{ node().title }}»
@@ -99,6 +100,8 @@ export class DictNodeComponent {
   readonly add = output<string>();
   readonly edit = output<string>();
   readonly remove = output<string>();
+  /** يُطلق عند النقر على رابط داخلي [[id|نص]] داخل التعريف */
+  readonly goto = output<string>();
 
   protected isOpen(): boolean {
     return this.store.openIds().has(this.node().id);
@@ -111,6 +114,15 @@ export class DictNodeComponent {
 
   protected definitionHtml(): SafeHtml {
     return this.sanitizer.bypassSecurityTrustHtml(formatDefinition(this.node().def));
+  }
+
+  /** يلتقط النقر على أي رابط داخلي [[id|نص]] بداخل التعريف ويطلقه لأعلى */
+  protected onDefClick(e: MouseEvent): void {
+    const target = (e.target as HTMLElement).closest('a.ref-link') as HTMLElement | null;
+    if (!target) return;
+    e.preventDefault();
+    const id = target.dataset['refId'];
+    if (id) this.goto.emit(id);
   }
 
   protected async copy(code: string): Promise<void> {

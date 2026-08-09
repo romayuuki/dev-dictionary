@@ -112,7 +112,8 @@ import { TransferDialogComponent, TransferMode } from './components/transfer-dia
               <app-dict-node [node]="node" [depth]="0"
                              (add)="openEditor({ nodeId: null, parentId: $event })"
                              (edit)="openEditor({ nodeId: $event })"
-                             (remove)="confirmDelete($event)" />
+                             (remove)="confirmDelete($event)"
+                             (goto)="gotoNode($event)" />
             } @empty {
               <div class="empty">
                 <span class="e">{{ cat.icon }}</span>
@@ -202,6 +203,16 @@ export class AppComponent {
 
   protected jump(e: Event, id: string): void {
     e.preventDefault();
+    this.store.revealNode(id);
+    this.scrollToNode(id);
+  }
+
+  /** الانتقال لعقدة عبر رابط داخلي [[id|نص]] داخل تعريف عقدة أخرى */
+  protected gotoNode(id: string): void {
+    if (!this.store.find(id)) {
+      this.toast.show('العنصر المشار إليه لم يعد موجوداً');
+      return;
+    }
     this.store.revealNode(id);
     this.scrollToNode(id);
   }

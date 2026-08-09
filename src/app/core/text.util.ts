@@ -181,6 +181,10 @@ export function expandSynonyms(normalizedQuery: string): string {
     .replace(/\bnode\s+js\b/g, 'node');
 }
 
+/** يستبدل روابط `[[id|نص]]` بنصها الظاهر فقط — لعرض نظيف في المقتطفات ونحوها */
+export const stripRefLinks = (s: string): string =>
+  String(s ?? '').replace(/\[\[[a-zA-Z0-9_-]+\|([^\]]+)\]\]/g, '$1');
+
 /** يلوّن موضع المطابقة داخل النص */
 export function highlight(text: string, query: string): string {
   const t = String(text ?? '');
@@ -207,8 +211,16 @@ export function highlight(text: string, query: string): string {
   );
 }
 
+/**
+ * روابط داخلية بين المصطلحات: `[[node-id|النص الظاهر]]` تتحول لرابط قابل للنقر
+ * يأخذ المستخدم لشرح تلك النقطة مباشرة (عبر حدث نقر يُعالج في dict-node.component).
+ */
 const inlineFormat = (s: string): string =>
   escapeHtml(s)
+    .replace(
+      /\[\[([a-zA-Z0-9_-]+)\|([^\]]+)\]\]/g,
+      '<a href="#" class="ref-link" data-ref-id="$1">$2</a>',
+    )
     .replace(/`([^`]+)`/g, '<code>$1</code>')
     .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
     .replace(/\*([^*\n]+)\*/g, '<em>$1</em>');

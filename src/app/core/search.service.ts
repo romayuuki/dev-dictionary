@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { DictNode, MatchField, SearchHit } from '../models/dict.model';
 import { DictionaryStore } from './dictionary.store';
-import { escapeHtml, expandSynonyms, highlight, norm } from './text.util';
+import { escapeHtml, expandSynonyms, highlight, norm, stripRefLinks } from './text.util';
 
 /** أوزان المطابقة — العنوان أهم من الوسوم، والوسوم أهم من التعريف */
 const WEIGHTS: Record<MatchField | 'titlePrefix', number> = {
@@ -88,7 +88,7 @@ export class SearchService {
     if (where === 'def' || where === 'code') {
       const source =
         where === 'def' ? node.def ?? '' : (node.examples ?? []).map((e) => e.code).join('\n');
-      const plain = source.replace(/\s+/g, ' ');
+      const plain = stripRefLinks(source).replace(/\s+/g, ' ');
       const i = norm(plain).indexOf(norm(query));
       if (i >= 0) {
         const start = Math.max(0, i - 45);
@@ -100,7 +100,7 @@ export class SearchService {
       }
     }
 
-    const def = (node.def ?? '').replace(/\s+/g, ' ');
+    const def = stripRefLinks(node.def ?? '').replace(/\s+/g, ' ');
     return escapeHtml(def.slice(0, 130)) + (def.length > 130 ? '…' : '');
   }
 

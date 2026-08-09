@@ -1,4 +1,13 @@
-import { ChangeDetectionStrategy, Component, inject, input, output, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  ElementRef,
+  inject,
+  input,
+  output,
+  signal,
+  viewChild,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Category, Example } from '../models/dict.model';
@@ -52,9 +61,34 @@ export interface EditorRequest {
           <div class="field">
             <label>
               التعريف
-              <span class="hint">— يدعم **عريض** و \`كود\` و - للقوائم</span>
+              <span class="hint">— يدعم **عريض** و \`كود\` و - للقوائم، و 🔗 روابط لعناصر أخرى</span>
             </label>
-            <textarea class="inp" [(ngModel)]="defValue" placeholder="اشرح المصطلح هنا…"></textarea>
+            <div style="position:relative">
+              <textarea #defTextarea class="inp" [(ngModel)]="defValue"
+                        placeholder="اشرح المصطلح هنا…"
+                        (select)="rememberCursor()" (click)="rememberCursor()"
+                        (keyup)="rememberCursor()"></textarea>
+
+              <button type="button" class="btn sm ghost" style="margin-top:6px"
+                      (click)="toggleLinkPicker()">
+                🔗 إشارة إلى شرح موجود
+              </button>
+
+              @if (linkPickerOpen()) {
+                <div class="link-picker">
+                  <input class="inp" [(ngModel)]="linkQuery" placeholder="ابحث عن العنصر المراد الإشارة إليه…" />
+                  <div class="link-results">
+                    @for (n of linkMatches(); track n.id) {
+                      <button type="button" class="link-result" (click)="insertLink(n)">
+                        {{ n.title }}
+                      </button>
+                    } @empty {
+                      <div class="link-empty">لا نتائج</div>
+                    }
+                  </div>
+                </div>
+              }
+            </div>
           </div>
 
           <div class="field">
@@ -110,6 +144,11 @@ export class NodeEditorComponent {
   protected colorValue = '#5b5bd6';
   protected readonly examples = signal<Example[]>([]);
 
+  private readonly defTextarea = viewChild<ElementRef<HTMLTextAreaElement>>('defTextarea');
+  protected readonly linkPickerOpen = signal(false);
+  protected linkQuery = '';
+  private cursorPos = 0;
+
   private loadedFor: EditorRequest | null = null;
 
   constructor() {
@@ -163,6 +202,51 @@ export class NodeEditorComponent {
 
   protected removeExample(index: number): void {
     this.examples.update((list) => list.filter((_, i) => i !== index));
+  }
+
+  // ---------- روابط داخلية بين المصطلحات ----------
+
+  /** يحفظ موضع المؤشر داخل حقل التعريف لإدراج الرابط في المكان الصحيح */
+  protected rememberCursor(): void {
+    const el = this.defTextarea()?.nativeElement;
+    if (el) this.cursorPos = el.selectionStart ?? this.defValue.length;
+  }
+
+  protected toggleLinkPicker(): void {
+    this.rememberCursor();
+    this.linkQuery = '';
+    this.linkPickerOpen.update((v) => !v);
+  }
+
+  /** يبحث في كل عناصر القاموس (عدا العنصر الحالي) لاختيار هدف الرابط */
+  protected linkMatches(): { id: string; title: string }[] {
+    const q = this.linkQuery.trim().toLowerCase();
+    const currentId = this.request().nodeId;
+    const results: { id: string; title: string }[] = [];
+
+    for (const cat of this.store.categories()) {
+      this.store.walk(cat.children, (n) => {
+        if (n.id === currentId) return;
+        if (!q || n.title.toLowerCase().includes(q)) results.push({ id: n.id, title: n.title });
+      });
+    }
+    return results.slice(0, 30);
+  }
+
+  protected insertLink(n: { id: string; title: string }): void {
+    const markup = `[[${n.id}|${n.title}]]`;
+    this.defValue = this.defValue.slice(0, this.cursorPos) + markup + this.defValue.slice(this.cursorPos);
+    this.cursorPos += markup.length;
+    this.linkPickerOpen.set(false);
+    this.linkQuery = '';
+
+    queueMicrotask(() => {
+      const el = this.defTextarea()?.nativeElement;
+      if (el) {
+        el.focus();
+        el.setSelectionRange(this.cursorPos, this.cursorPos);
+      }
+    });
   }
 
   protected onBackdrop(e: MouseEvent): void {

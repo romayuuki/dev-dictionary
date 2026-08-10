@@ -102,6 +102,8 @@ import { TransferDialogComponent, TransferMode } from './components/transfer-dia
               </button>
               <button class="btn sm ghost" (click)="store.setAllOpen(true)">فتح الكل</button>
               <button class="btn sm ghost" (click)="store.setAllOpen(false)">طي الكل</button>
+              <button class="btn sm ghost" title="دمج الأقسام المكرّرة العنوان تحت بعضها"
+                      (click)="dedupeCategory(cat.id)">🧹 دمج المكرّرات</button>
               <button class="btn sm ghost" title="تعديل القسم"
                       (click)="openEditor({ nodeId: cat.id })">✎</button>
             </div>
@@ -176,7 +178,12 @@ import { TransferDialogComponent, TransferMode } from './components/transfer-dia
       </div>
     }
 
-    <div class="toast" [class.show]="!!toast.message()">{{ toast.message() }}</div>
+    <div class="toast" [class.show]="!!toast.message()">
+      <span>{{ toast.message() }}</span>
+      @if (toast.action(); as a) {
+        <button class="toast-action" (click)="toast.runAction()">{{ a.label }}</button>
+      }
+    </div>
   `,
 })
 export class AppComponent {
@@ -194,6 +201,21 @@ export class AppComponent {
   protected addCategory(): void {
     const cat = this.store.addCategory();
     this.openEditor({ nodeId: cat.id });
+  }
+
+  /** يدمج الأقسام متطابقة العنوان تحت بعضها (SPEC-003 §3) — يعالج تكراراً وقع سابقاً */
+  protected dedupeCategory(catId: string): void {
+    const report = this.store.dedupeCategory(catId);
+    if (!report.merged) {
+      this.toast.show('لا تكرار — كل شيء مرتّب بالفعل');
+      return;
+    }
+    this.toast.showWithAction(`🧹 دُمج ${report.merged} عنصراً مكرّراً`, {
+      label: 'تراجع',
+      run: () => {
+        if (this.store.undoLastImport()) this.toast.show('تم التراجع');
+      },
+    });
   }
 
   protected afterSave(nodeId: string): void {

@@ -212,6 +212,22 @@ html[dir="rtl"] .node.open>.node-head .chev{transform:rotate(-90deg)}
 .mini::before{content:"";position:absolute;inset:-8px}
 .mini:hover{background:var(--line);color:var(--fg)}
 .mini.del:hover{background:color-mix(in srgb,var(--danger) 15%,transparent);color:var(--danger)}
+.mini:disabled{opacity:.3;cursor:not-allowed}
+.mini:disabled:hover{background:transparent;color:var(--fg-3)}
+
+/* SPEC-003 §4 — تحريك العقد: مجموعة أزرار مفصولة + مؤشرات السحب والإفلات */
+.move-acts{display:flex;gap:1px;padding-inline-end:5px;margin-inline-end:5px;border-inline-end:1px solid var(--line)}
+
+/* خط رفيع بين كل عقدتين — يظهر فقط أثناء سحب عنصر آخر فوقه (وجهة "أدخِل قبل") */
+.drop-line{height:6px;margin:-3px 0;border-radius:3px;position:relative;z-index:1}
+.drop-line.active{background:var(--brand)}
+.drop-line.active::after{
+  content:"⤵ إفلات هنا";position:absolute;inset-inline-start:12px;top:-9px;
+  font-size:10.5px;font-weight:700;color:var(--brand);background:var(--bg);padding:0 6px;
+}
+
+.node.drag-source{opacity:.45}
+.node.drop-into{box-shadow:0 0 0 2px var(--brand) inset;background:color-mix(in srgb, var(--brand) 6%, var(--bg-2))}
 
 /* REQ-1 — مسار (breadcrumb) دائم داخل شجرة المحتوى، للعقد العميقة (depth ≥ 3) */
 .trail{display:flex;flex-wrap:wrap;align-items:center;gap:4px;font-size:11.5px;color:var(--fg-3);margin-bottom:10px}
@@ -323,10 +339,17 @@ textarea.code-inp{font-family:var(--mono);font-size:12.8px;direction:ltr;text-al
 
 .toast{
   position:fixed;bottom:22px;inset-inline-start:50%;transform:translateX(50%) translateY(80px);
-  background:var(--fg);color:var(--bg);padding:11px 20px;border-radius:12px;font-size:13.5px;font-weight:600;
-  box-shadow:var(--sh-3);z-index:200;opacity:0;transition:.25s cubic-bezier(.2,.8,.3,1);pointer-events:none;max-width:88vw
+  background:var(--fg);color:var(--bg);padding:9px 10px 9px 20px;border-radius:12px;font-size:13.5px;font-weight:600;
+  box-shadow:var(--sh-3);z-index:200;opacity:0;transition:.25s cubic-bezier(.2,.8,.3,1);pointer-events:none;max-width:88vw;
+  display:flex;align-items:center;gap:6px
 }
-.toast.show{opacity:1;transform:translateX(50%) translateY(0)}
+.toast.show{opacity:1;transform:translateX(50%) translateY(0);pointer-events:auto}
+.toast-action{
+  background:transparent;border:1px solid color-mix(in srgb, var(--bg) 40%, transparent);
+  color:var(--bg);border-radius:8px;padding:0 14px;height:44px;min-width:44px;
+  font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap
+}
+.toast-action:hover{background:color-mix(in srgb, var(--bg) 14%, transparent)}
 
 /* ========== RESPONSIVE ========== */
 @media (max-width:1000px){

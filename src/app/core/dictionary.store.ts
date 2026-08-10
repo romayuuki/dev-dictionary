@@ -12,9 +12,14 @@ import {
 import { SupabaseService } from './supabase.service';
 // migrateToLatest تُشغّل سلسلة الترحيلات كاملة (v4→v5→v6) — لا تستدعِ ترحيلاً مفرداً
 import { migrateToLatest } from './migrations/migrate-v4-to-v5.mjs';
+import { planMerge, dedupeTree, MergeReport } from './merge.service';
 
 const LS_DATA = 'dev-dictionary-v1';
 const LS_UI = 'dev-dictionary-ui-v1';
+/** نسخة قبل آخر دمج/تنظيف — تسمح بالتراجع خلال مهلة قصيرة (SPEC-003 §3.5) */
+const LS_UNDO_IMPORT = 'dev-dictionary-v1-undo-import';
+/** مهلة صلاحية التراجع بالمللي ثانية — بعدها يُتجاهل أي snapshot متبقٍّ */
+const UNDO_WINDOW_MS = 60_000;
 
 /** رقم الإصدار الحالي لبنية البيانات (SPEC-001 §4.3 / §6.2) — v6 يضيف محتوى React */
 const DATA_VERSION = 6;
@@ -26,6 +31,9 @@ interface UiState {
   catId: string;
   open: string[];
 }
+
+/** أعلى/أسفل: تبادل مع شقيق. أدخِل: تصير ابناً للشقيق السابق. أخرِج: تصير شقيقاً لأبيها (SPEC-003 §4) */
+export type MoveDir = 'up' | 'down' | 'in' | 'out';
 
 export interface NodeLocation {
   node: DictNode;
@@ -324,6 +332,7 @@ export class DictionaryStore {
     target.node.children = [...(target.node.children ?? []), node];
 
     this._open.update((set) => new Set(set).add(parentId).add(node.id));
+    this.clearUndoSnapshot();
     this.touch();
     this.persistUi();
     return node;
@@ -333,12 +342,14 @@ export class DictionaryStore {
     const loc = this.find(id);
     if (!loc) return;
     Object.assign(loc.node, payload);
+    this.clearUndoSnapshot();
     this.touch();
   }
 
   deleteNode(id: string): void {
     const loc = this.find(id);
     if (!loc) return;
+    this.clearUndoSnapshot();
 
     if (loc.isCategory) {
       this._data.update((d) => ({ ...d, categories: d.categories.filter((c) => c.id !== id) }));
@@ -353,6 +364,123 @@ export class DictionaryStore {
       return next;
     });
     this.touch();
+  }
+
+  // ---------- إعادة الترتيب (SPEC-003 §4) ----------
+
+  /** معلومات الموضع الحالي لعقدة — بلا أي تعديل، تُستخدم داخلياً وللتحقق من إمكانية الحركة */
+  private locateForMove(
+    id: string,
+  ): { siblings: DictNode[]; idx: number; parentNode: DictNode; grandparent: DictNode | null } | null {
+    const loc = this.find(id);
+    if (!loc || loc.isCategory || !loc.parent) return null;
+    const siblings = loc.parent.children ?? [];
+    const idx = siblings.findIndex((n) => n.id === id);
+    if (idx === -1) return null;
+
+    // path يتضمّن الأب نفسه عندما العمق ≥ 1 (انظر بناء dig() في find()) —
+    // فالجدّ هو ما قبل الأخير في path، أو القسم نفسه عندما العمق = 1، أو لا جدّ عند العمق = 0
+    const grandparent =
+      loc.path.length >= 2 ? loc.path[loc.path.length - 2] : loc.path.length === 1 ? loc.cat : null;
+
+    return { siblings, idx, parentNode: loc.parent, grandparent };
+  }
+
+  /** هل عملية الحركة ممكنة الآن؟ — لتعطيل الأزرار بصرياً (SPEC-003 AC-2.3) */
+  canMove(id: string, dir: MoveDir): boolean {
+    const info = this.locateForMove(id);
+    if (!info) return false;
+    switch (dir) {
+      case 'up':
+        return info.idx > 0;
+      case 'down':
+        return info.idx < info.siblings.length - 1;
+      case 'in':
+        return info.idx > 0;
+      case 'out':
+        return info.grandparent !== null;
+      default:
+        return false;
+    }
+  }
+
+  /**
+   * ينفّذ حركة واحدة بسيطة على عقدة. لا يحذف ولا يفقد أي ابن — العقدة تنتقل بكامل شجرتها.
+   * يُعيد false بأمان إن كانت الحركة غير ممكنة، دون أي تعديل (SPEC-003 AC-2.1/2.2).
+   */
+  moveNode(id: string, dir: MoveDir): boolean {
+    if (!this.canMove(id, dir)) return false;
+    const info = this.locateForMove(id);
+    if (!info) return false;
+    const { siblings, idx, parentNode, grandparent } = info;
+
+    if (dir === 'up') {
+      [siblings[idx - 1], siblings[idx]] = [siblings[idx], siblings[idx - 1]];
+    } else if (dir === 'down') {
+      [siblings[idx + 1], siblings[idx]] = [siblings[idx], siblings[idx + 1]];
+    } else if (dir === 'in') {
+      const newParent = siblings[idx - 1];
+      const [node] = siblings.splice(idx, 1);
+      newParent.children = [...(newParent.children ?? []), node];
+      newParent.kind = 'group';
+      this._open.update((set) => new Set(set).add(newParent.id));
+    } else if (dir === 'out') {
+      const [node] = siblings.splice(idx, 1);
+      const gp = grandparent!;
+      gp.children = gp.children ?? [];
+      const parentIdxInGp = gp.children.findIndex((n) => n.id === parentNode.id);
+      gp.children.splice(parentIdxInGp + 1, 0, node);
+    }
+
+    this.clearUndoSnapshot();
+    this.touch();
+    return true;
+  }
+
+  /**
+   * ينقل عقدة لتصبح ابناً لعقدة أخرى في أي مكان بالشجرة — يُستخدم من نافذة
+   * «نقل إلى…» ومن السحب والإفلات. محميّ من الحلقات (SPEC-003 §4.2).
+   */
+  moveToParent(id: string, parentId: string, index?: number): boolean {
+    if (id === parentId) return false;
+    const nodeLoc = this.find(id);
+    const targetLoc = this.find(parentId);
+    if (!nodeLoc || nodeLoc.isCategory || !nodeLoc.parent || !targetLoc) return false;
+
+    // حماية من الحلقات: الهدف يجب ألا يكون داخل ذرّية العقدة المنقولة أو العقدة نفسها
+    let isCycle = false;
+    this.walk(nodeLoc.node.children ?? [], (n) => {
+      if (n.id === parentId) isCycle = true;
+    });
+    if (isCycle) return false;
+
+    const oldSiblings = nodeLoc.parent.children ?? [];
+    const oldIdx = oldSiblings.findIndex((n) => n.id === id);
+    if (oldIdx === -1) return false;
+
+    const [node] = oldSiblings.splice(oldIdx, 1);
+    targetLoc.node.children = targetLoc.node.children ?? [];
+    const newSiblings = targetLoc.node.children;
+    const insertAt = index === undefined ? newSiblings.length : Math.max(0, Math.min(index, newSiblings.length));
+    newSiblings.splice(insertAt, 0, node);
+    if (newSiblings.length) targetLoc.node.kind = 'group';
+
+    this.clearUndoSnapshot();
+    this.touch();
+    return true;
+  }
+
+  /**
+   * يضع عقدة قبل beforeId مباشرة (كأخوين تحت نفس أب beforeId) — الأداة التي
+   * يستخدمها السحب والإفلات لإعادة الترتيب البصري (SPEC-003 §4.3).
+   */
+  moveBefore(id: string, beforeId: string): boolean {
+    if (id === beforeId) return false;
+    const targetLoc = this.find(beforeId);
+    if (!targetLoc || !targetLoc.parent) return false;
+    const idx = targetLoc.parent.children.findIndex((n) => n.id === beforeId);
+    if (idx === -1) return false;
+    return this.moveToParent(id, targetLoc.parent.id, idx);
   }
 
   addCategory(): Category {
@@ -379,6 +507,7 @@ export class DictionaryStore {
     this.persistUi();
   }
 
+  /** @deprecated استخدم mergeIntoCategory — تُبقيها متاحة لأي كود قديم يستدعيها مباشرة */
   appendToCategory(catId: string, nodes: DictNode[]): number {
     const cat = this.categories().find((c) => c.id === catId);
     if (!cat) throw new Error('لم يُحدَّد قسم');
@@ -387,6 +516,102 @@ export class DictionaryStore {
     this.walk(nodes, () => count++);
     this.touch();
     return count;
+  }
+
+  // ---------- الدمج الذكي (SPEC-003 §3) ----------
+
+  /**
+   * معاينة بلا أي تعديل فعلي — نقيّة تماماً، لبناء نافذة التأكيد قبل الاستيراد.
+   * آمنة للاستدعاء من الواجهة في كل ضغطة زر دون أي أثر جانبي.
+   */
+  previewMerge(catId: string, nodes: DictNode[]): MergeReport {
+    const cat = this.categories().find((c) => c.id === catId);
+    if (!cat) throw new Error('لم يُحدَّد قسم');
+    return planMerge(cat.children ?? [], nodes).report;
+  }
+
+  /**
+   * يطبّق الدمج فعلياً بعد موافقة المستخدم على المعاينة (SPEC-003 §3.3).
+   * لا يحذف عقدة أبداً — إمّا يُضيف عقدة جديدة أو يُثري عقدة مطابقة بالعنوان.
+   */
+  mergeIntoCategory(catId: string, nodes: DictNode[]): MergeReport {
+    const cat = this.categories().find((c) => c.id === catId);
+    if (!cat) throw new Error('لم يُحدَّد قسم');
+
+    this.snapshotForUndo();
+    const { result, report } = planMerge(cat.children ?? [], nodes);
+    cat.children = result;
+    this.touch();
+    return report;
+  }
+
+  /**
+   * استعادة نسخة JSON كاملة (تصدير سابق) — استبدال شامل، لذا يُحفَظ snapshot
+   * للتراجع تماماً كما في الدمج. تُستخدم من واجهة الاستيراد بعد تأكيد صريح من المستخدم.
+   */
+  restoreFromJson(data: DictData): void {
+    if (!Array.isArray(data?.categories)) throw new Error('ملف غير صالح');
+    this.snapshotForUndo();
+    this.replaceAll(data);
+  }
+
+  /**
+   * يزيل تكراراً وقع سابقاً (قبل تفعيل الدمج الذكي) بدمج الأشقاء متطابقي العنوان
+   * تعاودياً بأي عمق — مثال: قسمان اسمهما "React" تحت نفس الأب.
+   */
+  dedupeCategory(catId: string): MergeReport {
+    const cat = this.categories().find((c) => c.id === catId);
+    if (!cat) throw new Error('لم يُحدَّد قسم');
+
+    this.snapshotForUndo();
+    const { result, report } = dedupeTree(cat.children ?? []);
+    cat.children = result;
+    this.touch();
+    return report;
+  }
+
+  private snapshotForUndo(): void {
+    try {
+      localStorage.setItem(LS_UNDO_IMPORT, JSON.stringify({ at: Date.now(), data: this._data() }));
+    } catch {
+      /* التراجع ميزة مساعدة — فشل حفظه لا يوقف عملية الدمج نفسها */
+    }
+  }
+
+  /** أي تعديل يدوي بعد دمج/تنظيف يُبطل التراجع — تجنّباً لاستعادة تتجاهل تعديلاً لاحقاً */
+  private clearUndoSnapshot(): void {
+    try {
+      localStorage.removeItem(LS_UNDO_IMPORT);
+    } catch {
+      /* غير حرج */
+    }
+  }
+
+  /** هل توجد نسخة تراجع صالحة الآن؟ — تُستخدم لإظهار/إخفاء زر «تراجع» */
+  canUndoImport(): boolean {
+    try {
+      const raw = localStorage.getItem(LS_UNDO_IMPORT);
+      if (!raw) return false;
+      const snap = JSON.parse(raw) as { at: number };
+      return Date.now() - snap.at < UNDO_WINDOW_MS;
+    } catch {
+      return false;
+    }
+  }
+
+  /** يستعيد الحالة كما كانت قبل آخر دمج/تنظيف، إن كانت النافذة الزمنية لم تنتهِ بعد */
+  undoLastImport(): boolean {
+    try {
+      const raw = localStorage.getItem(LS_UNDO_IMPORT);
+      if (!raw) return false;
+      const snap = JSON.parse(raw) as { at: number; data: DictData };
+      localStorage.removeItem(LS_UNDO_IMPORT);
+      if (Date.now() - snap.at >= UNDO_WINDOW_MS) return false;
+      this.replaceAll(snap.data);
+      return true;
+    } catch {
+      return false;
+    }
   }
 
   toJson(): string {

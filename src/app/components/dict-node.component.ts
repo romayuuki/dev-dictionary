@@ -1,9 +1,10 @@
-import { ChangeDetectionStrategy, Component, inject, input, output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, input, output, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { DictNode, NodeKind, nodeKind } from '../models/dict.model';
-import { DictionaryStore } from '../core/dictionary.store';
+import { DictionaryStore, MoveDir } from '../core/dictionary.store';
 import { ToastService } from '../core/toast.service';
+import { DragService } from '../core/drag.service';
 import { formatDefinition } from '../core/text.util';
 
 /** عقدة قابلة للطي تعرض نفسها وأبناءها بشكل تعاودي بأي عمق */
@@ -13,10 +14,19 @@ import { formatDefinition } from '../core/text.util';
   imports: [CommonModule],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <div class="node" [class.open]="isOpen()" [attr.id]="'node-' + node().id"
-         [attr.data-depth]="depth()" [attr.data-kind]="kind()">
+    <div class="drop-line" [class.active]="isDropLineTarget()"
+         (dragover)="onDragOverLine($event)" (dragleave)="onDragLeaveLine()" (drop)="onDropLine($event)"></div>
+
+    <div class="node" [class.open]="isOpen()" [class.drag-source]="isBeingDragged()"
+         [class.drop-into]="isDropIntoTarget()"
+         [attr.id]="'node-' + node().id"
+         [attr.data-depth]="depth()" [attr.data-kind]="kind()"
+         (dragover)="onDragOverInto($event)" (dragleave)="onDragLeaveInto()" (drop)="onDropInto($event)">
       <button type="button" class="node-head" [attr.aria-expanded]="hasBody() ? isOpen() : null"
               [attr.aria-controls]="hasBody() ? 'node-body-' + node().id : null"
+              draggable="true"
+              (dragstart)="onDragStart($event)" (dragend)="onDragEnd()"
+              (keydown)="onKeydown($event)"
               (click)="store.toggleOpen(node().id)">
         <span class="chev" aria-hidden="true">
           @if (kind() === 'term') {
@@ -45,6 +55,20 @@ import { formatDefinition } from '../core/text.util';
             <span class="pill">{{ node().children.length }}</span>
           }
           <span class="row-acts">
+            <span class="move-acts">
+              <button type="button" class="mini" title="تحريك لأعلى (Alt+↑)" aria-label="تحريك لأعلى"
+                    [disabled]="!canMove('up')"
+                    (click)="move('up'); $event.stopPropagation()">↑</button>
+              <button type="button" class="mini" title="تحريك لأسفل (Alt+↓)" aria-label="تحريك لأسفل"
+                    [disabled]="!canMove('down')"
+                    (click)="move('down'); $event.stopPropagation()">↓</button>
+              <button type="button" class="mini" title="أدخِلها في العنصر السابق (Alt+←)" aria-label="أدخل في العنصر السابق"
+                    [disabled]="!canMove('in')"
+                    (click)="move('in'); $event.stopPropagation()">⇤</button>
+              <button type="button" class="mini" title="أخرِجها لمستوى أعلى (Alt+→)" aria-label="أخرج لمستوى أعلى"
+                    [disabled]="!canMove('out')"
+                    (click)="move('out'); $event.stopPropagation()">⇥</button>
+            </span>
             <button type="button" class="mini" title="إضافة قسم بداخله" [attr.aria-label]="'إضافة قسم داخل ' + node().title"
                   (click)="add.emit(node().id); $event.stopPropagation()">＋</button>
             <button type="button" class="mini" title="تعديل" [attr.aria-label]="'تعديل ' + node().title"
@@ -110,6 +134,11 @@ export class DictNodeComponent {
   protected readonly store = inject(DictionaryStore);
   private readonly toast = inject(ToastService);
   private readonly sanitizer = inject(DomSanitizer);
+  private readonly dragSvc = inject(DragService);
+
+  /** حالة تحويم محلية لهذه النسخة فقط أثناء السحب — كل عقدة تعرف حالتها بمعزل عن البقية */
+  private readonly hoverLine = signal(false);
+  private readonly hoverInto = signal(false);
 
   readonly node = input.required<DictNode>();
   readonly depth = input<number>(0);
@@ -144,6 +173,107 @@ export class DictNodeComponent {
     if (this.kind() !== 'term') return false;
     const t = this.node().title.trim();
     return /^</.test(t) || /\(\)$/.test(t) || /^[a-zA-Z@.-]+\.[a-zA-Z.]+$/.test(t);
+  }
+
+  // ---------- إعادة الترتيب: أزرار + اختصارات (SPEC-003 §4.3) ----------
+
+  protected canMove(dir: MoveDir): boolean {
+    return this.store.canMove(this.node().id, dir);
+  }
+
+  protected move(dir: MoveDir): void {
+    if (!this.store.moveNode(this.node().id, dir)) this.toast.show('لا يمكن الحركة في هذا الاتجاه');
+  }
+
+  /** Alt+↑/↓/←/→ على عقدة مركَّز عليها — يعمل بلوحة المفاتيح بالكامل (AC-2.5) */
+  protected onKeydown(e: KeyboardEvent): void {
+    if (!e.altKey) return;
+    const map: Partial<Record<string, MoveDir>> = {
+      ArrowUp: 'up',
+      ArrowDown: 'down',
+      ArrowLeft: 'in',
+      ArrowRight: 'out',
+    };
+    const dir = map[e.key];
+    if (!dir) return;
+    e.preventDefault();
+    this.move(dir);
+  }
+
+  // ---------- إعادة الترتيب: سحب وإفلات (سطح المكتب — SPEC-003 §4.3) ----------
+
+  protected isBeingDragged(): boolean {
+    return this.dragSvc.draggedId() === this.node().id;
+  }
+
+  protected isDropLineTarget(): boolean {
+    const id = this.dragSvc.draggedId();
+    return this.hoverLine() && !!id && id !== this.node().id;
+  }
+
+  protected isDropIntoTarget(): boolean {
+    const id = this.dragSvc.draggedId();
+    return this.hoverInto() && !!id && id !== this.node().id;
+  }
+
+  protected onDragStart(e: DragEvent): void {
+    e.dataTransfer?.setData('text/plain', this.node().id);
+    if (e.dataTransfer) e.dataTransfer.effectAllowed = 'move';
+    this.dragSvc.start(this.node().id);
+  }
+
+  protected onDragEnd(): void {
+    this.dragSvc.end();
+    this.hoverLine.set(false);
+    this.hoverInto.set(false);
+  }
+
+  /** خط رفيع أعلى العقدة — الإفلات عليه يضع العنصر المسحوب شقيقاً قبلها مباشرة */
+  protected onDragOverLine(e: DragEvent): void {
+    const id = this.dragSvc.draggedId();
+    if (!id || id === this.node().id) return;
+    e.preventDefault();
+    e.stopPropagation();
+    if (e.dataTransfer) e.dataTransfer.dropEffect = 'move';
+    this.hoverLine.set(true);
+  }
+
+  protected onDragLeaveLine(): void {
+    this.hoverLine.set(false);
+  }
+
+  protected onDropLine(e: DragEvent): void {
+    e.preventDefault();
+    e.stopPropagation();
+    this.hoverLine.set(false);
+    const draggedId = this.dragSvc.draggedId();
+    this.dragSvc.end();
+    if (!draggedId || draggedId === this.node().id) return;
+    if (!this.store.moveBefore(draggedId, this.node().id)) this.toast.show('تعذّر النقل هنا');
+  }
+
+  /** الإفلات على جسم العقدة نفسها يضع العنصر المسحوب ابناً بداخلها */
+  protected onDragOverInto(e: DragEvent): void {
+    const id = this.dragSvc.draggedId();
+    if (!id || id === this.node().id) return;
+    e.preventDefault();
+    e.stopPropagation();
+    if (e.dataTransfer) e.dataTransfer.dropEffect = 'move';
+    this.hoverInto.set(true);
+  }
+
+  protected onDragLeaveInto(): void {
+    this.hoverInto.set(false);
+  }
+
+  protected onDropInto(e: DragEvent): void {
+    e.preventDefault();
+    e.stopPropagation();
+    this.hoverInto.set(false);
+    const draggedId = this.dragSvc.draggedId();
+    this.dragSvc.end();
+    if (!draggedId || draggedId === this.node().id) return;
+    if (!this.store.moveToParent(draggedId, this.node().id)) this.toast.show('لا يمكن نقل عنصر داخل نفسه');
   }
 
   protected definitionHtml(): SafeHtml {

@@ -8,6 +8,15 @@ interface ParsedNode extends DictNode {
   level?: number;
 }
 
+/**
+ * ناتج تحليل ملف واحد — بلا أي تعديل فعلي على القاموس (SPEC-003 §3.4).
+ * التطبيق الفعلي (الدمج أو الاستبدال) يحدث لاحقاً بعد موافقة المستخدم على المعاينة.
+ */
+export type ImportResult =
+  | { kind: 'nodes'; fileName: string; nodes: DictNode[] }
+  | { kind: 'restore'; fileName: string; data: DictData }
+  | { kind: 'empty'; fileName: string };
+
 /** الاستيراد من JSON / Markdown / Word، والتصدير إلى JSON */
 @Injectable({ providedIn: 'root' })
 export class TransferService {
@@ -35,14 +44,17 @@ export class TransferService {
 
   // ---------- الاستيراد ----------
 
-  /** يرجع رسالة وصفية لكل ملف لعرضها في سجل الاستيراد */
-  async importFile(file: File, targetCategoryId: string): Promise<string> {
+  /**
+   * يحلّل ملفاً واحداً فقط — لا يعدّل القاموس إطلاقاً (SPEC-003 §3.4).
+   * الجهة المستدعية (transfer-dialog) تجمع النتائج، تعرض معاينة دمج موحّدة،
+   * ثم تطبّق فعلياً عبر store.mergeIntoCategory أو store.restoreFromJson بعد التأكيد.
+   */
+  async parseFile(file: File): Promise<ImportResult> {
     const ext = file.name.split('.').pop()?.toLowerCase() ?? '';
 
     if (ext === 'json') {
       const data = JSON.parse(await file.text()) as DictData;
-      this.store.replaceAll(data);
-      return '✅ استُعيدت النسخة الاحتياطية بالكامل';
+      return { kind: 'restore', fileName: file.name, data };
     }
 
     const nodes =
@@ -50,12 +62,8 @@ export class TransferService {
         ? await this.parseDocx(file)
         : this.parseMarkdown(await file.text());
 
-    if (!nodes.length) {
-      return `⚠️ ${file.name} — لم أجد عناوين. تأكّد من استخدام أنماط Heading.`;
-    }
-
-    const count = this.store.appendToCategory(targetCategoryId, nodes);
-    return `✅ ${file.name} — أُضيف ${count} عنصراً`;
+    if (!nodes.length) return { kind: 'empty', fileName: file.name };
+    return { kind: 'nodes', fileName: file.name, nodes };
   }
 
   /** Markdown / نص عادي → شجرة، بالاعتماد على مستويات العناوين # */

@@ -4,13 +4,16 @@ import { FormsModule } from '@angular/forms';
 import { DictionaryStore } from '../core/dictionary.store';
 import { ToastService } from '../core/toast.service';
 import { TransferService } from '../core/transfer.service';
+import { DictData, DictNode } from '../models/dict.model';
+import { MergeReport } from '../core/merge.service';
+import { MergePreviewComponent } from './merge-preview.component';
 
 export type TransferMode = 'import' | 'export';
 
 @Component({
   selector: 'app-transfer-dialog',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, MergePreviewComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="overlay open" (click)="onBackdrop($event)">
@@ -71,13 +74,43 @@ export type TransferMode = 'import' | 'export';
             }
 
             <div class="note">
-              <b>ملف Word:</b> تُحوَّل عناوين Word (Heading 1/2/3…) إلى أقسام متداخلة تلقائياً،
-              والفقرات إلى تعريفات، وكتل الكود إلى أمثلة.
+              <b>الدمج آمن دائماً:</b> قبل أي إضافة تظهر معاينة تفصيلية للموافقة عليها،
+              ولن يُحذف أو يُستبدل أي محتوى موجود لديك — يُضاف الجديد ويُثرى المتشابه فقط.
             </div>
           </div>
         }
       </div>
     </div>
+
+    @if (pendingRestore(); as restore) {
+      <div class="overlay open" (click)="cancelRestore($event)">
+        <div class="modal">
+          <div class="m-h">
+            <h3>استعادة نسخة كاملة</h3>
+            <button class="icon-btn" (click)="pendingRestore.set(null)">✕</button>
+          </div>
+          <div class="m-b">
+            <p style="margin:0">
+              ملف <b>«{{ restore.fileName }}»</b> نسخة JSON كاملة — استيراده
+              <b>يستبدل كامل قاموسك الحالي</b> بمحتوى هذا الملف.
+            </p>
+            <div class="note">💡 يمكنك التراجع خلال دقيقة من زر «تراجع» في الإشعار بعد الاستيراد.</div>
+          </div>
+          <div class="m-f">
+            <button class="btn ghost" (click)="pendingRestore.set(null)">إلغاء</button>
+            <button class="btn danger" (click)="confirmRestore(restore)">نعم، استبدل الكل</button>
+          </div>
+        </div>
+      </div>
+    }
+
+    @if (pendingMerge(); as pending) {
+      <app-merge-preview
+        [title]="'معاينة الاستيراد — ' + pending.catTitle"
+        [report]="pending.report"
+        (confirm)="confirmMerge(pending)"
+        (cancel)="pendingMerge.set(null)" />
+    }
   `,
 })
 export class TransferDialogComponent {
@@ -91,6 +124,14 @@ export class TransferDialogComponent {
   protected targetCategoryId = this.store.activeCategory()?.id ?? '';
   protected readonly dragOver = signal(false);
   protected readonly log = signal<string[]>([]);
+
+  protected readonly pendingRestore = signal<{ fileName: string; data: DictData } | null>(null);
+  protected readonly pendingMerge = signal<{
+    catTitle: string;
+    catId: string;
+    nodes: DictNode[];
+    report: MergeReport;
+  } | null>(null);
 
   protected exportJson(): void {
     this.transfer.exportJson();
@@ -116,18 +157,67 @@ export class TransferDialogComponent {
     void this.handle((e.target as HTMLInputElement).files);
   }
 
+  /**
+   * يحلّل الملفات فقط (بلا أي تعديل على القاموس)، ثم يبني معاينة موحّدة.
+   * ملفات JSON (استعادة كاملة) تُعرض كتأكيد منفصل لأنها عملية استبدال شامل، لا دمج.
+   */
   private async handle(files: FileList | null | undefined): Promise<void> {
     if (!files?.length) return;
 
+    const combinedNodes: DictNode[] = [];
+
     for (const file of Array.from(files)) {
       try {
-        const message = await this.transfer.importFile(file, this.targetCategoryId);
-        this.log.update((l) => [...l, message]);
+        const result = await this.transfer.parseFile(file);
+        if (result.kind === 'empty') {
+          this.log.update((l) => [...l, `⚠️ ${result.fileName} — لم أجد عناوين. تأكّد من استخدام أنماط Heading.`]);
+        } else if (result.kind === 'restore') {
+          this.pendingRestore.set({ fileName: result.fileName, data: result.data });
+        } else {
+          combinedNodes.push(...result.nodes);
+          this.log.update((l) => [...l, `📄 ${result.fileName} — جاهز للمعاينة`]);
+        }
       } catch (err) {
         const reason = err instanceof Error ? err.message : String(err);
         this.log.update((l) => [...l, `❌ ${file.name} — ${reason}`]);
       }
     }
-    this.toast.show('انتهى الاستيراد');
+
+    if (combinedNodes.length) {
+      const cat = this.store.categories().find((c) => c.id === this.targetCategoryId);
+      if (cat) {
+        const report = this.store.previewMerge(this.targetCategoryId, combinedNodes);
+        this.pendingMerge.set({ catTitle: cat.title, catId: this.targetCategoryId, nodes: combinedNodes, report });
+      }
+    }
+  }
+
+  protected cancelRestore(e: MouseEvent): void {
+    if ((e.target as HTMLElement).classList.contains('overlay')) this.pendingRestore.set(null);
+  }
+
+  protected confirmRestore(restore: { fileName: string; data: DictData }): void {
+    this.store.restoreFromJson(restore.data);
+    this.pendingRestore.set(null);
+    this.close.emit();
+    this.toast.showWithAction(`✅ استُعيدت النسخة الكاملة من «${restore.fileName}»`, {
+      label: 'تراجع',
+      run: () => {
+        if (this.store.undoLastImport()) this.toast.show('تم التراجع');
+      },
+    });
+  }
+
+  protected confirmMerge(pending: { catTitle: string; catId: string; nodes: DictNode[] }): void {
+    const report = this.store.mergeIntoCategory(pending.catId, pending.nodes);
+    this.pendingMerge.set(null);
+    this.close.emit();
+    const summary = `✅ «${pending.catTitle}» — ${report.added} جديدة · ${report.merged} مدموجة`;
+    this.toast.showWithAction(summary, {
+      label: 'تراجع',
+      run: () => {
+        if (this.store.undoLastImport()) this.toast.show('تم التراجع');
+      },
+    });
   }
 }

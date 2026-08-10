@@ -1134,10 +1134,26 @@ export function migrateV4ToV5(data) {
  * لا فقد: لا تحذف أي عقدة — تستبدل الـ placeholder الفارغ فقط.
  */
 function ensureReactSection(frontend) {
-  const fw = findNode(frontend.children ?? [], 'fe-fw');
-  if (!fw || !Array.isArray(fw.children)) return;
+  if (!Array.isArray(frontend.children)) frontend.children = [];
 
-  const existing = fw.children.find((c) => c?.id === 'fe-fw-react');
+  // ابحث عن fe-fw في أي عمق. إن لم توجد (بيانات عُدِّلت يدوياً) أنشئها —
+  // الضمانة: المحتوى يظهر للمستخدم دائماً بدل الخروج الصامت.
+  let fw = findNode(frontend.children, 'fe-fw');
+  if (!fw) {
+    fw = group(
+      'fe-fw',
+      'أطر العمل والمكتبات',
+      'تجمع كل إطار عمل مستقل (Vue، React، Angular…) كابن مباشر، بدل دفنه داخل غيره.',
+      ['framework', 'library', 'أطر عمل', 'مكتبات'],
+      [],
+    );
+    frontend.children.push(fw);
+  }
+  if (!Array.isArray(fw.children)) fw.children = [];
+  fw.kind = 'group';
+
+  // العقدة قد تكون موجودة في أي مكان تحت fe-fw (وليس كابن مباشر فقط)
+  const existing = findNode(fw.children, 'fe-fw-react');
   const built = buildReactSection();
 
   // العقدة موجودة لكنها placeholder فارغ → املأها مع الحفاظ على مكانها
@@ -1168,8 +1184,11 @@ export function migrateV5ToV6(data) {
   if ((data.version ?? 0) < 5) return data;  // v4 يجب أن تمرّ بـ v4→v5 أولاً
 
   const next = deepClone(data);
-  const frontend = next.categories.find((c) => c?.id === 'frontend');
-  if (frontend && Array.isArray(frontend.children)) ensureReactSection(frontend);
+  // بحث بالمعرّف، ثم بالعنوان كخطة بديلة إن كان القسم قد أُعيدت تسميته
+  const frontend =
+    next.categories.find((c) => c?.id === 'frontend') ??
+    next.categories.find((c) => /front\s*-?\s*end/i.test(String(c?.title ?? '')));
+  if (frontend) ensureReactSection(frontend);
 
   next.version = 6;
   return next;

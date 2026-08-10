@@ -3,6 +3,8 @@
  * وتنسيق التعريفات المبسّط (**عريض** / `كود` / قوائم بـ -).
  */
 
+import { parseCanvasModel, renderCanvasSvg } from './canvas-block.util';
+
 export const escapeHtml = (s: unknown): string =>
   String(s ?? '').replace(/[&<>"']/g, (c) =>
     ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]!,
@@ -255,6 +257,12 @@ function renderCodeBlock(lang: string, rawCode: string): string {
     return '<figure class="mermaid-figure" data-mermaid="' + escapeHtml(code) + '">' +
       '<pre class="mermaid-src">' + escapeHtml(code) + '</pre></figure>';
   }
+  if (label === 'canvas') {
+    // لوحة رسم تفاعلية (أشكال + أسهم + ألوان، على طراز Obsidian) — رسم SVG فوري بلا مكتبة خارجية
+    const model = parseCanvasModel(code);
+    const svg = model ? renderCanvasSvg(model) : '<p style="color:var(--danger)">تعذّر قراءة لوحة الرسم</p>';
+    return '<figure class="canvas-figure" data-canvas="' + escapeHtml(code) + '">' + svg + '</figure>';
+  }
   return '<div class="code-block" data-lang="' + escapeHtml(label) + '">' +
     '<div class="code-block-h"><span>' + escapeHtml(label) + '</span>' +
     '<button type="button" class="code-copy" data-copy-code="' + escapeHtml(code) + '">نسخ</button></div>' +
@@ -392,6 +400,10 @@ export function htmlToMarkup(root: HTMLElement): string {
     if (tag === 'FIGURE' && el.classList.contains('mermaid-figure')) {
       const code = el.querySelector('.mermaid-src')?.textContent ?? '';
       return '```mermaid\n' + code.replace(/\n$/, '') + '\n```';
+    }
+    if (tag === 'FIGURE' && el.classList.contains('canvas-figure')) {
+      const json = el.getAttribute('data-canvas') ?? '';
+      return '```canvas\n' + json + '\n```';
     }
     if (tag === 'UL') {
       return Array.from(el.children)

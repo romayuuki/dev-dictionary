@@ -14,6 +14,13 @@ import { FormsModule } from '@angular/forms';
 import { DictionaryStore } from '../core/dictionary.store';
 import { sanitizeHtml } from '../core/sanitize.util';
 import { ARROW_CHARS, TEXT_SIZE_TOKENS, escapeHtml, formatDefinition, htmlToMarkup } from '../core/text.util';
+import {
+  CanvasModel,
+  buildEditableCanvas,
+  emptyCanvasModel,
+  parseCanvasModel,
+  serializeCanvasModel,
+} from '../core/canvas-block.util';
 
 /**
  * محرر مرئي (WYSIWYG) لحقل التعريف — SPEC-003 REQ-4 / مبدأ P3 في STORY-003:
@@ -86,6 +93,10 @@ import { ARROW_CHARS, TEXT_SIZE_TOKENS, escapeHtml, formatDefinition, htmlToMark
       <button type="button" class="btn sm ghost" (mousedown)="keepFocus($event)" (click)="insertMermaid()">
         📊 مخطط
       </button>
+
+      <button type="button" class="btn sm ghost" (mousedown)="keepFocus($event)" (click)="insertCanvas()">
+        🖼 لوحة رسم
+      </button>
     </div>
 
     @if (linkPickerOpen()) {
@@ -130,6 +141,9 @@ export class RichEditorComponent {
   /** آخر Range فعّال داخل المحرر — يُحفَظ عند كل تغيّر تحديد حتى لا يضيع عند الضغط على أزرار شريط الأدوات */
   private savedRange: Range | null = null;
 
+  /** دوال تنظيف مستمعي كل لوحة رسم تفاعلية حالية — تُستدعى عند إعادة الهيدرات أو تدمير المكوّن */
+  private canvasDisposers: (() => void)[] = [];
+
   constructor() {
     // إعادة الهيدرات فقط عند تغيّر مرجع resetKey (فتح نافذة جديدة) — لا عند كل حرف يُكتب
     effect(() => {
@@ -138,7 +152,15 @@ export class RichEditorComponent {
     });
 
     document.addEventListener('selectionchange', this.onSelectionChange);
-    inject(DestroyRef).onDestroy(() => document.removeEventListener('selectionchange', this.onSelectionChange));
+    inject(DestroyRef).onDestroy(() => {
+      document.removeEventListener('selectionchange', this.onSelectionChange);
+      this.disposeCanvases();
+    });
+  }
+
+  private disposeCanvases(): void {
+    for (const dispose of this.canvasDisposers) dispose();
+    this.canvasDisposers = [];
   }
 
   private readonly onSelectionChange = (): void => {
@@ -149,6 +171,7 @@ export class RichEditorComponent {
   };
 
   private hydrate(markup: string): void {
+    this.disposeCanvases();
     const el = this.editorEl().nativeElement;
     el.innerHTML = formatDefinition(markup) || '<p><br></p>';
     this.normalizeForEditing(el);
@@ -171,6 +194,21 @@ export class RichEditorComponent {
       el.removeAttribute('data-mermaid');
       el.innerHTML = '<pre class="mermaid-src" contenteditable="true">' + escapeHtml(codeText) + '</pre>';
     });
+    (Array.from(container.querySelectorAll('.canvas-figure')) as HTMLElement[]).forEach((el) => {
+      const json = el.getAttribute('data-canvas') ?? '';
+      this.mountCanvas(el, parseCanvasModel(json) ?? emptyCanvasModel());
+    });
+  }
+
+  /** يبني لوحة الرسم التفاعلية داخل figure معطى، ويُبقي data-canvas متزامناً مع كل تعديل */
+  private mountCanvas(figure: HTMLElement, model: CanvasModel): void {
+    figure.contentEditable = 'false';
+    figure.setAttribute('data-canvas', serializeCanvasModel(model));
+    figure.innerHTML = '';
+    const dispose = buildEditableCanvas(figure, model, (next) => {
+      figure.setAttribute('data-canvas', serializeCanvasModel(next));
+    });
+    this.canvasDisposers.push(dispose);
   }
 
   /** يُقرأ من الأب (node-editor) عند الحفظ — نقطة السحب الوحيدة لتحويل DOM إلى نصّ مُعلَّم */
@@ -371,6 +409,23 @@ export class RichEditorComponent {
       this.applyRange(sel);
       (pre as HTMLElement).focus();
     }
+  }
+
+  // ---------- لوحة رسم تفاعلية (أشكال + أسهم + ألوان) ----------
+
+  protected insertCanvas(): void {
+    const range = this.currentRangeOrEnd();
+    const figure = document.createElement('figure');
+    figure.className = 'canvas-figure';
+
+    range.deleteContents();
+    range.insertNode(figure);
+    const after = document.createElement('p');
+    after.innerHTML = '<br>';
+    figure.after(after);
+
+    this.mountCanvas(figure, emptyCanvasModel());
+    this.focusEditor();
   }
 
   // ---------- روابط داخلية ----------

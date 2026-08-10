@@ -80,7 +80,7 @@ import { ARROW_CHARS, TEXT_SIZE_TOKENS, escapeHtml, formatDefinition, htmlToMark
       </button>
 
       <button type="button" class="btn sm ghost" (mousedown)="keepFocus($event)" (click)="insertCodeBlock()">
-        { } كتلة كود
+        🧱 كتلة كود
       </button>
 
       <button type="button" class="btn sm ghost" (mousedown)="keepFocus($event)" (click)="insertMermaid()">
@@ -157,7 +157,7 @@ export class RichEditorComponent {
 
   /** يحوّل كتل الكود والمخططات المعروضة (للقراءة) إلى صيغتها القابلة للتحرير المباشر */
   private normalizeForEditing(container: HTMLElement): void {
-    container.querySelectorAll<HTMLElement>('.code-block').forEach((el) => {
+    (Array.from(container.querySelectorAll('.code-block')) as HTMLElement[]).forEach((el) => {
       const lang = el.getAttribute('data-lang') || 'text';
       const codeText = el.querySelector('code')?.textContent ?? '';
       el.contentEditable = 'false';
@@ -165,7 +165,7 @@ export class RichEditorComponent {
         '<div class="code-block-h"><span class="lang-tag" contenteditable="true">' + escapeHtml(lang) + '</span></div>' +
         '<pre><code contenteditable="true">' + escapeHtml(codeText) + '</code></pre>';
     });
-    container.querySelectorAll<HTMLElement>('.mermaid-figure').forEach((el) => {
+    (Array.from(container.querySelectorAll('.mermaid-figure')) as HTMLElement[]).forEach((el) => {
       const codeText = el.querySelector('.mermaid-src')?.textContent ?? el.getAttribute('data-mermaid') ?? '';
       el.contentEditable = 'false';
       el.removeAttribute('data-mermaid');

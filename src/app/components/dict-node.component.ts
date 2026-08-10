@@ -166,9 +166,9 @@ export class DictNodeComponent {
 
   /** يبحث داخل عنصر هذه العقدة فقط عن مخططات لم تُرسَم بعد — يتجاهل مخططات عقد أبناء (لها معالجتها الخاصة) */
   private renderVisibleDiagrams(): void {
-    const host = this.elRef.nativeElement;
-    const figures = host.querySelectorAll<HTMLElement>('.mermaid-figure[data-mermaid]');
-    for (const fig of Array.from(figures)) {
+    const host: HTMLElement = this.elRef.nativeElement;
+    const figures = Array.from(host.querySelectorAll('.mermaid-figure[data-mermaid]')) as HTMLElement[];
+    for (const fig of figures) {
       if (fig.closest('app-dict-node') !== host) continue;
       void this.diagrams.renderInto(fig);
     }

@@ -1,10 +1,22 @@
-import { ChangeDetectionStrategy, Component, inject, input, output, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  ElementRef,
+  Injector,
+  afterNextRender,
+  effect,
+  inject,
+  input,
+  output,
+  signal,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { DictNode, NodeKind, nodeKind } from '../models/dict.model';
 import { DictionaryStore, MoveDir } from '../core/dictionary.store';
 import { ToastService } from '../core/toast.service';
 import { DragService } from '../core/drag.service';
+import { DiagramService } from '../core/diagram.service';
 import { formatDefinition } from '../core/text.util';
 
 /** عقدة قابلة للطي تعرض نفسها وأبناءها بشكل تعاودي بأي عمق */
@@ -135,10 +147,32 @@ export class DictNodeComponent {
   private readonly toast = inject(ToastService);
   private readonly sanitizer = inject(DomSanitizer);
   private readonly dragSvc = inject(DragService);
+  private readonly diagrams = inject(DiagramService);
+  private readonly elRef = inject(ElementRef<HTMLElement>);
+  private readonly injector = inject(Injector);
 
   /** حالة تحويم محلية لهذه النسخة فقط أثناء السحب — كل عقدة تعرف حالتها بمعزل عن البقية */
   private readonly hoverLine = signal(false);
   private readonly hoverInto = signal(false);
+
+  constructor() {
+    // يرسم أي مخططات Mermaid داخل تعريف هذه العقدة فقط عند فتحها فعلياً (SPEC-003 REQ-5/NFR-2) —
+    // العقدة المطوية أصلاً غير موجودة في الـ DOM (@if isOpen)، فلا تحميل قبل الحاجة الحقيقية.
+    effect(() => {
+      if (!this.isOpen()) return;
+      afterNextRender(() => this.renderVisibleDiagrams(), { injector: this.injector });
+    });
+  }
+
+  /** يبحث داخل عنصر هذه العقدة فقط عن مخططات لم تُرسَم بعد — يتجاهل مخططات عقد أبناء (لها معالجتها الخاصة) */
+  private renderVisibleDiagrams(): void {
+    const host = this.elRef.nativeElement;
+    const figures = host.querySelectorAll<HTMLElement>('.mermaid-figure[data-mermaid]');
+    for (const fig of Array.from(figures)) {
+      if (fig.closest('app-dict-node') !== host) continue;
+      void this.diagrams.renderInto(fig);
+    }
+  }
 
   readonly node = input.required<DictNode>();
   readonly depth = input<number>(0);
@@ -280,13 +314,23 @@ export class DictNodeComponent {
     return this.sanitizer.bypassSecurityTrustHtml(formatDefinition(this.node().def));
   }
 
-  /** يلتقط النقر على أي رابط داخلي [[id|نص]] بداخل التعريف ويطلقه لأعلى */
+  /** يلتقط النقر على رابط داخلي [[id|نص]] أو زر نسخ كتلة كود بداخل التعريف (SPEC-003 REQ-3) */
   protected onDefClick(e: MouseEvent): void {
-    const target = (e.target as HTMLElement).closest('a.ref-link') as HTMLElement | null;
-    if (!target) return;
-    e.preventDefault();
-    const id = target.dataset['refId'];
-    if (id) this.goto.emit(id);
+    const el = e.target as HTMLElement;
+
+    const link = el.closest('a.ref-link') as HTMLElement | null;
+    if (link) {
+      e.preventDefault();
+      const id = link.dataset['refId'];
+      if (id) this.goto.emit(id);
+      return;
+    }
+
+    const copyBtn = el.closest('.code-copy') as HTMLElement | null;
+    if (copyBtn) {
+      const code = copyBtn.dataset['copyCode'] ?? '';
+      void this.copy(code);
+    }
   }
 
   protected async copy(code: string): Promise<void> {

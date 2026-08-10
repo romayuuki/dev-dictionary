@@ -1,7 +1,6 @@
 import {
   ChangeDetectionStrategy,
   Component,
-  ElementRef,
   inject,
   input,
   output,
@@ -11,10 +10,10 @@ import {
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Category, Example, NodeKind } from '../models/dict.model';
-import { TEXT_SIZE_TOKENS } from '../core/text.util';
 import { DictionaryStore } from '../core/dictionary.store';
 import { ToastService } from '../core/toast.service';
 import { CameraOcrDialogComponent } from './camera-ocr-dialog.component';
+import { RichEditorComponent } from './rich-editor.component';
 
 export interface EditorRequest {
   /** معرّف العقدة المراد تعديلها، أو null عند الإضافة */
@@ -26,7 +25,7 @@ export interface EditorRequest {
 @Component({
   selector: 'app-node-editor',
   standalone: true,
-  imports: [CommonModule, FormsModule, CameraOcrDialogComponent],
+  imports: [CommonModule, FormsModule, CameraOcrDialogComponent, RichEditorComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="overlay open" (click)="onBackdrop($event)">
@@ -109,56 +108,19 @@ export interface EditorRequest {
           <div class="field">
             <label>
               التعريف
-              <span class="hint">— يدعم **عريض** و \`كود\` و - للقوائم، و 🔗 روابط لعناصر أخرى، ولون/حجم لنص محدَّد</span>
+              <span class="hint">— محرر مرئي: التنسيق يظهر مباشرة، بلا رموز نصية ظاهرة</span>
             </label>
             <div style="position:relative">
-              <textarea #defTextarea class="inp" [(ngModel)]="defValue"
-                        placeholder="اشرح المصطلح هنا…"
-                        (select)="rememberCursor()" (click)="rememberCursor()"
-                        (keyup)="rememberCursor()"></textarea>
+              <app-rich-editor #richEditor
+                                [resetKey]="request()"
+                                [initialMarkup]="defValue"
+                                [excludeId]="request().nodeId" />
 
-              <div class="fmt-toolbar">
-                <button type="button" class="btn sm ghost" (click)="toggleLinkPicker()">
-                  🔗 إشارة إلى شرح موجود
-                </button>
-
+              <div class="fmt-toolbar" style="margin-top:8px">
                 <button type="button" class="btn sm ghost" (click)="cameraOpen.set(true)">
                   📷 مسح من الكاميرا (OCR)
                 </button>
-
-                <span class="fmt-sep"></span>
-
-                <span class="fmt-group" title="لوّن النص المحدَّد">
-                  <label class="color-swatch" [style.background]="lastColor">
-                    <input type="color" [(ngModel)]="lastColor" [ngModelOptions]="{standalone:true}"
-                           (change)="applyColor(lastColor)" />
-                  </label>
-                  @if (hasSelection()) {
-                    <button type="button" class="btn sm ghost" (click)="clearColor()">✕ إزالة اللون</button>
-                  }
-                </span>
-
-                <span class="fmt-group" title="حجم النص المحدَّد">
-                  @for (s of sizeOptions; track s.key) {
-                    <button type="button" class="btn sm ghost" (click)="applySize(s.key)">{{ s.label }}</button>
-                  }
-                </span>
               </div>
-
-              @if (linkPickerOpen()) {
-                <div class="link-picker">
-                  <input class="inp" [(ngModel)]="linkQuery" placeholder="ابحث عن العنصر المراد الإشارة إليه…" />
-                  <div class="link-results">
-                    @for (n of linkMatches(); track n.id) {
-                      <button type="button" class="link-result" (click)="insertLink(n)">
-                        {{ n.title }}
-                      </button>
-                    } @empty {
-                      <div class="link-empty">لا نتائج</div>
-                    }
-                  </div>
-                </div>
-              }
             </div>
           </div>
 
@@ -221,21 +183,8 @@ export class NodeEditorComponent {
   /** SPEC-002 REQ-6.1 — بقيمة مقترحة تلقائياً: term لعقدة جديدة، أو النوع الفعلي عند التعديل */
   protected kindValue: NodeKind = 'term';
 
-  private readonly defTextarea = viewChild<ElementRef<HTMLTextAreaElement>>('defTextarea');
-  protected readonly linkPickerOpen = signal(false);
+  private readonly richEditor = viewChild.required(RichEditorComponent);
   protected readonly cameraOpen = signal(false);
-  protected linkQuery = '';
-  private cursorPos = 0;
-  private selEnd = 0;
-  protected readonly hasSelection = signal(false);
-
-  /** تنسيق نص محدَّد (لون/حجم) */
-  protected lastColor = '#e11d48';
-  protected readonly sizeOptions: { key: keyof typeof TEXT_SIZE_TOKENS; label: string }[] = [
-    { key: 'sm', label: 'A صغير' },
-    { key: 'lg', label: 'A كبير' },
-    { key: 'xl', label: 'A أكبر' },
-  ];
 
   private loadedFor: EditorRequest | null = null;
 
@@ -300,10 +249,15 @@ export class NodeEditorComponent {
    * أكثر من مفهوم مدفون في عقدة واحدة (نفس نمط God Node الموصوف في storytelling).
    */
   protected looksLikeMultiConcept(): boolean {
-    const bulletsWithCode = this.defValue
+    const bulletsWithCode = this.currentDef()
       .split('\n')
       .filter((l) => /^\s*[-*•]\s+`/.test(l));
     return bulletsWithCode.length >= 3;
+  }
+
+  /** القيمة الحيّة الحالية للتعريف من المحرر المرئي — لا defValue المجمّدة عند الفتح */
+  private currentDef(): string {
+    return this.richEditor().getMarkup();
   }
 
   // ---------- SPEC-002 REQ-6.4/6.5 — تقسيم إلى عقد (معاينة قابلة للتراجع قبل الحفظ) ----------
@@ -313,7 +267,7 @@ export class NodeEditorComponent {
 
   /** يستخرج بنود القائمة النقطية (رمز + وصف) من def دون تعديله بعد — للمعاينة فقط */
   protected previewSplit(): void {
-    const items = this.defValue
+    const items = this.currentDef()
       .split('\n')
       .map((line) => {
         const m = line.match(NodeEditorComponent.BULLET_RE);
@@ -352,138 +306,32 @@ export class NodeEditorComponent {
     }
 
     const removedLines = new Set(items.map((it) => it.line));
-    this.defValue = this.defValue
+    this.defValue = this.currentDef()
       .split('\n')
       .filter((line) => !removedLines.has(line))
       .join('\n')
       .replace(/\n{3,}/g, '\n\n')
       .trim();
+    // نُعيد بناء محتوى المحرر من القيمة المخفَّضة — التحرير الحيّ لا يتزامن تلقائياً مع defValue
+    this.richEditor().setMarkup(this.defValue);
 
     this.splitPreview.set(null);
     this.toast.show(`تم إنشاء ${items.length} عقدة — لا تنسَ الضغط على «حفظ»`);
   }
 
-  // ---------- روابط داخلية بين المصطلحات ----------
-
-  /** يحفظ موضع المؤشر (وحدود التحديد) داخل حقل التعريف لإدراج الرابط أو التنسيق في المكان الصحيح */
-  protected rememberCursor(): void {
-    const el = this.defTextarea()?.nativeElement;
-    if (!el) return;
-    this.cursorPos = el.selectionStart ?? this.defValue.length;
-    this.selEnd = el.selectionEnd ?? this.cursorPos;
-    this.hasSelection.set(this.selEnd > this.cursorPos);
-  }
-
-  // ---------- تنسيق نص محدَّد: لون وحجم ----------
-
-  /** يلفّ النص المحدَّد حالياً بوسمَي فتح/إغلاق، أو يُدرجهما فارغين عند المؤشر إن لم يوجد تحديد */
-  private wrapSelection(open: string, close: string): void {
-    const el = this.defTextarea()?.nativeElement;
-    const start = Math.min(this.cursorPos, this.selEnd);
-    const end = Math.max(this.cursorPos, this.selEnd);
-    const selected = this.defValue.slice(start, end);
-
-    this.defValue = this.defValue.slice(0, start) + open + selected + close + this.defValue.slice(end);
-    const newStart = start + open.length;
-    const newEnd = newStart + selected.length;
-
-    queueMicrotask(() => {
-      if (!el) return;
-      el.focus();
-      el.setSelectionRange(newStart, newEnd);
-      this.cursorPos = newStart;
-      this.selEnd = newEnd;
-    });
-  }
-
-  protected applyColor(hex: string): void {
-    if (!/^#[0-9a-fA-F]{3,8}$/.test(hex)) return;
-    this.wrapSelection(`{color:${hex}}`, '{/color}');
-  }
-
-  protected clearColor(): void {
-    // يحذف أي وسمَي color تحيط تماماً بالتحديد الحالي (تبسيط: يحذف أقرب وسم مطابق فقط)
-    const start = Math.min(this.cursorPos, this.selEnd);
-    const end = Math.max(this.cursorPos, this.selEnd);
-    const before = this.defValue.slice(0, start);
-    const openMatch = before.match(/\{color:#[0-9a-fA-F]{3,8}\}$/);
-    const after = this.defValue.slice(end);
-    const closeMatch = after.match(/^\{\/color\}/);
-    if (openMatch && closeMatch) {
-      this.defValue =
-        before.slice(0, before.length - openMatch[0].length) +
-        this.defValue.slice(start, end) +
-        after.slice(closeMatch[0].length);
-    }
-  }
-
-  protected applySize(key: keyof typeof TEXT_SIZE_TOKENS): void {
-    this.wrapSelection(`{size:${key}}`, '{/size}');
-  }
-
-  protected toggleLinkPicker(): void {
-    this.rememberCursor();
-    this.linkQuery = '';
-    this.linkPickerOpen.update((v) => !v);
-  }
-
-  /** يبحث في كل عناصر القاموس (عدا العنصر الحالي) لاختيار هدف الرابط */
-  protected linkMatches(): { id: string; title: string }[] {
-    const q = this.linkQuery.trim().toLowerCase();
-    const currentId = this.request().nodeId;
-    const results: { id: string; title: string }[] = [];
-
-    for (const cat of this.store.categories()) {
-      this.store.walk(cat.children, (n) => {
-        if (n.id === currentId) return;
-        if (!q || n.title.toLowerCase().includes(q)) results.push({ id: n.id, title: n.title });
-      });
-    }
-    return results.slice(0, 30);
-  }
-
-  protected insertLink(n: { id: string; title: string }): void {
-    const markup = `[[${n.id}|${n.title}]]`;
-    this.defValue = this.defValue.slice(0, this.cursorPos) + markup + this.defValue.slice(this.cursorPos);
-    this.cursorPos += markup.length;
-    this.linkPickerOpen.set(false);
-    this.linkQuery = '';
-
-    queueMicrotask(() => {
-      const el = this.defTextarea()?.nativeElement;
-      if (el) {
-        el.focus();
-        el.setSelectionRange(this.cursorPos, this.cursorPos);
-      }
-    });
-  }
-
   // ---------- تصوير ورقة وتحويلها لنص (OCR) ----------
 
   /**
-   * يُدرج النص المستخرَج (بعد مراجعة المستخدم له داخل حوار الكاميرا) في حقل التعريف
-   * مكان المؤشر المحفوظ — يستبدل التحديد الحالي إن وُجد، أو يُدرَج عنده مباشرة.
-   * يبقى قابلاً للتعديل الكامل فور الإدراج، ولا يُحفظ إلا بضغط «حفظ» صراحةً.
+   * يُدرج النص المستخرَج (بعد مراجعة المستخدم له داخل حوار الكاميرا) في المحرر المرئي
+   * عند موضع المؤشر المحفوظ فيه. يبقى قابلاً للتعديل الكامل فور الإدراج،
+   * ولا يُحفظ إلا بضغط «حفظ» صراحةً.
    */
   protected onOcrInsert(text: string): void {
     this.cameraOpen.set(false);
     const clean = text.trim();
     if (!clean) return;
 
-    const start = Math.min(this.cursorPos, this.selEnd);
-    const end = Math.max(this.cursorPos, this.selEnd);
-    this.defValue = this.defValue.slice(0, start) + clean + this.defValue.slice(end);
-    const newPos = start + clean.length;
-    this.cursorPos = newPos;
-    this.selEnd = newPos;
-
-    queueMicrotask(() => {
-      const el = this.defTextarea()?.nativeElement;
-      if (el) {
-        el.focus();
-        el.setSelectionRange(newPos, newPos);
-      }
-    });
+    this.richEditor().insertPlainText(clean);
     this.toast.show('تم إدراج النص — راجعه وعدّل ما تحتاج');
   }
 
@@ -500,7 +348,7 @@ export class NodeEditorComponent {
 
     const payload: Record<string, unknown> = {
       title,
-      def: this.defValue,
+      def: this.currentDef(),
       tags: this.tagsValue.split(/[،,]/).map((s) => s.trim()).filter(Boolean),
       examples: this.examples().filter((e) => e.code.trim() || e.title.trim()),
     };

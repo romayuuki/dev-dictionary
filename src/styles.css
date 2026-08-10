@@ -245,6 +245,35 @@ html[dir="rtl"] .node.open>.node-head .chev{transform:rotate(-90deg)}
 .def a.ref-link{color:var(--brand);font-weight:700;text-decoration:none;border-bottom:1.5px dashed color-mix(in srgb,var(--brand) 55%,transparent);padding-bottom:1px;transition:.12s}
 .def a.ref-link:hover{border-bottom-style:solid;background:var(--brand-soft);border-radius:3px}
 .def a.ref-link::before{content:"🔗";font-size:11px;margin-inline-end:3px;opacity:.7}
+.def ol{margin:6px 0 10px;padding-inline-start:20px}
+
+/* SPEC-003 REQ-3/REQ-4 — أسهم جميلة داخل النص، بمعزل عن اتجاه العربية المحيط */
+.arrow{
+  font-size:1.15em;vertical-align:-.05em;margin:0 .25em;color:var(--fg-2);
+  direction:ltr;unicode-bidi:isolate;display:inline-block;font-weight:700
+}
+
+/* SPEC-003 REQ-3 — كتلة كود داخل التعريف نفسه (مصطلح أو مجموعة)، بنفس هوية .ex */
+.code-block{margin:10px 0;border:1px solid var(--line);border-radius:var(--r-m);overflow:hidden;background:var(--code-bg)}
+.code-block-h{display:flex;align-items:center;gap:8px;padding:7px 11px;border-bottom:1px solid var(--line);background:var(--bg-2)}
+.code-block-h span{font-family:var(--mono);font-size:10.5px;color:var(--fg-3);text-transform:uppercase;letter-spacing:.5px;flex:1}
+.code-copy{
+  position:relative;background:transparent;border:1px solid var(--line);border-radius:7px;
+  color:var(--fg-2);font-size:11.5px;font-weight:600;padding:0 10px;height:26px;cursor:pointer
+}
+.code-copy::before{content:"";position:absolute;inset:-9px}
+.code-copy:hover{background:var(--line);color:var(--fg)}
+.code-block pre{margin:0;padding:13px 14px;overflow:auto;direction:ltr;text-align:left}
+.code-block code{font-family:var(--mono);font-size:12.8px;line-height:1.75;color:var(--code-fg);white-space:pre}
+
+/* SPEC-003 REQ-5 — حاوية مخطط Mermaid؛ content-visibility يحافظ على أداء التمرير في القوائم الطويلة */
+.mermaid-figure{margin:12px 0;content-visibility:auto;contain-intrinsic-size:0 200px}
+.mermaid-figure .mermaid-src{
+  margin:0;padding:13px 14px;background:var(--code-bg);border:1px solid var(--line);border-radius:var(--r-m);
+  font-family:var(--mono);font-size:12px;color:var(--fg-3);direction:ltr;text-align:left;white-space:pre-wrap
+}
+.mermaid-figure.rendered .mermaid-src{display:none}
+.mermaid-figure svg{max-width:100%;height:auto}
 
 .ex{margin-top:12px;border:1px solid var(--line);border-radius:var(--r-m);overflow:hidden;background:var(--code-bg)}
 .ex-h{display:flex;align-items:center;gap:8px;padding:7px 11px;border-bottom:1px solid var(--line);background:var(--bg-2)}
@@ -319,6 +348,40 @@ textarea.code-inp{font-family:var(--mono);font-size:12.8px;direction:ltr;text-al
 }
 .link-result:hover{background:var(--brand-soft);color:var(--brand)}
 .link-empty{padding:14px;text-align:center;color:var(--fg-3);font-size:12.5px}
+
+/* ========== SPEC-003 REQ-4 — المحرر المرئي (rich-editor.component.ts) ========== */
+.rich-editor{
+  min-height:130px;max-height:420px;overflow-y:auto;line-height:1.85;font-size:14.5px;
+  cursor:text
+}
+.rich-editor:empty::before,.rich-editor p:only-child:empty::before{content:"اشرح المصطلح هنا…";color:var(--fg-3)}
+.rich-editor p{margin:0 0 9px}
+.rich-editor ul{margin:6px 0 10px;padding-inline-start:20px}
+.rich-editor ol{margin:6px 0 10px;padding-inline-start:20px}
+.rich-editor li{margin-bottom:4px}
+.rich-editor code{font-family:var(--mono);font-size:12.5px;background:var(--code-bg);padding:2px 6px;border-radius:5px;color:var(--code-fg);direction:ltr;display:inline-block;border:1px solid var(--line)}
+.rich-editor strong{font-weight:800}
+.rich-editor a.ref-link{color:var(--brand);font-weight:700;text-decoration:none;border-bottom:1.5px dashed color-mix(in srgb,var(--brand) 55%,transparent);padding-bottom:1px}
+.rich-editor a.ref-link::before{content:"🔗";font-size:11px;margin-inline-end:3px;opacity:.7}
+.rich-editor .code-block{margin:10px 0;border-radius:var(--r-m)}
+.rich-editor .code-block .lang-tag{outline:none;cursor:text;text-transform:lowercase}
+.rich-editor .code-block .lang-tag:focus{background:var(--line);border-radius:4px;padding:0 4px}
+.rich-editor .code-block pre code{outline:none;cursor:text;display:block}
+.rich-editor .mermaid-figure{margin:10px 0}
+.rich-editor .mermaid-src{outline:none;cursor:text;min-height:40px}
+
+/* لوحة اختيار الأسهم (SPEC-003 REQ-4) */
+.arrow-picker{position:relative}
+.arrow-menu{
+  position:absolute;top:calc(100% + 4px);inset-inline-start:0;z-index:25;
+  background:var(--bg-2);border:1px solid var(--line);border-radius:12px;box-shadow:var(--sh-3);
+  padding:6px;display:flex;gap:4px
+}
+.arrow-menu button{
+  width:38px;height:38px;border-radius:8px;font-size:17px;color:var(--fg);
+  direction:ltr;unicode-bidi:isolate;transition:.12s
+}
+.arrow-menu button:hover{background:var(--brand-soft);color:var(--brand)}
 
 .ex-edit{border:1px solid var(--line);border-radius:var(--r-m);padding:var(--s3);margin-bottom:var(--s3);background:var(--bg)}
 .ex-edit-h{display:flex;gap:var(--s2);margin-bottom:var(--s2)}

@@ -218,6 +218,10 @@ export const TEXT_SIZE_TOKENS: Record<string, string> = {
   xl: '24px',
 };
 
+/** الأسهم المدعومة في المحرر (SPEC-003 REQ-4) — تُلفّ بـ span.arrow لضبط الحجم والاتجاه بمعزل عن النص العربي المحيط */
+export const ARROW_CHARS: readonly string[] = ['⟶', '⇒', '⤳', '↳', '⟷'];
+const ARROW_RE = new RegExp('[' + ARROW_CHARS.join('') + ']', 'g');
+
 /**
  * روابط داخلية بين المصطلحات: `[[node-id|النص الظاهر]]` تتحول لرابط قابل للنقر
  * يأخذ المستخدم لشرح تلك النقطة مباشرة (عبر حدث نقر يُعالج في dict-node.component).
@@ -226,60 +230,189 @@ export const TEXT_SIZE_TOKENS: Record<string, string> = {
  * القيم تُدقَّق بصرامة (hex 3/6/8 خانات، أو أحد رموز الحجم الثابتة) قبل التحويل لـ style —
  * أي قيمة لا تُطابق تبقى نصاً عادياً بلا تنسيق، فلا خطر من إدخال CSS تعسّفي.
  */
-const inlineFormat = (s: string): string =>
-  escapeHtml(s)
+function inlineFormat(s: string): string {
+  return escapeHtml(s)
     .replace(
       /\[\[([a-zA-Z0-9_-]+)\|([^\]]+)\]\]/g,
       '<a href="#" class="ref-link" data-ref-id="$1">$2</a>',
     )
     .replace(/\{color:(#[0-9a-fA-F]{3,8})\}([\s\S]*?)\{\/color\}/g, '<span style="color:$1">$2</span>')
     .replace(/\{size:(sm|lg|xl)\}([\s\S]*?)\{\/size\}/g, (_m, key: string, inner: string) =>
-      `<span style="font-size:${TEXT_SIZE_TOKENS[key]}">${inner}</span>`,
+      '<span style="font-size:' + TEXT_SIZE_TOKENS[key] + '">' + inner + '</span>',
     )
     .replace(/`([^`]+)`/g, '<code>$1</code>')
     .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
-    .replace(/\*([^*\n]+)\*/g, '<em>$1</em>');
+    .replace(/\*([^*\n]+)\*/g, '<em>$1</em>')
+    .replace(ARROW_RE, '<span class="arrow">$&</span>');
+}
 
-/** تنسيق مبسّط للتعريف إلى HTML آمن */
+/** كتلة كود بلغة معلَّمة — رأس فيه اسم اللغة وزر نسخ، وجسم بخط أحادي المسافة (SPEC-003 REQ-3) */
+function renderCodeBlock(lang: string, rawCode: string): string {
+  const code = rawCode.replace(/\n$/, '');
+  const label = (lang || 'text').trim();
+  if (label === 'mermaid') {
+    // مخطط Mermaid — النص الخام يبقى في data-mermaid ليقرأه diagram.service عند التحميل الكسول (SPEC-003 REQ-5)
+    return '<figure class="mermaid-figure" data-mermaid="' + escapeHtml(code) + '">' +
+      '<pre class="mermaid-src">' + escapeHtml(code) + '</pre></figure>';
+  }
+  return '<div class="code-block" data-lang="' + escapeHtml(label) + '">' +
+    '<div class="code-block-h"><span>' + escapeHtml(label) + '</span>' +
+    '<button type="button" class="code-copy" data-copy-code="' + escapeHtml(code) + '">نسخ</button></div>' +
+    '<pre><code>' + escapeHtml(code) + '</code></pre></div>';
+}
+
+/** رمز نائب داخلي لا يتعارض مع محتوى حقيقي — يحمي كتل الكود من تقسيم الفقرات والتنسيق الداخلي */
+function codeToken(i: number): string {
+  return 'CODEBLOCKTOKEN' + i;
+}
+const CODE_TOKEN_RE = /^CODEBLOCKTOKEN(\d+)$/;
+
+/** تنسيق مبسّط للتعريف إلى HTML آمن — يدعم عريض/كود مضمّن، قوائم نقطية ومرقّمة، كتل كود، وأسهماً */
 export function formatDefinition(text: string): string {
   if (!text) return '';
+
+  // 1) استخراج كتل الكود أولاً (قد تحوي أسطراً فارغة تتعارض مع تقسيم الفقرات لاحقاً)
+  const codeBlocks: string[] = [];
+  const withTokens = String(text).replace(/```(\w*)\n?([\s\S]*?)```/g, (_m, lang: string, code: string) => {
+    const idx = codeBlocks.length;
+    codeBlocks.push(renderCodeBlock(lang, code));
+    return '\n\n' + codeToken(idx) + '\n\n';
+  });
+
   const isBullet = (l: string) => /^\s*[-*•]\s+/.test(l);
+  const isNumbered = (l: string) => /^\s*\d+[.)]\s+/.test(l);
   const stripBullet = (l: string) => l.replace(/^\s*[-*•]\s+/, '');
+  const stripNumbered = (l: string) => l.replace(/^\s*\d+[.)]\s+/, '');
 
-  return String(text)
-    .split(/\n{2,}/)
-    .map((block) => {
-      const lines = block.split('\n');
+  const blocks = withTokens.split(/\n{2,}/).map((block) => {
+    const trimmedBlock = block.trim();
+    const tokenMatch = trimmedBlock.match(CODE_TOKEN_RE);
+    if (tokenMatch) return codeBlocks[+tokenMatch[1]] ?? '';
 
-      if (lines.every((l) => isBullet(l) || !l.trim())) {
-        const items = lines
-          .filter((l) => l.trim())
-          .map((l) => `<li>${inlineFormat(stripBullet(l))}</li>`)
-          .join('');
-        return `<ul>${items}</ul>`;
-      }
+    const lines = block.split('\n');
 
-      if (lines.some(isBullet)) {
-        let out = '';
-        let buf: string[] = [];
-        const flush = () => {
-          if (buf.length) {
-            out += `<ul>${buf.join('')}</ul>`;
-            buf = [];
-          }
-        };
-        for (const l of lines) {
-          if (isBullet(l)) buf.push(`<li>${inlineFormat(stripBullet(l))}</li>`);
-          else {
-            flush();
-            if (l.trim()) out += `<p>${inlineFormat(l)}</p>`;
-          }
+    // فقرة كلها نقاط، أو كلها ترقيم — قائمة واحدة نظيفة
+    if (lines.every((l) => isBullet(l) || !l.trim())) {
+      const items = lines.filter((l) => l.trim()).map((l) => '<li>' + inlineFormat(stripBullet(l)) + '</li>').join('');
+      return '<ul>' + items + '</ul>';
+    }
+    if (lines.every((l) => isNumbered(l) || !l.trim())) {
+      const items = lines.filter((l) => l.trim()).map((l) => '<li>' + inlineFormat(stripNumbered(l)) + '</li>').join('');
+      return '<ol>' + items + '</ol>';
+    }
+
+    // فقرة مختلطة (نص وقوائم متداخلة) — نبني تسلسلاً من فقرات وقوائم حسب كل سطر
+    if (lines.some((l) => isBullet(l) || isNumbered(l))) {
+      let out = '';
+      let buf: string[] = [];
+      let bufTag: 'ul' | 'ol' | null = null;
+      const flush = () => {
+        if (buf.length && bufTag) out += '<' + bufTag + '>' + buf.join('') + '</' + bufTag + '>';
+        buf = [];
+        bufTag = null;
+      };
+      for (const l of lines) {
+        if (isBullet(l)) {
+          if (bufTag !== 'ul') flush();
+          bufTag = 'ul';
+          buf.push('<li>' + inlineFormat(stripBullet(l)) + '</li>');
+        } else if (isNumbered(l)) {
+          if (bufTag !== 'ol') flush();
+          bufTag = 'ol';
+          buf.push('<li>' + inlineFormat(stripNumbered(l)) + '</li>');
+        } else {
+          flush();
+          if (l.trim()) out += '<p>' + inlineFormat(l) + '</p>';
         }
-        flush();
-        return out;
       }
+      flush();
+      return out;
+    }
 
-      return `<p>${inlineFormat(block).replace(/\n/g, '<br>')}</p>`;
-    })
-    .join('');
+    return '<p>' + inlineFormat(block).replace(/\n/g, '<br>') + '</p>';
+  });
+
+  return blocks.join('');
+}
+
+/** يعكس أحجام النص الثابتة: من px مضبوط إلى مفتاحه (sm/lg/xl) — عكس TEXT_SIZE_TOKENS */
+function sizeKeyFromPx(px: string): string | null {
+  for (const [key, val] of Object.entries(TEXT_SIZE_TOKENS)) {
+    if (val === px) return key;
+  }
+  return null;
+}
+
+/**
+ * يحوّل DOM محرر WYSIWYG (rich-editor) إلى نصّ مُعلَّم قابل للتخزين والبحث —
+ * عكس formatDefinition بالضبط، على نفس مفردات الوسوم التي نُولِّدها نحن فقط
+ * (توليد مضبوط + تنقية عند اللصق SPEC-003 NFR-5)، فلا حاجة لتغطية HTML عشوائي.
+ */
+export function htmlToMarkup(root: HTMLElement): string {
+  const inline = (node: Node): string => {
+    if (node.nodeType === Node.TEXT_NODE) return node.textContent ?? '';
+    if (node.nodeType !== Node.ELEMENT_NODE) return '';
+    const el = node as HTMLElement;
+    const tag = el.tagName;
+    const childText = () => Array.from(el.childNodes).map(inline).join('');
+
+    if (tag === 'BR') return '\n';
+    if (tag === 'STRONG' || tag === 'B') return '**' + childText() + '**';
+    if (tag === 'EM' || tag === 'I') return '*' + childText() + '*';
+    if (tag === 'CODE') return '`' + childText() + '`';
+    if (tag === 'A' && el.classList.contains('ref-link')) {
+      const id = el.getAttribute('data-ref-id') ?? '';
+      return '[[' + id + '|' + childText() + ']]';
+    }
+    if (tag === 'SPAN' && el.classList.contains('arrow')) return childText();
+    if (tag === 'SPAN') {
+      const style = el.getAttribute('style') ?? '';
+      const colorMatch = style.match(/color:\s*(#[0-9a-fA-F]{3,8})/);
+      if (colorMatch) return '{color:' + colorMatch[1] + '}' + childText() + '{/color}';
+      const sizeMatch = style.match(/font-size:\s*([\d.]+px)/);
+      if (sizeMatch) {
+        const key = sizeKeyFromPx(sizeMatch[1]);
+        if (key) return '{size:' + key + '}' + childText() + '{/size}';
+      }
+      return childText();
+    }
+    return childText();
+  };
+
+  const childrenInline = (el: HTMLElement): string => Array.from(el.childNodes).map(inline).join('');
+
+  const block = (el: HTMLElement): string => {
+    const tag = el.tagName;
+
+    if (tag === 'DIV' && el.classList.contains('code-block')) {
+      const lang = el.querySelector('.lang-tag')?.textContent?.trim() || el.getAttribute('data-lang') || '';
+      const code = el.querySelector('code')?.textContent ?? '';
+      return '```' + lang + '\n' + code.replace(/\n$/, '') + '\n```';
+    }
+    if (tag === 'FIGURE' && el.classList.contains('mermaid-figure')) {
+      const code = el.querySelector('.mermaid-src')?.textContent ?? '';
+      return '```mermaid\n' + code.replace(/\n$/, '') + '\n```';
+    }
+    if (tag === 'UL') {
+      return Array.from(el.children)
+        .map((li) => '- ' + inline(li).trim())
+        .join('\n');
+    }
+    if (tag === 'OL') {
+      return Array.from(el.children)
+        .map((li, i) => (i + 1) + '. ' + inline(li).trim())
+        .join('\n');
+    }
+    if (tag === 'P' || tag === 'DIV') return childrenInline(el);
+
+    return inline(el);
+  };
+
+  const topLevel = Array.from(root.children) as HTMLElement[];
+  if (!topLevel.length) {
+    return childrenInline(root).replace(/\n{3,}/g, '\n\n').trim();
+  }
+
+  const parts = topLevel.map((el) => block(el)).filter((t) => t.trim());
+  return parts.join('\n\n').replace(/\n{3,}/g, '\n\n').trim();
 }
